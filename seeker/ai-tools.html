@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Career Copilot – TalentArc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* =========================================================
+       CSS CUSTOM PROPERTIES – DESIGN TOKENS
+    ========================================================= */
+    :root {
+      --primary: #6366F1;
+      --primary-light: #818CF8;
+      --primary-dark: #4F46E5;
+      --accent: #06B6D4;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --purple: #A855F7;
+      --pink: #EC4899;
+      --orange: #F97316;
+
+      /* Dark theme */
+      --bg-base: #0A0A0F;
+      --bg-surface: #0F0F17;
+      --bg-card: #13131E;
+      --bg-elevated: #1A1A28;
+      --bg-hover: #1E1E2E;
+      --border: rgba(255,255,255,0.06);
+      --border-strong: rgba(255,255,255,0.10);
+      --text-primary: #E2E8F0;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --sidebar-w: 240px;
+      --header-h: 72px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+      --shadow-glow: 0 0 32px rgba(99,102,241,0.25);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-full: 999px;
+      --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    [data-theme="light"] {
+      --bg-base: #F0F0F8;
+      --bg-surface: #FAFAFA;
+      --bg-card: #FFFFFF;
+      --bg-elevated: #F8F8FF;
+      --bg-hover: #F0F0F8;
+      --border: rgba(0,0,0,0.07);
+      --border-strong: rgba(0,0,0,0.12);
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+      --shadow-glow: 0 0 32px rgba(99,102,241,0.12);
+    }
+
+    /* =========================================================
+       RESET & BASE
+    ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+    input, textarea { font-family: inherit; outline: none; border: none; }
+
+    /* =========================================================
+       LAYOUT SHELL
+    ========================================================= */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 100;
+      transition: transform var(--transition), background var(--transition);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--text-primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-section {
+      padding: 12px 12px 4px;
+    }
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+      position: relative;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    .nav-item.active {
+      background: rgba(99,102,241,0.14);
+      color: var(--primary-light);
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 3px; height: 60%;
+      background: var(--primary);
+      border-radius: 0 3px 3px 0;
+    }
+    .nav-item i { width: 17px; height: 17px; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+    }
+    .nav-badge.new {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+    }
+    .nav-badge.count {
+      background: var(--primary);
+      color: #fff;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      transition: background var(--transition);
+    }
+    .user-card:hover { background: var(--bg-hover); }
+    .user-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .user-info { overflow: hidden; }
+    .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role { font-size: 11px; color: var(--text-muted); }
+
+    /* =========================================================
+       MAIN CONTENT AREA
+    ========================================================= */
+    .main-area {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      transition: background var(--transition);
+    }
+    [data-theme="light"] .top-header {
+      background: rgba(250,250,250,0.88);
+    }
+
+    .header-left { display: flex; flex-direction: column; gap: 2px; }
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--text-primary) 30%, var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+    .header-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+
+    .btn-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .btn-icon:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+    .btn-icon i { width: 17px; height: 17px; }
+
+    .theme-toggle { position: relative; }
+    .notif-dot {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 7px; height: 7px;
+      background: var(--error);
+      border-radius: 50%;
+      border: 1.5px solid var(--bg-surface);
+    }
+
+    /* =========================================================
+       PAGE CONTENT
+    ========================================================= */
+    .page-content {
+      flex: 1;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* =========================================================
+       SECTION HEADERS
+    ========================================================= */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title i { width: 18px; height: 18px; color: var(--primary-light); }
+    .section-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+    /* =========================================================
+       AI FEATURE GRID (2x3)
+    ========================================================= */
+    .ai-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .ai-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition);
+    }
+    .ai-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      transition: opacity var(--transition);
+      opacity: 0.8;
+    }
+    .ai-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    .ai-card:hover::before { opacity: 1; }
+
+    /* Card accent colors */
+    .card-indigo::before { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+    .card-cyan::before { background: linear-gradient(90deg, var(--accent), #22D3EE); }
+    .card-purple::before { background: linear-gradient(90deg, var(--purple), #C084FC); }
+    .card-green::before { background: linear-gradient(90deg, var(--success), #34D399); }
+    .card-orange::before { background: linear-gradient(90deg, var(--orange), var(--warning)); }
+    .card-pink::before { background: linear-gradient(90deg, var(--pink), #F472B6); }
+
+    .card-icon-wrap {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-icon-wrap i { width: 22px; height: 22px; }
+
+    .icon-indigo { background: rgba(99,102,241,0.15); color: var(--primary-light); }
+    .icon-cyan   { background: rgba(6,182,212,0.15);  color: var(--accent); }
+    .icon-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+    .icon-green  { background: rgba(16,185,129,0.15); color: var(--success); }
+    .icon-orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .icon-pink   { background: rgba(236,72,153,0.15); color: var(--pink); }
+
+    .card-header { display: flex; align-items: flex-start; gap: 12px; }
+    .card-meta { flex: 1; }
+    .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .card-desc  { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; }
+
+    /* =========================================================
+       CARD 1: RESUME ANALYZER
+    ========================================================= */
+    .resume-score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .circular-ring {
+      position: relative;
+      width: 80px; height: 80px;
+      flex-shrink: 0;
+    }
+    .circular-ring svg { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--border-strong); stroke-width: 6; }
+    .ring-fill {
+      fill: none;
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 201;
+      stroke-dashoffset: 201;
+      transition: stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .ring-indigo { stroke: url(#grad-ring-indigo); }
+    .ring-text {
+      position: absolute;
+      inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .ring-score { font-size: 18px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+    .ring-label { font-size: 9px; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
+
+    .sub-scores { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+    .sub-score-row { display: flex; align-items: center; gap: 8px; }
+    .sub-score-name { font-size: 11px; color: var(--text-muted); width: 55px; flex-shrink: 0; }
+    .sub-score-bar { flex: 1; height: 5px; background: var(--bg-elevated); border-radius: var(--radius-full); overflow: hidden; }
+    .sub-score-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s;
+    }
+    .fill-indigo { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+    .fill-cyan   { background: linear-gradient(90deg, var(--accent), #22D3EE); }
+    .fill-green  { background: linear-gradient(90deg, var(--success), #34D399); }
+    .fill-orange { background: linear-gradient(90deg, var(--orange), var(--warning)); }
+    .sub-score-pct { font-size: 11px; font-weight: 600; color: var(--text-secondary); width: 28px; text-align: right; }
+
+    /* =========================================================
+       CARD 2: JOB MATCHING
+    ========================================================= */
+    .match-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      background: rgba(6,182,212,0.12);
+      border: 1px solid rgba(6,182,212,0.2);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .match-count-badge i { width: 14px; height: 14px; }
+    .top-match-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .company-logo {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #000, #1a1a1a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; color: #fff;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    [data-theme="light"] .company-logo { background: #f8f8f8; color: #000; }
+    .match-job-info { flex: 1; }
+    .match-job-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .match-company   { font-size: 11.5px; color: var(--text-muted); }
+    .match-pct {
+      font-size: 14px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--success), #34D399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* =========================================================
+       CARD 3: COVER LETTER
+    ========================================================= */
+    .cover-input-wrap {
+      display: flex;
+      gap: 8px;
+    }
+    .cover-input {
+      flex: 1;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      transition: border-color var(--transition);
+    }
+    .cover-input::placeholder { color: var(--text-muted); }
+    .cover-input:focus { border-color: var(--primary); }
+
+    .cover-preview {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      min-height: 76px;
+      position: relative;
+      overflow: hidden;
+    }
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 12px;
+      background: var(--purple);
+      border-radius: 1px;
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+      margin-left: 1px;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* =========================================================
+       CARD 4: INTERVIEW COACH
+    ========================================================= */
+    .interview-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .interview-chip {
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .interview-chip:hover,
+    .interview-chip.selected {
+      background: rgba(99,102,241,0.14);
+      border-color: rgba(99,102,241,0.35);
+      color: var(--primary-light);
+    }
+    .session-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .session-info i { width: 13px; height: 13px; }
+
+    /* =========================================================
+       CARD 5: SKILL GAP
+    ========================================================= */
+    .skill-gap-chart { display: flex; flex-direction: column; gap: 10px; }
+    .skill-row { display: flex; flex-direction: column; gap: 5px; }
+    .skill-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .skill-name { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+    .skill-gap-tag {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      background: rgba(239,68,68,0.12);
+      color: var(--error);
+    }
+    .skill-bars { display: flex; flex-direction: column; gap: 3px; }
+    .skill-bar-row { display: flex; align-items: center; gap: 8px; }
+    .skill-bar-label { font-size: 10px; color: var(--text-muted); width: 50px; }
+    .skill-bar-track { flex: 1; height: 6px; background: var(--bg-elevated); border-radius: var(--radius-full); overflow: hidden; }
+    .skill-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      width: 0%;
+      transition: width 1.3s cubic-bezier(0.4,0,0.2,1) 0.5s;
+    }
+    .bar-required { background: rgba(249,115,22,0.5); }
+    .bar-current  { background: linear-gradient(90deg, var(--success), #34D399); }
+
+    /* =========================================================
+       CARD 6: SALARY PREDICTOR
+    ========================================================= */
+    .salary-range {
+      text-align: center;
+      padding: 14px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+    .salary-amount {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--pink), #F472B6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    .salary-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .salary-level {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 6px;
+      background: rgba(236,72,153,0.08);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(236,72,153,0.15);
+    }
+    .salary-factors { display: flex; gap: 6px; flex-wrap: wrap; }
+    .factor-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .factor-badge i { width: 11px; height: 11px; }
+    .factor-loc { background: rgba(6,182,212,0.12); color: var(--accent); border: 1px solid rgba(6,182,212,0.2); }
+    .factor-exp { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+
+    /* =========================================================
+       SHARED BUTTON STYLES
+    ========================================================= */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background var(--transition);
+    }
+    .btn-primary:hover::after { background: rgba(255,255,255,0.07); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary i { width: 14px; height: 14px; }
+
+    .btn-indigo { background: linear-gradient(135deg, var(--primary), var(--primary-light)); box-shadow: 0 4px 14px rgba(99,102,241,0.35); }
+    .btn-cyan   { background: linear-gradient(135deg, #0E7490, var(--accent)); box-shadow: 0 4px 14px rgba(6,182,212,0.3); }
+    .btn-purple { background: linear-gradient(135deg, #7C3AED, var(--purple)); box-shadow: 0 4px 14px rgba(168,85,247,0.3); }
+    .btn-green  { background: linear-gradient(135deg, #059669, var(--success)); box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
+    .btn-orange { background: linear-gradient(135deg, #EA580C, var(--orange)); box-shadow: 0 4px 14px rgba(249,115,22,0.3); }
+    .btn-pink   { background: linear-gradient(135deg, #BE185D, var(--pink)); box-shadow: 0 4px 14px rgba(236,72,153,0.3); }
+
+    .status-text {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 4px;
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    /* =========================================================
+       AI USAGE STATS
+    ========================================================= */
+    .usage-section {}
+    .usage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .usage-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      text-align: center;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .usage-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+    .usage-card:nth-child(1)::after { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+    .usage-card:nth-child(2)::after { background: linear-gradient(90deg, var(--purple), #C084FC); }
+    .usage-card:nth-child(3)::after { background: linear-gradient(90deg, var(--success), #34D399); }
+    .usage-card:nth-child(4)::after { background: linear-gradient(90deg, var(--accent), #22D3EE); }
+    .usage-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .usage-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 10px;
+    }
+    .usage-icon i { width: 19px; height: 19px; }
+    .usage-number {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .usage-label { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+
+    .upgrade-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(168,85,247,0.08) 100%);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: var(--radius-lg);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .upgrade-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+    }
+    .upgrade-text { flex: 1; }
+    .upgrade-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+    .upgrade-desc  { font-size: 12.5px; color: var(--text-secondary); }
+    .btn-upgrade {
+      padding: 9px 20px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all var(--transition);
+      box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+    }
+    .btn-upgrade:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(99,102,241,0.45); }
+
+    /* =========================================================
+       FLOATING CHATBOT
+    ========================================================= */
+    .chat-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      box-shadow: 0 6px 24px rgba(99,102,241,0.55);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      z-index: 200;
+      transition: all var(--transition);
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.1);
+      animation: fab-pulse 3s ease-in-out infinite;
+    }
+    .chat-fab:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(99,102,241,0.7); }
+    @keyframes fab-pulse {
+      0%,100% { box-shadow: 0 6px 24px rgba(99,102,241,0.55); }
+      50%      { box-shadow: 0 6px 28px rgba(99,102,241,0.8), 0 0 0 8px rgba(99,102,241,0.1); }
+    }
+
+    .chat-panel {
+      position: fixed;
+      bottom: 100px;
+      right: 28px;
+      width: 340px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg), 0 0 40px rgba(99,102,241,0.15);
+      z-index: 199;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1);
+      transform-origin: bottom right;
+    }
+    .chat-panel.open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .chat-panel-header {
+      padding: 16px 18px;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chat-ai-avatar {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      border: 1.5px solid rgba(255,255,255,0.3);
+    }
+    .chat-ai-name { font-size: 14px; font-weight: 700; color: #fff; }
+    .chat-ai-status { font-size: 11px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 5px; }
+    .online-dot { width: 6px; height: 6px; background: #4ADE80; border-radius: 50%; }
+    .chat-close { margin-left: auto; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background var(--transition); }
+    .chat-close:hover { background: rgba(255,255,255,0.25); }
+    .chat-close i { width: 14px; height: 14px; }
+
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 280px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-strong) transparent;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+    .chat-msg {
+      display: flex;
+      gap: 8px;
+      animation: msg-in 0.3s ease;
+    }
+    @keyframes msg-in { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+    .chat-msg.user { flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    .msg-avatar.ai { background: linear-gradient(135deg, var(--primary), var(--purple)); }
+    .msg-avatar.user-av { background: linear-gradient(135deg, var(--accent), #22D3EE); color: #fff; font-weight: 700; font-size: 11px; }
+    .msg-bubble {
+      max-width: 80%;
+      padding: 9px 13px;
+      border-radius: 14px;
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+    .chat-msg.ai   .msg-bubble { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); border-top-left-radius: 4px; }
+    .chat-msg.user .msg-bubble { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-top-right-radius: 4px; }
+
+    .quick-chips {
+      padding: 8px 16px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .quick-chip {
+      padding: 5px 11px;
+      border-radius: var(--radius-full);
+      font-size: 11.5px;
+      font-weight: 500;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .quick-chip:hover {
+      background: rgba(99,102,241,0.12);
+      border-color: rgba(99,102,241,0.3);
+      color: var(--primary-light);
+    }
+
+    .chat-input-row {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .chat-input {
+      flex: 1;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 8px 14px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      transition: border-color var(--transition);
+    }
+    .chat-input::placeholder { color: var(--text-muted); }
+    .chat-input:focus { border-color: var(--primary); }
+    .chat-send {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .chat-send:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(99,102,241,0.45); }
+    .chat-send i { width: 15px; height: 15px; }
+
+    /* =========================================================
+       GLOW EFFECTS
+    ========================================================= */
+    .ai-card:hover .card-icon-wrap { filter: brightness(1.15); }
+    .glow-pulse {
+      animation: glow-anim 2.5s ease-in-out infinite;
+    }
+    @keyframes glow-anim {
+      0%,100% { box-shadow: 0 0 20px rgba(99,102,241,0.2); }
+      50%      { box-shadow: 0 0 35px rgba(99,102,241,0.4); }
+    }
+
+    /* =========================================================
+       SCROLL ANIMATIONS
+    ========================================================= */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.08s; }
+    .reveal-delay-2 { transition-delay: 0.16s; }
+    .reveal-delay-3 { transition-delay: 0.24s; }
+    .reveal-delay-4 { transition-delay: 0.32s; }
+    .reveal-delay-5 { transition-delay: 0.40s; }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+    @media (max-width: 1280px) {
+      .ai-grid { grid-template-columns: repeat(2, 1fr); }
+      .usage-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 900px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { transform: translateX(-100%); }
+      .main-area { margin-left: 0; }
+      .ai-grid { grid-template-columns: 1fr; }
+      .usage-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-content { padding: 20px; }
+    }
+    @media (max-width: 600px) {
+      .usage-grid { grid-template-columns: 1fr 1fr; }
+      .upgrade-banner { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SVG DEFS (Gradients for rings)
+============================================================ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="grad-ring-indigo" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ============================================================
+     APP SHELL
+============================================================ -->
+<div class="app-shell">
+
+  <!-- ========================================================
+       SIDEBAR
+  ======================================================== -->
+  <aside class="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-text">TalentArc</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item">
+        <i data-lucide="layout-dashboard"></i>
+        Dashboard
+      </a>
+      <a href="jobs.html" class="nav-item">
+        <i data-lucide="briefcase"></i>
+        Jobs
+        <span class="nav-badge count">12</span>
+      </a>
+      <a href="applications.html" class="nav-item">
+        <i data-lucide="file-text"></i>
+        Applications
+      </a>
+      <a href="ai-tools.html" class="nav-item active">
+        <i data-lucide="sparkles"></i>
+        AI Tools
+        <span class="nav-badge new">NEW</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Career</div>
+      <a href="resume.html" class="nav-item">
+        <i data-lucide="file-badge"></i>
+        My Resume
+      </a>
+      <a href="profile.html" class="nav-item">
+        <i data-lucide="user-circle"></i>
+        Profile
+      </a>
+      <a href="interviews.html" class="nav-item">
+        <i data-lucide="mic"></i>
+        Interviews
+      </a>
+      <a href="skills.html" class="nav-item">
+        <i data-lucide="zap"></i>
+        Skills
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Network</div>
+      <a href="messages.html" class="nav-item">
+        <i data-lucide="message-square"></i>
+        Messages
+        <span class="nav-badge count">3</span>
+      </a>
+      <a href="companies.html" class="nav-item">
+        <i data-lucide="building-2"></i>
+        Companies
+      </a>
+      <a href="mentors.html" class="nav-item">
+        <i data-lucide="users"></i>
+        Mentors
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Account</div>
+      <a href="settings.html" class="nav-item">
+        <i data-lucide="settings"></i>
+        Settings
+      </a>
+      <a href="pricing.html" class="nav-item">
+        <i data-lucide="crown"></i>
+        Upgrade Pro
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">PS</div>
+        <div class="user-info">
+          <div class="user-name">Priya Sharma</div>
+          <div class="user-role">Free Plan</div>
+        </div>
+        <button class="btn-icon" style="margin-left:auto;width:28px;height:28px;" aria-label="Account menu">
+          <i data-lucide="chevron-up" style="width:13px;height:13px;"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================================
+       MAIN AREA
+  ======================================================== -->
+  <div class="main-area">
+
+    <!-- HEADER -->
+    <header class="top-header" role="banner">
+      <div class="header-left">
+        <div class="header-title">AI Career Copilot ✨</div>
+        <div class="header-subtitle">Supercharge your job search with AI-powered tools</div>
+      </div>
+      <div class="header-right">
+        <button class="btn-icon" aria-label="Search" title="Search">
+          <i data-lucide="search"></i>
+        </button>
+        <button class="btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+          <i data-lucide="sun" id="themeIcon"></i>
+        </button>
+        <button class="btn-icon" aria-label="Notifications" title="Notifications" style="position:relative;">
+          <i data-lucide="bell"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="user-avatar" style="cursor:pointer;" title="Profile">PS</div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content" role="main">
+
+      <!-- ====================================================
+           AI FEATURE GRID
+      ==================================================== -->
+      <section aria-label="AI Tools">
+        <div class="section-header">
+          <div>
+            <div class="section-title">
+              <i data-lucide="cpu"></i>
+              AI-Powered Career Tools
+            </div>
+            <div class="section-subtitle">6 tools to accelerate your job search</div>
+          </div>
+        </div>
+
+        <div class="ai-grid">
+
+          <!-- CARD 1: AI RESUME ANALYZER -->
+          <div class="ai-card card-indigo reveal" aria-label="AI Resume Analyzer">
+            <div class="card-header">
+              <div class="card-icon-wrap icon-indigo">
+                <i data-lucide="file-search"></i>
+              </div>
+              <div class="card-meta">
+                <div class="card-title">AI Resume Analyzer</div>
+                <div class="card-desc">Get instant feedback with ATS compatibility check and improvement suggestions</div>
+              </div>
+            </div>
+
+            <div class="resume-score-wrap">
+              <div class="circular-ring" title="Overall Score: 78/100">
+                <svg viewBox="0 0 80 80" width="80" height="80">
+                  <circle class="ring-bg" cx="40" cy="40" r="32"/>
+                  <circle class="ring-fill ring-indigo" cx="40" cy="40" r="32" data-pct="78" id="ring1"/>
+                </svg>
+                <div class="ring-text">
+                  <span class="ring-score" id="ring1-num">0</span>
+                  <span class="ring-label">/100</span>
+                </div>
+              </div>
+              <div class="sub-scores">
+                <div class="sub-score-row">
+                  <span class="sub-score-name">ATS Score</span>
+                  <div class="sub-score-bar"><div class="sub-score-fill fill-indigo" data-w="82"></div></div>
+                  <span class="sub-score-pct">82%</span>
+                </div>
+                <div class="sub-score-row">
+                  <span class="sub-score-name">Keywords</span>
+                  <div class="sub-score-bar"><div class="sub-score-fill fill-cyan" data-w="74"></div></div>
+                  <span class="sub-score-pct">74%</span>
+                </div>
+                <div class="sub-score-row">
+                  <span class="sub-score-name">Format</span>
+                  <div class="sub-score-bar"><div class="sub-score-fill fill-green" data-w="85"></div></div>
+                  <span class="sub-score-pct">85%</span>
+                </div>
+                <div class="sub-score-row">
+                  <span class="sub-score-name">Impact</span>
+                  <div class="sub-score-bar"><div class="sub-score-fill fill-orange" data-w="69"></div></div>
+                  <span class="sub-score-pct">69%</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-primary btn-indigo" onclick="analyzeResume(this)">
+              <i data-lucide="zap"></i>
+              Analyze Resume
+            </button>
+            <div class="status-text"><span class="status-dot"></span> Last analyzed 2 days ago</div>
+          </div>
+
+          <!-- CARD 2: AI JOB MATCHING -->
+          <div class="ai-card card-cyan reveal reveal-delay-1" aria-label="AI Job Matching">
+            <div class="card-header">
+              <div class="card-icon-wrap icon-cyan">
+                <i data-lucide="crosshair"></i>
+              </div>
+              <div class="card-meta">
+                <div class="card-title">AI Job Matching</div>
+                <div class="card-desc">AI finds jobs where you have 85%+ match based on your skills, experience, and preferences</div>
+              </div>
+            </div>
+
+            <div class="match-count-badge">
+              <i data-lucide="sparkles"></i>
+              94 matched jobs found for you
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;">Top Match</div>
+              <div class="top-match-card">
+                <div class="company-logo">▲</div>
+                <div class="match-job-info">
+                  <div class="match-job-title">Staff Engineer</div>
+                  <div class="match-company">Vercel · Remote · $180K–$240K</div>
+                </div>
+                <div class="match-pct">97%</div>
+              </div>
+            </div>
+
+            <button class="btn-primary btn-cyan" onclick="rippleBtn(this)">
+              <i data-lucide="layers"></i>
+              View All Matches
+            </button>
+          </div>
+
+          <!-- CARD 3: AI COVER LETTER -->
+          <div class="ai-card card-purple reveal reveal-delay-2" aria-label="AI Cover Letter Generator">
+            <div class="card-header">
+              <div class="card-icon-wrap icon-purple">
+                <i data-lucide="pen-tool"></i>
+              </div>
+              <div class="card-meta">
+                <div class="card-title">AI Cover Letter</div>
+                <div class="card-desc">Generate personalized cover letters for any job in under 30 seconds</div>
+              </div>
+            </div>
+
+            <div class="cover-input-wrap">
+              <input type="text" class="cover-input" id="coverInput" placeholder="Job URL or paste job description…" aria-label="Job URL or description" />
+              <button class="btn-primary btn-purple" id="generateBtn" onclick="generateCoverLetter()" style="white-space:nowrap;padding:9px 14px;font-size:12px;">
+                <i data-lucide="wand-2"></i>
+                Generate
+              </button>
+            </div>
+
+            <div class="cover-preview" id="coverPreview" aria-live="polite">
+              <span id="coverText"></span><span class="typing-cursor" id="typingCursor" style="display:none;"></span>
+              <span style="color:var(--text-muted);font-size:12px;" id="coverPlaceholder">Your cover letter preview will appear here…</span>
+            </div>
+          </div>
+
+          <!-- CARD 4: AI INTERVIEW COACH -->
+          <div class="ai-card card-green reveal reveal-delay-3" aria-label="AI Interview Coach">
+            <div class="card-header">
+              <div class="card-icon-wrap icon-green">
+                <i data-lucide="mic"></i>
+              </div>
+              <div class="card-meta">
+                <div class="card-title">AI Interview Coach</div>
+                <div class="card-desc">Practice mock interviews and get real-time AI feedback on your answers</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;">Session Type</div>
+              <div class="interview-chips">
+                <button class="interview-chip selected" onclick="selectChip(this)">Behavioral</button>
+                <button class="interview-chip" onclick="selectChip(this)">Technical</button>
+                <button class="interview-chip" onclick="selectChip(this)">System Design</button>
+              </div>
+            </div>
+
+            <button class="btn-primary btn-green" onclick="rippleBtn(this)">
+              <i data-lucide="play-circle"></i>
+              Start Practice Session
+            </button>
+            <div class="session-info">
+              <i data-lucide="clock"></i>
+              Last session: 3 days ago · Score: <strong style="color:var(--success);">82/100</strong>
+            </div>
+          </div>
+
+          <!-- CARD 5: SKILL GAP ANALYSIS -->
+          <div class="ai-card card-orange reveal reveal-delay-4" aria-label="Skill Gap Analysis">
+            <div class="card-header">
+              <div class="card-icon-wrap icon-orange">
+                <i data-lucide="bar-chart-3"></i>
+              </div>
+              <div class="card-meta">
+                <div class="card-title">Skill Gap Analysis</div>
+                <div class="card-desc">Discover what skills you need for your dream role and get a personalized learning path</div>
+              </div>
+            </div>
+
+            <div class="skill-gap-chart">
+
+              <div class="skill-row">
+                <div class="skill-label-row">
+                  <span class="skill-name">Kubernetes</span>
+                  <span class="skill-gap-tag">-20% gap</span>
+                </div>
+                <div class="skill-bars">
+                  <div class="skill-bar-row">
+                    <span class="skill-bar-label">Required</span>
+                    <div class="skill-bar-track"><div class="skill-bar-fill bar-required" data-w="90"></div></div>
+                  </div>
+                  <div class="skill-bar-row">
+                    <span class="skill-bar-label">You have</span>
+                    <div class="skill-bar-track"><div class="skill-bar-fill bar-current" data-w="70"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="skill-row">
+                <div class="skill-label-row">
+                  <span class="skill-name">System Design</span>
+                  <span class="skill-gap-tag">-15% gap</span>
+                </div>
+                <div class="skill-bars">
+                  <div class="skill-bar-row">
+                    <span class="skill-bar-label">Required</span>
+                    <div class="skill-bar-track"><div class="skill-bar-fill bar-required" data-w="85"></div></div>
+                  </div>
+                  <div class="skill-bar-row">
+                    <span class="skill-bar-label">You have</span>
+                    <div class="skill-bar-track"><div class="skill-bar-fill bar-current" data-w="70"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="skill-row">
+                <div class="skill-label-row">
+                  <span class="skill-name">Rust</span>
+                  <span class="skill-gap-tag">-40% gap</span>
+                </div>
+                <div class="skill-bars">
+                  <div class="skill-bar-row">
+                    <span class="skill-bar-label">Required</span>
+                    <div class="skill-bar-track"><div class="skill-bar-fill bar-required" data-w="70"></div></div>
+                  </div>
+                  <div class="skill-bar-row">
+                    <span class="skill-bar-label">You have</span>
+                    <div class="skill-bar-track"><div class="skill-bar-fill bar-current" data-w="30"></div></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <button class="btn-primary btn-orange" onclick="rippleBtn(this)">
+              <i data-lucide="route"></i>
+              Get Learning Path
+            </button>
+          </div>
+
+          <!-- CARD 6: SALARY PREDICTOR -->
+          <div class="ai-card card-pink reveal reveal-delay-5" aria-label="AI Salary Predictor">
+            <div class="card-header">
+              <div class="card-icon-wrap icon-pink">
+                <i data-lucide="trending-up"></i>
+              </div>
+              <div class="card-meta">
+                <div class="card-title">AI Salary Predictor</div>
+                <div class="card-desc">Get AI-predicted salary range based on your experience, location, and market data</div>
+              </div>
+            </div>
+
+            <div class="salary-range">
+              <div class="salary-amount">$165K – $210K</div>
+              <div class="salary-label">Predicted Annual Compensation · San Francisco, CA</div>
+            </div>
+
+            <div class="salary-level">
+              <span style="color:var(--pink);font-weight:700;">✦</span>
+              Your profile suggests <strong>Senior Engineer</strong> level positioning
+            </div>
+
+            <div class="salary-factors">
+              <span class="factor-badge factor-loc">
+                <i data-lucide="map-pin"></i>
+                SF Bay Area +22%
+              </span>
+              <span class="factor-badge factor-exp">
+                <i data-lucide="award"></i>
+                7 yrs exp +18%
+              </span>
+            </div>
+
+            <button class="btn-primary btn-pink" onclick="rippleBtn(this)">
+              <i data-lucide="dollar-sign"></i>
+              Explore Salary Data
+            </button>
+          </div>
+
+        </div><!-- /.ai-grid -->
+      </section>
+
+      <!-- ====================================================
+           AI USAGE STATS
+      ==================================================== -->
+      <section class="usage-section reveal" aria-label="AI Usage Statistics">
+        <div class="section-header">
+          <div>
+            <div class="section-title">
+              <i data-lucide="activity"></i>
+              Your AI Usage This Month
+            </div>
+            <div class="section-subtitle">July 2026 · Free Plan</div>
+          </div>
+          <button class="btn-primary btn-indigo" onclick="rippleBtn(this)" style="font-size:12px;padding:8px 14px;">
+            <i data-lucide="crown"></i>
+            Upgrade to Pro
+          </button>
+        </div>
+
+        <div class="usage-grid">
+          <div class="usage-card">
+            <div class="usage-icon" style="background:rgba(99,102,241,0.12);">
+              <i data-lucide="file-search" style="color:var(--primary-light);"></i>
+            </div>
+            <div class="usage-number" style="color:var(--primary-light);" data-count="3" id="count1">0</div>
+            <div class="usage-label">Resume Analyses</div>
+          </div>
+          <div class="usage-card">
+            <div class="usage-icon" style="background:rgba(168,85,247,0.12);">
+              <i data-lucide="pen-tool" style="color:var(--purple);"></i>
+            </div>
+            <div class="usage-number" style="color:var(--purple);" data-count="12" id="count2">0</div>
+            <div class="usage-label">Cover Letters</div>
+          </div>
+          <div class="usage-card">
+            <div class="usage-icon" style="background:rgba(16,185,129,0.12);">
+              <i data-lucide="mic" style="color:var(--success);"></i>
+            </div>
+            <div class="usage-number" style="color:var(--success);" data-count="5" id="count3">0</div>
+            <div class="usage-label">Interview Practices</div>
+          </div>
+          <div class="usage-card">
+            <div class="usage-icon" style="background:rgba(6,182,212,0.12);">
+              <i data-lucide="crosshair" style="color:var(--accent);"></i>
+            </div>
+            <div class="usage-number" style="color:var(--accent);" data-count="47" id="count4">0</div>
+            <div class="usage-label">Job Matches Reviewed</div>
+          </div>
+        </div>
+
+        <div class="upgrade-banner">
+          <div class="upgrade-icon">⚡</div>
+          <div class="upgrade-text">
+            <div class="upgrade-title">Unlock Unlimited AI with TalentArc Pro</div>
+            <div class="upgrade-desc">Get unlimited resume analyses, cover letters, and interview coaching. Plus priority job matching and advanced salary insights.</div>
+          </div>
+          <button class="btn-upgrade" onclick="rippleBtn(this)">Upgrade Now →</button>
+        </div>
+      </section>
+
+    </main><!-- /.page-content -->
+  </div><!-- /.main-area -->
+</div><!-- /.app-shell -->
+
+<!-- ============================================================
+     FLOATING CHATBOT
+============================================================ -->
+<button class="chat-fab" id="chatFab" aria-label="Open AI Career Coach" title="AI Career Coach" onclick="toggleChat()">
+  ✨
+</button>
+
+<div class="chat-panel" id="chatPanel" role="dialog" aria-label="AI Career Coach" aria-modal="true">
+  <div class="chat-panel-header">
+    <div class="chat-ai-avatar">✦</div>
+    <div>
+      <div class="chat-ai-name">AI Career Coach</div>
+      <div class="chat-ai-status"><span class="online-dot"></span> Active now</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()" aria-label="Close chat">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg ai">
+      <div class="msg-avatar ai">✦</div>
+      <div class="msg-bubble">
+        Hi Priya! I'm your AI Career Coach. How can I help you today? 🚀
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-chips" id="quickChips">
+    <button class="quick-chip" onclick="sendQuickReply(this, 'Review my resume')">Review my resume</button>
+    <button class="quick-chip" onclick="sendQuickReply(this, 'Find matching jobs')">Find matching jobs</button>
+    <button class="quick-chip" onclick="sendQuickReply(this, 'Practice interview')">Practice interview</button>
+    <button class="quick-chip" onclick="sendQuickReply(this, 'Salary advice')">Salary advice</button>
+  </div>
+
+  <div class="chat-input-row">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything…" aria-label="Chat message" onkeypress="handleChatKey(event)" />
+    <button class="chat-send" onclick="sendChatMessage()" aria-label="Send message">
+      <i data-lucide="send"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+  /* =========================================================
+     LUCIDE ICONS INIT
+  ========================================================= */
+  lucide.createIcons();
+
+  /* =========================================================
+     THEME TOGGLE
+  ========================================================= */
+  (function() {
+    const saved = localStorage.getItem('ta-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    updateThemeIcon(saved);
+  })();
+
+  function updateThemeIcon(theme) {
+    const icon = document.getElementById('themeIcon');
+    if (!icon) return;
+    if (theme === 'dark') {
+      icon.setAttribute('data-lucide', 'sun');
+    } else {
+      icon.setAttribute('data-lucide', 'moon');
+    }
+    lucide.createIcons();
+  }
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next    = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('ta-theme', next);
+    updateThemeIcon(next);
+  });
+
+  /* =========================================================
+     INTERSECTION OBSERVER – REVEAL + BAR ANIMATIONS
+  ========================================================= */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Trigger bar fills
+        const bars = entry.target.querySelectorAll('[data-w]');
+        bars.forEach(bar => {
+          setTimeout(() => {
+            bar.style.width = bar.dataset.w + '%';
+          }, 200);
+        });
+        // Trigger ring animation
+        const ring = entry.target.querySelector('.ring-fill');
+        if (ring) animateRing(ring);
+        // Trigger counters
+        const counters = entry.target.querySelectorAll('[data-count]');
+        counters.forEach(c => animateCounter(c));
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* =========================================================
+     CIRCULAR RING ANIMATION
+  ========================================================= */
+  function animateRing(ringEl) {
+    const pct = parseFloat(ringEl.dataset.pct) || 0;
+    const circumference = 201;
+    const offset = circumference - (pct / 100) * circumference;
+    ringEl.style.strokeDashoffset = offset;
+
+    // Animate counter text
+    const numEl = document.getElementById('ring1-num');
+    if (numEl) {
+      let current = 0;
+      const duration = 1400;
+      const step = pct / (duration / 16);
+      const timer = setInterval(() => {
+        current = Math.min(current + step, pct);
+        numEl.textContent = Math.round(current);
+        if (current >= pct) clearInterval(timer);
+      }, 16);
+    }
+  }
+
+  /* =========================================================
+     COUNTER ANIMATION
+  ========================================================= */
+  function animateCounter(el) {
+    const target = parseInt(el.dataset.count, 10);
+    let current = 0;
+    const duration = 900;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = Math.round(current);
+      if (current >= target) clearInterval(timer);
+    }, 16);
+  }
+
+  /* =========================================================
+     ANALYZE RESUME BUTTON
+  ========================================================= */
+  function analyzeResume(btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" style="width:14px;height:14px;animation:spin 1s linear infinite;"></i> Analyzing…';
+    lucide.createIcons();
+    // Add spin style
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="check-circle" style="width:14px;height:14px;"></i> Analysis Complete!';
+      btn.style.background = 'linear-gradient(135deg, #059669, #10B981)';
+      lucide.createIcons();
+      setTimeout(() => {
+        btn.innerHTML = '<i data-lucide="zap" style="width:14px;height:14px;"></i> Analyze Resume';
+        btn.style.background = '';
+        lucide.createIcons();
+      }, 2500);
+    }, 2000);
+  }
+
+  /* =========================================================
+     COVER LETTER GENERATOR
+  ========================================================= */
+  const coverLetterText = `Dear Hiring Manager,
+
+I am excited to apply for the Staff Engineer position at Vercel. With 7+ years of experience building distributed systems at scale, I have consistently delivered reliable infrastructure that powers millions of users.
+
+At my current role, I architected a microservices platform handling 2M+ daily requests, reducing latency by 40% and operational costs by 30%. I'm drawn to Vercel's mission of making the web faster and more accessible.
+
+I would love to bring my expertise in Next.js, distributed systems, and technical leadership to your exceptional team.
+
+Best regards,
+Priya Sharma`;
+
+  let typingTimer = null;
+
+  function generateCoverLetter() {
+    const input = document.getElementById('coverInput').value.trim();
+    const previewEl = document.getElementById('coverPreview');
+    const textEl = document.getElementById('coverText');
+    const cursor = document.getElementById('typingCursor');
+    const placeholder = document.getElementById('coverPlaceholder');
+
+    placeholder.style.display = 'none';
+    cursor.style.display = 'inline-block';
+    textEl.textContent = '';
+
+    if (typingTimer) clearInterval(typingTimer);
+
+    let i = 0;
+    typingTimer = setInterval(() => {
+      textEl.textContent += coverLetterText[i];
+      i++;
+      previewEl.scrollTop = previewEl.scrollHeight;
+      if (i >= coverLetterText.length) {
+        clearInterval(typingTimer);
+        cursor.style.display = 'none';
+      }
+    }, 20);
+  }
+
+  // Auto-start typing preview after 1.2s
+  setTimeout(() => {
+    generateCoverLetter();
+  }, 1200);
+
+  /* =========================================================
+     INTERVIEW CHIP SELECTION
+  ========================================================= */
+  function selectChip(el) {
+    el.closest('.interview-chips').querySelectorAll('.interview-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  /* =========================================================
+     RIPPLE EFFECT
+  ========================================================= */
+  function rippleBtn(btn) {
+    const ripple = document.createElement('span');
+    ripple.style.cssText = `
+      position:absolute;
+      border-radius:50%;
+      background:rgba(255,255,255,0.25);
+      transform:scale(0);
+      animation:ripple-anim 0.55s linear;
+      width:60px;height:60px;
+      margin-top:-30px;margin-left:-30px;
+      top:50%;left:50%;
+      pointer-events:none;
+    `;
+    if (!document.querySelector('#ripple-style')) {
+      const s = document.createElement('style');
+      s.id = 'ripple-style';
+      s.textContent = '@keyframes ripple-anim{to{transform:scale(4);opacity:0}}';
+      document.head.appendChild(s);
+    }
+    btn.style.position = 'relative';
+    btn.style.overflow = 'hidden';
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  }
+
+  /* =========================================================
+     CHATBOT
+  ========================================================= */
+  const chatPanel = document.getElementById('chatPanel');
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  let chatOpen = false;
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    chatPanel.classList.toggle('open', chatOpen);
+    if (chatOpen) {
+      setTimeout(() => chatInput.focus(), 300);
+    }
+  }
+
+  function handleChatKey(e) {
+    if (e.key === 'Enter') sendChatMessage();
+  }
+
+  const aiReplies = {
+    'review my resume': "I'll analyze your resume right away! Your current ATS score is 82% — pretty strong! I suggest adding more quantified achievements to boost your Impact score from 69% to 85%+. Want me to highlight the specific sections to improve? 📄",
+    'find matching jobs': "Great news! I found 94 jobs matching your profile. Your top match is Staff Engineer at Vercel with a 97% compatibility. You also have 3 opportunities at Stripe and 2 at Linear. Want me to filter by salary range or location? 🎯",
+    'practice interview': "Let's ace that interview! I'll start with a Behavioral question:\n\n**Tell me about a time you led a complex technical project under tight deadlines. What was your approach?**\n\nTake your time and respond whenever you're ready! 🎤",
+    'salary advice': "Based on your 7 years of experience, Staff Engineer skills, and San Francisco location, your market range is **$165K–$210K**. You're currently slightly undervalued. I recommend negotiating at $190K as your starting anchor. Want specific negotiation tactics? 💰",
+  };
+
+  function sendQuickReply(chip, text) {
+    addMessage(text, 'user');
+    document.getElementById('quickChips').style.display = 'none';
+    setTimeout(() => {
+      const reply = aiReplies[text.toLowerCase()] || "I'm on it! Let me pull up the best insights for you. Give me a moment... ✨";
+      addMessage(reply, 'ai');
+    }, 800);
+  }
+
+  function sendChatMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    addMessage(text, 'user');
+    chatInput.value = '';
+    document.getElementById('quickChips').style.display = 'none';
+
+    // Typing indicator
+    const typingEl = addTypingIndicator();
+    setTimeout(() => {
+      typingEl.remove();
+      const lower = text.toLowerCase();
+      let reply = "That's a great question! I'm analyzing your profile and career data to give you the most personalized advice. Based on your experience as a Staff Engineer with 7 years in distributed systems, here's what I recommend: focus on quantifying your achievements more and targeting companies with strong remote cultures. 🚀";
+      for (const [key, val] of Object.entries(aiReplies)) {
+        if (lower.includes(key)) { reply = val; break; }
+      }
+      addMessage(reply, 'ai');
+    }, 1200);
+  }
+
+  function addMessage(text, type) {
+    const div = document.createElement('div');
+    div.className = `chat-msg ${type}`;
+    const isAI = type === 'ai';
+    div.innerHTML = `
+      <div class="msg-avatar ${isAI ? 'ai' : 'user-av'}">${isAI ? '✦' : 'PS'}</div>
+      <div class="msg-bubble">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
+    `;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return div;
+  }
+
+  function addTypingIndicator() {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ai';
+    div.innerHTML = `
+      <div class="msg-avatar ai">✦</div>
+      <div class="msg-bubble" style="padding:12px 14px;">
+        <span style="display:flex;gap:4px;align-items:center;">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--text-muted);animation:dot-blink 1.2s ease infinite 0s;"></span>
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--text-muted);animation:dot-blink 1.2s ease infinite 0.2s;"></span>
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--text-muted);animation:dot-blink 1.2s ease infinite 0.4s;"></span>
+        </span>
+      </div>
+    `;
+    if (!document.querySelector('#dot-style')) {
+      const s = document.createElement('style');
+      s.id = 'dot-style';
+      s.textContent = '@keyframes dot-blink{0%,100%{opacity:0.3;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}';
+      document.head.appendChild(s);
+    }
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return div;
+  }
+
+  /* =========================================================
+     RE-INIT LUCIDE after DOM mutations
+  ========================================================= */
+  setTimeout(() => lucide.createIcons(), 100);
+</script>
+</body>
+</html>

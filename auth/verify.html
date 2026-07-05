@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Code · TalentArc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ─────────────────────────────────────────
+       DESIGN TOKENS & RESET
+     ───────────────────────────────────────── */
+    :root {
+      --primary:        #6366F1;
+      --primary-light:  #818CF8;
+      --primary-dark:   #4F46E5;
+      --accent:         #06B6D4;
+      --success:        #10B981;
+      --warning:        #F59E0B;
+      --error:          #EF4444;
+      --purple:         #A855F7;
+
+      --r-md:  12px;
+      --r-lg:  16px;
+      --r-pill:999px;
+
+      --t-fast: 0.15s ease;
+      --t-base: 0.25s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg-base:    #0A0A0F;
+      --bg-1:       #0F0F17;
+      --bg-2:       #13131E;
+      --text-1:     #E2E8F0;
+      --text-2:     #94A3B8;
+      --text-3:     #64748B;
+      --border:     rgba(255,255,255,0.06);
+      --border-2:   rgba(255,255,255,0.10);
+      --glow:       0 0 20px rgba(99,102,241,0.15);
+    }
+
+    [data-theme="light"] {
+      --bg-base:    #F0F0F8;
+      --bg-1:       #FAFAFA;
+      --bg-2:       #FFFFFF;
+      --text-1:     #0F172A;
+      --text-2:     #475569;
+      --text-3:     #94A3B8;
+      --border:     rgba(0,0,0,0.08);
+      --border-2:   rgba(0,0,0,0.12);
+      --glow:       0 0 20px rgba(99,102,241,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+      display: flex;
+      transition: background var(--t-base), color var(--t-base);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ─────────────────────────────────────────
+       SPLIT LAYOUT
+     ───────────────────────────────────────── */
+    .split-container { display: flex; width: 100%; min-height: 100vh; }
+
+    /* Left Panel - Branding */
+    .left-panel {
+      flex: 1; background: linear-gradient(135deg, #0A0A0F 0%, #11111E 50%, #1D183A 100%);
+      display: flex; flex-direction: column; justify-content: space-between; padding: 48px;
+      position: relative; overflow: hidden; border-right: 1px solid var(--border);
+    }
+    .left-panel::before {
+      content: ''; position: absolute; top: -100px; left: -100px; width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%); pointer-events: none;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--text-1); }
+    .brand-icon {
+      width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--purple));
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px;
+    }
+    .brand-text {
+      background: linear-gradient(135deg, var(--primary-light), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    
+    .promo-content { max-width: 440px; margin: auto 0; display: flex; flex-direction: column; gap: 20px; }
+    .promo-title { font-size: 28px; font-weight: 800; letter-spacing: -0.6px; line-height: 1.25; }
+    .promo-desc { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+
+    .footer-text { font-size: 12.5px; color: var(--text-3); }
+
+    /* Right Panel - Form */
+    .right-panel {
+      width: 480px; flex-shrink: 0; background: var(--bg-1); display: flex; flex-direction: column;
+      justify-content: space-between; padding: 48px; position: relative;
+    }
+    .theme-toggle-wrap { display: flex; justify-content: flex-end; }
+    .theme-btn {
+      width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); display: flex;
+      align-items: center; justify-content: center; color: var(--text-2); cursor: pointer; transition: all var(--t-fast);
+    }
+    .theme-btn:hover { border-color: var(--border-2); color: var(--text-1); }
+
+    .form-wrap { max-width: 360px; width: 100%; margin: auto; display: flex; flex-direction: column; gap: 24px; }
+    .form-header { display: flex; flex-direction: column; gap: 8px; }
+    .form-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+    .form-subtitle { font-size: 13px; color: var(--text-3); line-height: 1.5; }
+
+    .form { display: flex; flex-direction: column; gap: 20px; }
+    
+    /* Code Inputs */
+    .otp-container { display: flex; justify-content: space-between; gap: 8px; margin: 10px 0; }
+    .otp-input {
+      width: 48px; height: 52px; background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--r-md); font-size: 20px; font-weight: 700; text-align: center; color: var(--text-1);
+      outline: none; transition: all var(--t-fast);
+    }
+    .otp-input:focus { border-color: var(--primary); box-shadow: var(--glow); }
+
+    .btn-submit {
+      width: 100%; padding: 11px; border-radius: var(--r-pill); font-size: 13.5px; font-weight: 600;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.25); display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all var(--t-fast); margin-top: 8px;
+    }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99,102,241,0.35); }
+
+    .resend-text { font-size: 13px; text-align: center; color: var(--text-3); }
+    .resend-link { color: var(--primary-light); font-weight: 600; cursor: pointer; }
+    .resend-link.disabled { color: var(--text-3); cursor: not-allowed; font-weight: 500; }
+
+    @media (max-width: 900px) {
+      .left-panel { display: none; }
+      .right-panel { width: 100%; padding: 24px; }
+      .form-wrap { max-width: 400px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="split-container">
+  <!-- Left side -->
+  <div class="left-panel">
+    <div class="brand">
+      <div class="brand-icon">✦</div>
+      <span class="brand-text">TalentArc</span>
+    </div>
+    
+    <div class="promo-content">
+      <h2 class="promo-title">Secure verification.</h2>
+      <p class="promo-desc">Two-factor authentication ensures your premium career data, salaries, and recruiter communications stay private and safe.</p>
+    </div>
+
+    <div class="footer-text">© 2026 TalentArc. Secure verification portal.</div>
+  </div>
+
+  <!-- Right side -->
+  <div class="right-panel">
+    <div class="theme-toggle-wrap">
+      <button class="theme-btn" id="themeToggle" aria-label="Toggle Theme">
+        <i data-lucide="sun" id="themeIcon" style="width: 16px; height: 16px;"></i>
+      </button>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-wrap" id="verifySection">
+      <div class="form-header">
+        <h1 class="form-title">Enter Verification Code</h1>
+        <p class="form-subtitle">We have sent a 6-digit security code to your email.</p>
+      </div>
+
+      <form class="form" id="verifyForm" onsubmit="handleVerification(event)">
+        <div class="otp-container">
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required onkeyup="moveToNext(this, event)" onpaste="handlePaste(event)" />
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required onkeyup="moveToNext(this, event)" />
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required onkeyup="moveToNext(this, event)" />
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required onkeyup="moveToNext(this, event)" />
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required onkeyup="moveToNext(this, event)" />
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required onkeyup="moveToNext(this, event)" />
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          Verify Code <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+        </button>
+
+        <p class="resend-text">
+          Didn't receive code? <span id="resendTimer" class="resend-link disabled">Resend code in 59s</span>
+          <span id="resendBtn" class="resend-link" style="display:none;" onclick="resendCode()">Resend Code</span>
+        </p>
+      </form>
+    </div>
+
+    <div style="height: 10px;"></div>
+  </div>
+</div>
+
+<script>
+  // Theme Management
+  const themeToggleBtn = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  
+  function getTheme() { return localStorage.getItem('tarc-auth-theme') || 'dark'; }
+  
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      themeIcon.setAttribute('data-lucide', 'sun');
+    } else {
+      themeIcon.setAttribute('data-lucide', 'moon');
+    }
+    if (window.lucide) lucide.createIcons();
+    localStorage.setItem('tarc-auth-theme', theme);
+  }
+  
+  themeToggleBtn.addEventListener('click', () => {
+    applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(getTheme());
+
+  // Input tabbing
+  function moveToNext(current, event) {
+    const key = event.key;
+    const inputs = document.querySelectorAll('.otp-input');
+    const index = Array.from(inputs).indexOf(current);
+
+    if (key === 'Backspace') {
+      if (index > 0 && current.value === '') {
+        inputs[index - 1].focus();
+      }
+    } else if (current.value !== '') {
+      if (index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    }
+  }
+
+  function handlePaste(e) {
+    e.preventDefault();
+    const data = e.clipboardData.getData('text').trim();
+    if (!/^\d{6}$/.test(data)) return;
+
+    const inputs = document.querySelectorAll('.otp-input');
+    inputs.forEach((input, index) => {
+      input.value = data[index];
+    });
+    inputs[5].focus();
+  }
+
+  // Timer countdown
+  let timeLeft = 59;
+  const timerLabel = document.getElementById('resendTimer');
+  const resendBtn = document.getElementById('resendBtn');
+  
+  const timer = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      timerLabel.style.display = 'none';
+      resendBtn.style.display = 'inline';
+    } else {
+      timerLabel.textContent = `Resend code in ${timeLeft}s`;
+    }
+  }, 1000);
+
+  function resendCode() {
+    alert("New OTP code has been sent!");
+    timeLeft = 59;
+    resendBtn.style.display = 'none';
+    timerLabel.style.display = 'inline';
+    // Re-run countdown logic...
+  }
+
+  function handleVerification(e) {
+    e.preventDefault();
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `Verifying... <i class="loader" style="width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;"></i>`;
+
+    setTimeout(() => {
+      // Simulate success and redirect
+      window.location.href = '../seeker/dashboard.html';
+    }, 1200);
+  }
+</script>
+
+<style>
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</body>
+</html>

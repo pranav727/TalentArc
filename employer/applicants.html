@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Applicants ATS · TalentArc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ─────────────────────────────────────────
+       DESIGN TOKENS
+     ───────────────────────────────────────── */
+    :root {
+      --primary:        #6366F1;
+      --primary-light:  #818CF8;
+      --primary-dark:   #4F46E5;
+      --accent:         #06B6D4;
+      --success:        #10B981;
+      --warning:        #F59E0B;
+      --error:          #EF4444;
+      --purple:         #A855F7;
+
+      /* Radius */
+      --r-sm:  8px;
+      --r-md:  12px;
+      --r-lg:  16px;
+      --r-xl:  20px;
+      --r-pill:999px;
+
+      /* Transitions */
+      --t-fast: 0.15s ease;
+      --t-base: 0.25s ease;
+      --t-slow: 0.4s ease;
+
+      /* Sidebar */
+      --sidebar-w: 240px;
+    }
+
+    /* Dark theme */
+    [data-theme="dark"] {
+      --bg-base:    #0A0A0F;
+      --bg-1:       #0F0F17;
+      --bg-2:       #13131E;
+      --bg-3:       #1A1A28;
+      --bg-4:       #1E1E2E;
+      --bg-5:       #242438;
+      --bg-hover:   #252535;
+      --border:     rgba(255,255,255,0.06);
+      --border-2:   rgba(255,255,255,0.10);
+      --text-1:     #E2E8F0;
+      --text-2:     #94A3B8;
+      --text-3:     #64748B;
+      --shadow:     0 4px 24px rgba(0,0,0,0.5);
+      --shadow-sm:  0 2px 8px  rgba(0,0,0,0.3);
+      --glow:       0 0 20px rgba(99,102,241,0.15);
+    }
+
+    /* Light theme */
+    [data-theme="light"] {
+      --bg-base:    #F0F0F8;
+      --bg-1:       #FAFAFA;
+      --bg-2:       #FFFFFF;
+      --bg-3:       #F5F5FF;
+      --bg-4:       #EDEDFA;
+      --bg-5:       #E8E8F5;
+      --bg-hover:   #F0F0FF;
+      --border:     rgba(0,0,0,0.08);
+      --border-2:   rgba(0,0,0,0.12);
+      --text-1:     #0F172A;
+      --text-2:     #475569;
+      --text-3:     #94A3B8;
+      --shadow:     0 4px 24px rgba(0,0,0,0.08);
+      --shadow-sm:  0 2px 8px  rgba(0,0,0,0.05);
+      --glow:       0 0 20px rgba(99,102,241,0.08);
+    }
+
+    /* ─────────────────────────────────────────
+       RESET & BASE
+     ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+      transition: background var(--t-base), color var(--t-base);
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ─────────────────────────────────────────
+       LAYOUT SHELL
+     ───────────────────────────────────────── */
+    .app-shell { display: flex; min-height: 100vh; }
+
+    /* ─────────────────────────────────────────
+       SIDEBAR
+     ───────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0;
+      display: flex; flex-direction: column; background: var(--bg-2); border-right: 1px solid var(--border);
+      z-index: 100; transition: transform var(--t-base), background var(--t-base); overflow: hidden;
+    }
+    .sidebar::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(99,102,241,0.04) 0%, transparent 60%); pointer-events: none;
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px; padding: 22px 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), var(--purple));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.4); flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 15px; font-weight: 700; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--primary-light), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; scrollbar-width: none; }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+    .nav-section-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
+      padding: 12px 10px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r-sm);
+      color: var(--text-2); font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all var(--t-fast); position: relative; margin-bottom: 2px;
+      white-space: nowrap; overflow: hidden;
+    }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-1); }
+    .nav-item.active { background: rgba(99,102,241,0.15); color: var(--primary-light); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px;
+      background: linear-gradient(180deg, var(--primary), var(--purple)); border-radius: 0 3px 3px 0;
+    }
+    .nav-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+    .nav-label { flex: 1; }
+    .nav-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill); line-height: 1.4; }
+    .badge-number { background: var(--error); color: #fff; }
+
+    .sidebar-profile {
+      padding: 14px 14px 18px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background var(--t-fast);
+    }
+    .sidebar-profile:hover { background: var(--bg-hover); }
+    .profile-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0; border: 2px solid rgba(99,102,241,0.4);
+    }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-name { font-size: 12.5px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-role { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .settings-btn {
+      width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      color: var(--text-3); transition: all var(--t-fast); flex-shrink: 0;
+    }
+    .settings-btn:hover { background: var(--border-2); color: var(--text-1); }
+
+    /* ─────────────────────────────────────────
+       MAIN AREA
+     ───────────────────────────────────────── */
+    .main-area { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ─────────────────────────────────────────
+       TOP HEADER
+     ───────────────────────────────────────── */
+    .top-header {
+      position: sticky; top: 0; z-index: 90; background: rgba(10,10,15,0.75); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 28px;
+      height: 66px; display: flex; align-items: center; gap: 20px; transition: background var(--t-base);
+    }
+    [data-theme="light"] .top-header { background: rgba(250,250,250,0.85); }
+    .header-greeting { flex: 1; }
+    .header-greeting h1 { font-size: 16px; font-weight: 700; color: var(--text-1); letter-spacing: -0.2px; }
+    .header-greeting p { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center;
+      color: var(--text-2); background: var(--bg-3); border: 1px solid var(--border); cursor: pointer; transition: all var(--t-fast);
+      position: relative;
+    }
+    .icon-btn:hover { background: var(--bg-4); color: var(--text-1); border-color: var(--border-2); }
+    .theme-toggle { width: 36px; height: 36px; }
+    .menu-toggle { display: none; }
+
+    /* ─────────────────────────────────────────
+       PAGE CONTENT
+     ───────────────────────────────────────── */
+    .page-content { padding: 24px 28px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ─────────────────────────────────────────
+       ATS BAR & TABS
+     ───────────────────────────────────────── */
+    .ats-filters {
+      display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);
+      padding-bottom: 2px; flex-wrap: wrap; gap: 12px;
+    }
+    .tabs { display: flex; gap: 8px; }
+    .tab {
+      padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-2); border-radius: var(--r-sm);
+      transition: all var(--t-fast); cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .tab:hover { color: var(--text-1); background: var(--bg-hover); }
+    .tab.active { color: var(--primary-light); background: rgba(99,102,241,0.1); font-weight: 600; }
+    .tab-count { font-size: 10.5px; padding: 2px 6px; border-radius: var(--r-pill); background: var(--bg-3); color: var(--text-3); }
+    .tab.active .tab-count { background: var(--primary); color: #fff; }
+
+    .search-panel { display: flex; gap: 10px; width: 100%; max-width: 480px; }
+    .search-input-wrap { position: relative; flex: 1; }
+    .search-input-wrap input {
+      width: 100%; height: 38px; padding: 0 12px 0 36px; background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--r-md); font-size: 13px; color: var(--text-1); outline: none; transition: all var(--t-fast);
+    }
+    .search-input-wrap input:focus { border-color: var(--primary); background: var(--bg-3); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+    .search-icon-inline { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; }
+    .sort-select {
+      height: 38px; padding: 0 32px 0 12px; background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--r-md); font-size: 13px; color: var(--text-2); outline: none; transition: all var(--t-fast);
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+    .sort-select:focus { border-color: var(--primary); }
+
+    /* Bulk Action Bar */
+    .bulk-bar {
+      display: none; align-items: center; justify-content: space-between; padding: 10px 18px;
+      background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25); border-radius: var(--r-md);
+      font-size: 13px; animation: slideDown 0.25s ease-out;
+    }
+    @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .bulk-left { display: flex; align-items: center; gap: 10px; color: var(--text-1); font-weight: 500; }
+    .bulk-actions { display: flex; gap: 8px; }
+    .btn-bulk {
+      padding: 6px 12px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600; cursor: pointer; transition: all var(--t-fast);
+    }
+    .btn-bulk-shortlist { background: var(--primary); color: #fff; }
+    .btn-bulk-shortlist:hover { background: var(--primary-dark); }
+    .btn-bulk-reject { border: 1px solid var(--border); color: var(--text-2); }
+    .btn-bulk-reject:hover { border-color: var(--error); color: var(--error); }
+
+    /* ─────────────────────────────────────────
+       ATS CONTENT GRID
+     ───────────────────────────────────────── */
+    .ats-grid { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
+    .candidate-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .cand-card {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px;
+      cursor: pointer; transition: all var(--t-base); display: flex; gap: 12px; align-items: flex-start;
+      position: relative;
+    }
+    .cand-card:hover { border-color: var(--border-2); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+    .cand-card.active { border-color: var(--primary); background: rgba(99,102,241,0.03); box-shadow: var(--glow); }
+
+    .cand-check { margin-top: 3px; cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary); }
+    .cand-avatar {
+      width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .cand-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .cand-name-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .cand-name { font-size: 14px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .match-badge {
+      font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: var(--r-pill); white-space: nowrap;
+    }
+    .match-high { background: rgba(16,185,129,0.12); color: var(--success); }
+    .match-mid  { background: rgba(245,158,11,0.12); color: var(--warning); }
+    .match-low  { background: rgba(239,68,68,0.12); color: var(--error); }
+
+    .cand-role { font-size: 12.5px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cand-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; font-size: 11.5px; color: var(--text-3); }
+    .cand-time { display: flex; align-items: center; gap: 4px; }
+    .status-chip { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: var(--r-pill); text-transform: uppercase; letter-spacing: 0.3px; }
+    .chip-new { background: rgba(6,182,212,0.12); color: var(--accent); }
+    .chip-shortlisted { background: rgba(16,185,129,0.12); color: var(--success); }
+    .chip-interview { background: rgba(99,102,241,0.12); color: var(--primary-light); }
+
+    .cand-actions { display: flex; gap: 6px; opacity: 0; transition: opacity var(--t-fast); position: absolute; right: 12px; bottom: 12px; }
+    .cand-card:hover .cand-actions { opacity: 1; }
+    .action-icon-btn {
+      width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      background: var(--bg-3); border: 1px solid var(--border); color: var(--text-3); transition: all var(--t-fast);
+    }
+    .action-icon-btn:hover { background: var(--bg-hover); color: var(--text-1); border-color: var(--border-2); }
+    .action-icon-btn.heart-btn:hover { color: var(--success); }
+    .action-icon-btn.message-btn:hover { color: var(--primary-light); }
+    .action-icon-btn.reject-btn:hover { color: var(--error); }
+
+    /* Candidate Details Detail Panel */
+    .cand-detail {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 24px;
+      display: flex; flex-direction: column; gap: 24px; position: sticky; top: 86px;
+    }
+    .detail-header { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 20px; flex-wrap: wrap; }
+    .detail-card-left { display: flex; gap: 16px; }
+    .detail-avatar {
+      width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 700; color: #fff;
+    }
+    .detail-name { font-size: 20px; font-weight: 700; color: var(--text-1); letter-spacing: -0.4px; }
+    .detail-role { font-size: 13.5px; color: var(--text-2); margin-top: 2px; }
+    .detail-socials { display: flex; gap: 10px; margin-top: 8px; }
+    .social-link { color: var(--text-3); transition: color var(--t-fast); }
+    .social-link:hover { color: var(--text-1); }
+
+    .detail-score-circle { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .circle-wrap { width: 56px; height: 56px; position: relative; display: flex; align-items: center; justify-content: center; }
+    .circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .circle-bg { fill: none; stroke: var(--bg-3); stroke-width: 4px; }
+    .circle-val { fill: none; stroke: var(--primary); stroke-dasharray: 100; stroke-dashoffset: 20; stroke-width: 4px; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+    .circle-text { font-size: 13px; font-weight: 700; fill: var(--text-1); }
+
+    .btn-row { display: flex; gap: 8px; width: 100%; margin-top: 4px; }
+    .btn {
+      padding: 10px 18px; border-radius: var(--r-pill); font-size: 13px; font-weight: 600; display: inline-flex;
+      align-items: center; gap: 6px; transition: all var(--t-fast); cursor: pointer;
+    }
+    .btn-success { background: linear-gradient(135deg, var(--success), #34d399); color: #fff; }
+    .btn-success:hover { transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary { border: 1px solid var(--border); color: var(--text-2); }
+    .btn-secondary:hover { border-color: var(--border-2); color: var(--text-1); background: var(--bg-hover); }
+    .btn-danger { border: 1px solid var(--border); color: var(--error); }
+    .btn-danger:hover { background: rgba(239,68,68,0.05); border-color: var(--error); }
+
+    /* Tabs Panel for Detail Panel */
+    .detail-tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 2px; margin-bottom: 10px; }
+    .d-tab {
+      padding: 8px 12px; font-size: 13px; font-weight: 500; color: var(--text-2); border-bottom: 2px solid transparent;
+      cursor: pointer; transition: all var(--t-fast);
+    }
+    .d-tab:hover { color: var(--text-1); }
+    .d-tab.active { color: var(--primary-light); border-color: var(--primary); font-weight: 600; }
+
+    .tab-content-panel { display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.25s ease; }
+    .tab-content-panel.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Overview Section */
+    .section-title { font-size: 13.5px; font-weight: 700; color: var(--text-1); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+    .skill-chip { font-size: 11.5px; font-weight: 500; padding: 4px 10px; border-radius: var(--r-pill); background: var(--bg-3); border: 1px solid var(--border); color: var(--text-2); }
+    
+    .exp-timeline { display: flex; flex-direction: column; position: relative; padding-left: 20px; margin-top: 10px; }
+    .exp-timeline::before { content: ''; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; background: var(--border); }
+    .exp-item { position: relative; padding-bottom: 18px; }
+    .exp-item:last-child { padding-bottom: 0; }
+    .exp-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary); border: 2px solid var(--bg-2); }
+    .exp-header { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+    .exp-role { font-weight: 600; color: var(--text-1); }
+    .exp-date { font-size: 11px; color: var(--text-3); }
+    .exp-comp { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+    /* AI Analysis Panel */
+    .ai-breakdown { display: flex; flex-direction: column; gap: 12px; }
+    .ai-bar-row { display: flex; flex-direction: column; gap: 6px; }
+    .ai-bar-header { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-2); }
+    .ai-bar-header span:last-child { font-weight: 600; color: var(--text-1); }
+    .ai-bar-wrap { background: var(--bg-3); border-radius: var(--r-pill); height: 6px; overflow: hidden; }
+    .ai-bar-fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--primary), var(--purple)); width: 0%; transition: width 0.6s ease; }
+
+    .ai-summary-box {
+      padding: 16px; border-radius: var(--r-lg); background: rgba(99,102,241,0.06);
+      border: 1px solid rgba(99,102,241,0.15); font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    }
+
+    /* Notes section */
+    .notes-editor { display: flex; flex-direction: column; gap: 12px; }
+    .notes-textarea {
+      width: 100%; height: 120px; padding: 12px; background: var(--bg-3); border: 1px solid var(--border);
+      border-radius: var(--r-md); color: var(--text-1); font-family: inherit; font-size: 13px; resize: none; outline: none;
+    }
+    .notes-textarea:focus { border-color: var(--primary); }
+    
+    .rating-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    .rating-label { font-size: 13px; color: var(--text-2); }
+    .stars { display: flex; gap: 4px; }
+    .star-icon { color: var(--text-3); cursor: pointer; transition: color var(--t-fast); }
+    .star-icon.filled { color: var(--warning); }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .ats-grid { grid-template-columns: 1fr; }
+      .cand-detail { position: relative; top: 0; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; }
+      .menu-toggle { display: flex; }
+      .top-header { padding: 0 16px; }
+      .page-content { padding: 16px; }
+      .ats-filters { flex-direction: column; align-items: flex-start; }
+      .search-panel { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-text">TalentArc</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Employer Portal</div>
+      <a href="./dashboard.html" class="nav-item">
+        <i data-lucide="layout-dashboard" class="nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="building" class="nav-icon"></i>
+        <span class="nav-label">Company Profile</span>
+      </a>
+      <a href="./post-job.html" class="nav-item">
+        <i data-lucide="plus-circle" class="nav-icon"></i>
+        <span class="nav-label">Post a Job</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="briefcase" class="nav-icon"></i>
+        <span class="nav-label">Manage Jobs</span>
+        <span class="nav-badge badge-number">12</span>
+      </a>
+      <a href="./applicants.html" class="nav-item active">
+        <i data-lucide="users" class="nav-icon"></i>
+        <span class="nav-label">Applicants</span>
+        <span class="nav-badge badge-number">89</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="search" class="nav-icon"></i>
+        <span class="nav-label">Candidate Search</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="calendar" class="nav-icon"></i>
+        <span class="nav-label">Interviews</span>
+      </a>
+    </nav>
+    <div class="sidebar-profile">
+      <div class="profile-avatar">ST</div>
+      <div class="profile-info">
+        <div class="profile-name">Stripe</div>
+        <div class="profile-role">Premium Employer</div>
+      </div>
+      <button class="settings-btn" aria-label="Settings">
+        <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+        <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+      </button>
+      <div class="header-greeting">
+        <h1>Applicant ATS</h1>
+        <p>Manage candidate profiles for: Senior Software Engineer</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+          <i data-lucide="sun" id="themeIcon" style="width: 18px; height: 18px;"></i>
+        </button>
+        <button class="icon-btn" aria-label="Export Data">
+          <i data-lucide="download" style="width: 18px; height: 18px;"></i>
+        </button>
+        <div class="header-avatar" style="background:#635BFF">S</div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="page-content">
+      <!-- ATS TABS & SEARCH -->
+      <section class="ats-filters">
+        <div class="tabs">
+          <div class="tab active" onclick="filterCandidates('all')">All <span class="tab-count">89</span></div>
+          <div class="tab" onclick="filterCandidates('new')">New <span class="tab-count">34</span></div>
+          <div class="tab" onclick="filterCandidates('shortlisted')">Shortlisted <span class="tab-count">18</span></div>
+          <div class="tab" onclick="filterCandidates('interview')">Interview <span class="tab-count">8</span></div>
+          <div class="tab" onclick="filterCandidates('offered')">Offer <span class="tab-count">2</span></div>
+          <div class="tab" onclick="filterCandidates('rejected')">Rejected <span class="tab-count">27</span></div>
+        </div>
+        <div class="search-panel">
+          <div class="search-input-wrap">
+            <i data-lucide="search" class="search-icon-inline" style="width:14px;height:14px;"></i>
+            <input type="text" id="searchInput" placeholder="Search candidates, skills..." onkeyup="searchCandidates()" />
+          </div>
+          <select class="sort-select" onchange="sortCandidates(this.value)">
+            <option value="score">Sort: Match Score</option>
+            <option value="recent">Sort: Most Recent</option>
+            <option value="exp">Sort: Experience</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- BULK ACTION BAR -->
+      <div class="bulk-bar" id="bulkBar">
+        <div class="bulk-left">
+          <span id="bulkCount">0 candidates selected</span>
+        </div>
+        <div class="bulk-actions">
+          <button class="btn-bulk btn-bulk-shortlist" onclick="bulkShortlist()">Move to Shortlist</button>
+          <button class="btn-bulk btn-bulk-reject" onclick="bulkReject()">Reject Selected</button>
+        </div>
+      </div>
+
+      <!-- ATS GRID -->
+      <div class="ats-grid">
+        <!-- LEFT: CANDIDATE LIST -->
+        <section class="candidate-list" id="candidatesList">
+          <!-- Candidate 1: James Chen -->
+          <div class="cand-card active" data-id="james" data-status="shortlisted" data-score="94" data-exp="7" onclick="selectCandidate('james')">
+            <input type="checkbox" class="cand-check" onclick="toggleSelectCandidate(event)" />
+            <div class="cand-avatar" style="background:#EF4444;">JC</div>
+            <div class="cand-info">
+              <div class="cand-name-row">
+                <span class="cand-name">James Chen</span>
+                <span class="match-badge match-high">94%</span>
+              </div>
+              <div class="cand-role">Senior Engineer @ Google</div>
+              <div class="cand-meta">
+                <span class="cand-time"><i data-lucide="clock" style="width:11px;height:11px;"></i> 2d ago</span>
+                <span class="status-chip chip-shortlisted">Shortlisted</span>
+              </div>
+            </div>
+            <div class="cand-actions">
+              <button class="action-icon-btn heart-btn" title="Shortlist"><i data-lucide="heart" style="width:12px;height:12px;"></i></button>
+              <button class="action-icon-btn message-btn" title="Message"><i data-lucide="message-square" style="width:12px;height:12px;"></i></button>
+              <button class="action-icon-btn reject-btn" title="Reject"><i data-lucide="x" style="width:12px;height:12px;"></i></button>
+            </div>
+          </div>
+
+          <!-- Candidate 2: Emily Watson -->
+          <div class="cand-card" data-id="emily" data-status="new" data-score="88" data-exp="5" onclick="selectCandidate('emily')">
+            <input type="checkbox" class="cand-check" onclick="toggleSelectCandidate(event)" />
+            <div class="cand-avatar" style="background:#10B981;">EW</div>
+            <div class="cand-info">
+              <div class="cand-name-row">
+                <span class="cand-name">Emily Watson</span>
+                <span class="match-badge match-high">88%</span>
+              </div>
+              <div class="cand-role">Software Dev III @ Microsoft</div>
+              <div class="cand-meta">
+                <span class="cand-time"><i data-lucide="clock" style="width:11px;height:11px;"></i> 3d ago</span>
+                <span class="status-chip chip-new">New</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Candidate 3: Michael Scott -->
+          <div class="cand-card" data-id="michael" data-status="interview" data-score="79" data-exp="9" onclick="selectCandidate('michael')">
+            <input type="checkbox" class="cand-check" onclick="toggleSelectCandidate(event)" />
+            <div class="cand-avatar" style="background:#F59E0B;">MS</div>
+            <div class="cand-info">
+              <div class="cand-name-row">
+                <span class="cand-name">Michael Scott</span>
+                <span class="match-badge match-mid">79%</span>
+              </div>
+              <div class="cand-role">Frontend Engineer @ Comcast</div>
+              <div class="cand-meta">
+                <span class="cand-time"><i data-lucide="clock" style="width:11px;height:11px;"></i> 5d ago</span>
+                <span class="status-chip chip-interview">Interview</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT: CANDIDATE DETAIL -->
+        <section class="cand-detail" id="detailPanel">
+          <div class="detail-header">
+            <div class="detail-card-left">
+              <div class="detail-avatar" id="detailAvatar" style="background:#EF4444;">JC</div>
+              <div>
+                <h2 class="detail-name" id="detailName">James Chen</h2>
+                <div class="detail-role" id="detailRole">Senior Engineer @ Google</div>
+                <div class="detail-socials">
+                  <a href="#" class="social-link" aria-label="LinkedIn"><i data-lucide="linkedin" style="width: 14px; height: 14px;"></i></a>
+                  <a href="#" class="social-link" aria-label="GitHub"><i data-lucide="github" style="width: 14px; height: 14px;"></i></a>
+                  <a href="#" class="social-link" aria-label="Email"><i data-lucide="mail" style="width: 14px; height: 14px;"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Score -->
+            <div class="detail-score-circle">
+              <div class="circle-wrap">
+                <svg class="circle-svg" viewBox="0 0 36 36">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="circle-val" id="detailProgress" stroke-dasharray="94, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="circle-text" id="detailMatchVal" style="position:absolute;font-size:13px;font-weight:700;">94%</div>
+              </div>
+              <span style="font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;">Match Score</span>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-success" onclick="updateCandidateStatus('shortlisted')"><i data-lucide="check" style="width:14px;height:14px;"></i> Shortlist</button>
+              <button class="btn btn-primary" onclick="updateCandidateStatus('interview')"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Schedule Interview</button>
+              <button class="btn btn-secondary"><i data-lucide="message-square" style="width:14px;height:14px;"></i> Message</button>
+              <button class="btn btn-danger" onclick="updateCandidateStatus('rejected')"><i data-lucide="slash" style="width:14px;height:14px;"></i> Reject</button>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="detail-tabs">
+            <div class="d-tab active" onclick="switchDetailTab('overview')">Overview</div>
+            <div class="d-tab" onclick="switchDetailTab('analysis')">AI Analysis</div>
+            <div class="d-tab" onclick="switchDetailTab('notes')">Interview Notes</div>
+          </div>
+
+          <!-- Overview Tab Content -->
+          <div class="tab-content-panel active" id="tab-overview">
+            <div>
+              <h3 class="section-title"><i data-lucide="cpu" style="width: 14px; height: 14px; color: var(--primary);"></i> Core Skills</h3>
+              <div class="skills-grid" id="detailSkills">
+                <span class="skill-chip">React</span>
+                <span class="skill-chip">TypeScript</span>
+                <span class="skill-chip">Node.js</span>
+                <span class="skill-chip">GraphQL</span>
+                <span class="skill-chip">AWS</span>
+                <span class="skill-chip">Kubernetes</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="section-title"><i data-lucide="briefcase" style="width: 14px; height: 14px; color: var(--primary);"></i> Work Experience</h3>
+              <div class="exp-timeline" id="detailExp">
+                <div class="exp-item">
+                  <div class="exp-dot"></div>
+                  <div class="exp-header">
+                    <span class="exp-role">Senior Software Engineer</span>
+                    <span class="exp-date">2021 – Present</span>
+                  </div>
+                  <div class="exp-comp">Google · Mountain View, CA</div>
+                </div>
+                <div class="exp-item">
+                  <div class="exp-dot"></div>
+                  <div class="exp-header">
+                    <span class="exp-role">Software Engineer II</span>
+                    <span class="exp-date">2019 – 2021</span>
+                  </div>
+                  <div class="exp-comp">LinkedIn · Sunnyvale, CA</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="section-title"><i data-lucide="graduation-cap" style="width: 14px; height: 14px; color: var(--primary);"></i> Education</h3>
+              <div class="exp-timeline" id="detailEdu">
+                <div class="exp-item" style="padding-bottom:0;">
+                  <div class="exp-dot" style="background:var(--accent);"></div>
+                  <div class="exp-header">
+                    <span class="exp-role">MS in Computer Science</span>
+                    <span class="exp-date">2017 – 2019</span>
+                  </div>
+                  <div class="exp-comp">Stanford University · Stanford, CA</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Analysis Tab Content -->
+          <div class="tab-content-panel" id="tab-analysis">
+            <div class="ai-breakdown">
+              <div class="ai-bar-row">
+                <div class="ai-bar-header"><span>Skills Compatibility</span><span id="ai-skills-val">96%</span></div>
+                <div class="ai-bar-wrap"><div class="ai-bar-fill" id="ai-skills-bar" style="width:96%"></div></div>
+              </div>
+              <div class="ai-bar-row">
+                <div class="ai-bar-header"><span>Experience Match</span><span id="ai-exp-val">90%</span></div>
+                <div class="ai-bar-wrap"><div class="ai-bar-fill" id="ai-exp-bar" style="width:90%"></div></div>
+              </div>
+              <div class="ai-bar-row">
+                <div class="ai-bar-header"><span>Role Relevance</span><span id="ai-rel-val">92%</span></div>
+                <div class="ai-bar-wrap"><div class="ai-bar-fill" id="ai-rel-bar" style="width:92%"></div></div>
+              </div>
+            </div>
+
+            <div class="ai-summary-box" id="aiSummary">
+              James has outstanding core skills alignment with 7+ years of experience in product engineering. Excellent record of backend and frontend delivery at Google and LinkedIn. Highly recommended for shortlisting and interview loops.
+            </div>
+          </div>
+
+          <!-- Interview Notes Tab Content -->
+          <div class="tab-content-panel" id="tab-notes">
+            <div class="notes-editor">
+              <div class="rating-row">
+                <span class="rating-label">Technical Skills</span>
+                <div class="stars" data-category="tech">
+                  <i data-lucide="star" class="star-icon filled" onclick="rateStar(event, 1)"></i>
+                  <i data-lucide="star" class="star-icon filled" onclick="rateStar(event, 2)"></i>
+                  <i data-lucide="star" class="star-icon filled" onclick="rateStar(event, 3)"></i>
+                  <i data-lucide="star" class="star-icon filled" onclick="rateStar(event, 4)"></i>
+                  <i data-lucide="star" class="star-icon" onclick="rateStar(event, 5)"></i>
+                </div>
+              </div>
+              <div class="rating-row">
+                <span class="rating-label">Communication</span>
+                <div class="stars" data-category="comm">
+                  <i data-lucide="star" class="star-icon filled" onclick="rateStar(event, 1)"></i>
+                  <i data-lucide="star" class="star-icon filled" onclick="rateStar(event, 2)"></i>
+                  <i data-lucide="star" class="star-icon filled" onclick="rateStar(event, 3)"></i>
+                  <i data-lucide="star" class="star-icon" onclick="rateStar(event, 4)"></i>
+                  <i data-lucide="star" class="star-icon" onclick="rateStar(event, 5)"></i>
+                </div>
+              </div>
+              <textarea class="notes-textarea" placeholder="Add candidate notes here... (e.g. cultural alignment, system design performance)"></textarea>
+              <button class="btn btn-primary" onclick="saveNotes()" style="align-self:flex-end;">Save Notes</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────
+  // THEME MANAGEMENT
+  // ─────────────────────────────────────────
+  const themeToggleBtn = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  
+  function getTheme() { return localStorage.getItem('tarc-employer-theme') || 'dark'; }
+  
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      themeIcon.setAttribute('data-lucide', 'sun');
+    } else {
+      themeIcon.setAttribute('data-lucide', 'moon');
+    }
+    if (window.lucide) lucide.createIcons();
+    localStorage.setItem('tarc-employer-theme', theme);
+  }
+  
+  themeToggleBtn.addEventListener('click', () => {
+    applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(getTheme());
+
+  // ─────────────────────────────────────────
+  // MOBILE NAVIGATION
+  // ─────────────────────────────────────────
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && e.target !== menuToggle && sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // ─────────────────────────────────────────
+  // DATA BINDINGS
+  // ─────────────────────────────────────────
+  const candidatesData = {
+    james: {
+      name: "James Chen",
+      role: "Senior Engineer @ Google",
+      avatarText: "JC",
+      avatarBg: "#EF4444",
+      score: 94,
+      skills: ["React", "TypeScript", "Node.js", "GraphQL", "AWS", "Kubernetes"],
+      exp: [
+        { role: "Senior Software Engineer", date: "2021 – Present", comp: "Google · Mountain View, CA" },
+        { role: "Software Engineer II", date: "2019 – 2021", comp: "LinkedIn · Sunnyvale, CA" }
+      ],
+      edu: [{ role: "MS in Computer Science", date: "2017 – 2019", comp: "Stanford University · Stanford, CA" }],
+      aiSummary: "James has outstanding core skills alignment with 7+ years of experience in product engineering. Excellent record of backend and frontend delivery at Google and LinkedIn. Highly recommended for shortlisting and interview loops.",
+      aiSkills: 96,
+      aiExp: 90,
+      aiRel: 92
+    },
+    emily: {
+      name: "Emily Watson",
+      role: "Software Dev III @ Microsoft",
+      avatarText: "EW",
+      avatarBg: "#10B981",
+      score: 88,
+      skills: ["React", "CSS3", "JavaScript", "Webpack", "Tailwind CSS", "Azure"],
+      exp: [
+        { role: "Software Dev III", date: "2022 – Present", comp: "Microsoft · Redmond, WA" },
+        { role: "Software Dev II", date: "2020 – 2022", comp: "Amazon · Seattle, WA" }
+      ],
+      edu: [{ role: "BS in Software Engineering", date: "2016 – 2020", comp: "University of Washington · Seattle, WA" }],
+      aiSummary: "Emily is a highly skilled frontend developer with strong CSS and React experience. Built scalable UI systems at Microsoft. Good culture alignment and solid delivery stats.",
+      aiSkills: 90,
+      aiExp: 84,
+      aiRel: 86
+    },
+    michael: {
+      name: "Michael Scott",
+      role: "Frontend Engineer @ Comcast",
+      avatarText: "MS",
+      avatarBg: "#F59E0B",
+      score: 79,
+      skills: ["JavaScript", "HTML5", "CSS3", "React", "Redux"],
+      exp: [
+        { role: "Frontend Engineer", date: "2017 – Present", comp: "Comcast · Philadelphia, PA" }
+      ],
+      edu: [{ role: "BS in Information Technology", date: "2013 – 2017", comp: "Drexel University · Philadelphia, PA" }],
+      aiSummary: "Michael has stable tenure at Comcast with standard frontend technical skills. May require assessment to verify system design depth. Good potential for product alignment.",
+      aiSkills: 78,
+      aiExp: 80,
+      aiRel: 76
+    }
+  };
+
+  function selectCandidate(id) {
+    document.querySelectorAll('.cand-card').forEach(c => c.classList.remove('active'));
+    const selectedCard = document.querySelector(`.cand-card[data-id="${id}"]`);
+    if (selectedCard) selectedCard.classList.add('active');
+
+    const data = candidatesData[id];
+    if (!data) return;
+
+    // Header updates
+    document.getElementById('detailName').textContent = data.name;
+    document.getElementById('detailRole').textContent = data.role;
+    const detailAvatar = document.getElementById('detailAvatar');
+    detailAvatar.style.background = data.avatarBg;
+    detailAvatar.textContent = data.avatarText;
+
+    // Score update
+    document.getElementById('detailMatchVal').textContent = `${data.score}%`;
+    const offset = 100 - data.score;
+    document.getElementById('detailProgress').setAttribute('stroke-dashoffset', offset);
+
+    // Skills
+    const skillsEl = document.getElementById('detailSkills');
+    skillsEl.innerHTML = '';
+    data.skills.forEach(skill => {
+      const chip = document.createElement('span');
+      chip.className = 'skill-chip';
+      chip.textContent = skill;
+      skillsEl.appendChild(chip);
+    });
+
+    // Experience
+    const expEl = document.getElementById('detailExp');
+    expEl.innerHTML = '';
+    data.exp.forEach(e => {
+      const item = document.createElement('div');
+      item.className = 'exp-item';
+      item.innerHTML = `
+        <div class="exp-dot"></div>
+        <div class="exp-header">
+          <span class="exp-role">${e.role}</span>
+          <span class="exp-date">${e.date}</span>
+        </div>
+        <div class="exp-comp">${e.comp}</div>
+      `;
+      expEl.appendChild(item);
+    });
+
+    // Education
+    const eduEl = document.getElementById('detailEdu');
+    eduEl.innerHTML = '';
+    data.edu.forEach(e => {
+      const item = document.createElement('div');
+      item.className = 'exp-item';
+      item.style.paddingBottom = '0';
+      item.innerHTML = `
+        <div class="exp-dot" style="background:var(--accent);"></div>
+        <div class="exp-header">
+          <span class="exp-role">${e.role}</span>
+          <span class="exp-date">${e.date}</span>
+        </div>
+        <div class="exp-comp">${e.comp}</div>
+      `;
+      eduEl.appendChild(item);
+    });
+
+    // AI Analysis Tab
+    document.getElementById('ai-skills-val').textContent = `${data.aiSkills}%`;
+    document.getElementById('ai-skills-bar').style.width = `${data.aiSkills}%`;
+    document.getElementById('ai-exp-val').textContent = `${data.aiExp}%`;
+    document.getElementById('ai-exp-bar').style.width = `${data.aiExp}%`;
+    document.getElementById('ai-rel-val').textContent = `${data.aiRel}%`;
+    document.getElementById('ai-rel-bar').style.width = `${data.aiRel}%`;
+    document.getElementById('aiSummary').textContent = data.aiSummary;
+
+    // Reset notes editor rating
+    resetRatings();
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function switchDetailTab(tabId) {
+    document.querySelectorAll('.d-tab').forEach(tab => tab.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+  }
+
+  // Bulk operation tracking
+  const selectedCandidates = new Set();
+  function toggleSelectCandidate(event) {
+    event.stopPropagation();
+    const checkbox = event.target;
+    const card = checkbox.closest('.cand-card');
+    const id = card.getAttribute('data-id');
+
+    if (checkbox.checked) {
+      selectedCandidates.add(id);
+    } else {
+      selectedCandidates.delete(id);
+    }
+
+    const bulkBar = document.getElementById('bulkBar');
+    if (selectedCandidates.size > 0) {
+      bulkBar.style.display = 'flex';
+      document.getElementById('bulkCount').textContent = `${selectedCandidates.size} candidate(s) selected`;
+    } else {
+      bulkBar.style.display = 'none';
+    }
+  }
+
+  function bulkShortlist() {
+    alert(`Shortlisted candidates: ${Array.from(selectedCandidates).join(', ')}`);
+    resetBulkSelection();
+  }
+
+  function bulkReject() {
+    alert(`Rejected candidates: ${Array.from(selectedCandidates).join(', ')}`);
+    resetBulkSelection();
+  }
+
+  function resetBulkSelection() {
+    selectedCandidates.clear();
+    document.querySelectorAll('.cand-check').forEach(chk => chk.checked = false);
+    document.getElementById('bulkBar').style.display = 'none';
+  }
+
+  // Interview Notes rating helper
+  function rateStar(event, rating) {
+    const star = event.currentTarget;
+    const starsContainer = star.closest('.stars');
+    const stars = starsContainer.querySelectorAll('.star-icon');
+    
+    stars.forEach((s, idx) => {
+      if (idx < rating) {
+        s.classList.add('filled');
+      } else {
+        s.classList.remove('filled');
+      }
+    });
+  }
+
+  function resetRatings() {
+    document.querySelectorAll('.stars .star-icon').forEach(star => {
+      star.classList.remove('filled');
+    });
+  }
+
+  function saveNotes() {
+    alert("Candidate notes and evaluation score saved successfully!");
+  }
+
+  function filterCandidates(status) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    const cards = document.querySelectorAll('.cand-card');
+    cards.forEach(card => {
+      const cardStatus = card.getAttribute('data-status');
+      if (status === 'all') {
+        card.style.display = 'flex';
+      } else if (cardStatus === status) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function searchCandidates() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.cand-card');
+    
+    cards.forEach(card => {
+      const id = card.getAttribute('data-id');
+      const data = candidatesData[id];
+      if (data.name.toLowerCase().includes(query) || data.role.toLowerCase().includes(query) || data.skills.some(s => s.toLowerCase().includes(query))) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  // Load first candidate
+  selectCandidate('james');
+</script>
+</body>
+</html>

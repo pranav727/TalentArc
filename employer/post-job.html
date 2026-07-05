@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Post a Job · TalentArc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --primary: #6366F1;
+    --primary-light: #818CF8;
+    --primary-gradient: linear-gradient(135deg, #6366F1, #818CF8);
+    --accent: #06B6D4;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 999px;
+    --font: 'Inter', sans-serif;
+    --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+  }
+  [data-theme="dark"] {
+    --bg-base: #0A0A0F;
+    --bg-surface: #0F0F17;
+    --bg-card: #13131E;
+    --bg-elevated: #1A1A28;
+    --bg-hover: #1E1E2E;
+    --text-primary: #E2E8F0;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --border: rgba(255,255,255,0.06);
+    --border-hover: rgba(255,255,255,0.12);
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
+    --input-bg: #1A1A28;
+    --input-border: rgba(255,255,255,0.08);
+    --input-focus: rgba(99,102,241,0.35);
+    --pill-bg: #1A1A28;
+    --pill-active-bg: rgba(99,102,241,0.15);
+    --pill-active-border: rgba(99,102,241,0.5);
+  }
+  [data-theme="light"] {
+    --bg-base: #F0F0F8;
+    --bg-surface: #FAFAFA;
+    --bg-card: #FFFFFF;
+    --bg-elevated: #F5F5FC;
+    --bg-hover: #EFEFFA;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #94A3B8;
+    --border: rgba(0,0,0,0.08);
+    --border-hover: rgba(0,0,0,0.15);
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 48px rgba(0,0,0,0.14);
+    --input-bg: #FFFFFF;
+    --input-border: rgba(0,0,0,0.1);
+    --input-focus: rgba(99,102,241,0.2);
+    --pill-bg: #F0F0F8;
+    --pill-active-bg: rgba(99,102,241,0.08);
+    --pill-active-border: rgba(99,102,241,0.4);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background var(--transition);
+  }
+  [data-theme="light"] .topbar { background: rgba(250,250,250,0.9); }
+
+  .topbar-left { display: flex; align-items: center; gap: 20px; }
+
+  .back-link {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 13px; font-weight: 500;
+    padding: 6px 10px; border-radius: var(--radius-sm);
+    transition: all var(--transition);
+  }
+  .back-link:hover { color: var(--text-primary); background: var(--bg-elevated); }
+
+  .logo {
+    font-size: 17px; font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.3px;
+  }
+
+  .step-indicator {
+    font-size: 13px; font-weight: 500;
+    color: var(--text-secondary);
+    padding: 4px 12px; border-radius: var(--radius-full);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+  }
+  .step-indicator span { color: var(--primary-light); font-weight: 600; }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .theme-btn {
+    width: 36px; height: 36px;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary); transition: all var(--transition);
+  }
+  .theme-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-track {
+    height: 3px; background: var(--border);
+    position: sticky; top: 60px; z-index: 99;
+  }
+  .progress-fill {
+    height: 100%; background: var(--primary-gradient);
+    width: 40%; transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* ─── STEPS NAV ─── */
+  .steps-nav {
+    max-width: 800px; margin: 32px auto 0;
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: center; gap: 0;
+  }
+  .step-node {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    position: relative;
+  }
+  .step-node:not(:last-child)::after {
+    content: '';
+    position: absolute; top: 14px; left: calc(50% + 14px);
+    width: calc(100% - 4px); height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .step-node.done:not(:last-child)::after { background: var(--primary); }
+
+  .step-circle {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    background: var(--bg-elevated); border: 2px solid var(--border);
+    color: var(--text-muted); z-index: 1; position: relative;
+    transition: all var(--transition);
+  }
+  .step-node.done .step-circle {
+    background: var(--primary); border-color: var(--primary);
+    color: #fff;
+  }
+  .step-node.active .step-circle {
+    background: rgba(99,102,241,0.15); border-color: var(--primary);
+    color: var(--primary-light); box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+  }
+  .step-label {
+    font-size: 11px; font-weight: 500; color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .step-node.active .step-label, .step-node.done .step-label {
+    color: var(--text-secondary);
+  }
+  .steps-nav-wrap {
+    display: flex; align-items: flex-start; gap: 0;
+    width: 100%;
+  }
+  .step-connector {
+    flex: 1; height: 2px; background: var(--border);
+    margin-top: 13px; min-width: 20px;
+  }
+  .step-connector.filled { background: var(--primary); }
+
+  /* ─── MAIN CONTENT ─── */
+  .wizard-wrap {
+    max-width: 800px; margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  .step-panel {
+    display: none;
+    animation: fadeSlideIn 0.3s ease;
+  }
+  .step-panel.active { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header { margin-bottom: 32px; }
+  .panel-title {
+    font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+    color: var(--text-primary);
+  }
+  .panel-subtitle { font-size: 14px; color: var(--text-secondary); margin-top: 6px; }
+
+  /* ─── FORM ELEMENTS ─── */
+  .form-group { margin-bottom: 24px; }
+  .form-label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--text-secondary); margin-bottom: 8px;
+    letter-spacing: 0.01em;
+  }
+  .form-label .required { color: var(--primary-light); margin-left: 3px; }
+
+  .form-input {
+    width: 100%; padding: 12px 16px;
+    background: var(--input-bg); border: 1px solid var(--input-border);
+    border-radius: var(--radius-md); color: var(--text-primary);
+    font-family: var(--font); font-size: 15px; font-weight: 400;
+    outline: none; transition: all var(--transition);
+    appearance: none;
+  }
+  .form-input::placeholder { color: var(--text-muted); }
+  .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--input-focus);
+  }
+  .form-input.large {
+    font-size: 18px; font-weight: 500; padding: 16px 20px;
+    border-radius: var(--radius-lg);
+  }
+  select.form-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 44px; cursor: pointer;
+  }
+  [data-theme="dark"] select.form-input { background-color: var(--input-bg); }
+  select.form-input option { background: var(--bg-card); }
+
+  /* ─── PILL SELECTOR ─── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill-option {
+    padding: 8px 18px; border-radius: var(--radius-full);
+    border: 1px solid var(--border);
+    background: var(--pill-bg);
+    color: var(--text-secondary); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all var(--transition);
+    user-select: none;
+  }
+  .pill-option:hover { border-color: var(--border-hover); color: var(--text-primary); }
+  .pill-option.selected {
+    background: var(--pill-active-bg);
+    border-color: var(--pill-active-border);
+    color: var(--primary-light);
+  }
+
+  /* ─── STEPPER ─── */
+  .stepper {
+    display: flex; align-items: center; gap: 0;
+    background: var(--input-bg); border: 1px solid var(--input-border);
+    border-radius: var(--radius-md); width: fit-content; overflow: hidden;
+  }
+  .stepper-btn {
+    width: 44px; height: 44px; border: none; background: transparent;
+    color: var(--text-secondary); font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition);
+  }
+  .stepper-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+  .stepper-value {
+    min-width: 56px; text-align: center; font-size: 16px; font-weight: 600;
+    color: var(--text-primary); padding: 0 8px;
+    border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+    line-height: 44px;
+  }
+
+  /* ─── RICH TEXT EDITOR ─── */
+  .rte-wrap {
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-md); overflow: hidden;
+    transition: all var(--transition);
+    background: var(--input-bg);
+  }
+  .rte-wrap:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--input-focus);
+  }
+  .rte-toolbar {
+    display: flex; flex-wrap: wrap; gap: 2px;
+    padding: 8px; background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+  }
+  .rte-btn {
+    width: 32px; height: 32px;
+    background: transparent; border: 1px solid transparent;
+    border-radius: var(--radius-sm); color: var(--text-secondary);
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition); font-family: var(--font);
+  }
+  .rte-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border); }
+  .rte-btn.active { background: rgba(99,102,241,0.15); color: var(--primary-light); border-color: rgba(99,102,241,0.3); }
+  .rte-divider { width: 1px; height: 24px; background: var(--border); margin: 4px 2px; }
+  .rte-content {
+    min-height: 180px; padding: 16px;
+    color: var(--text-primary); font-size: 14px; line-height: 1.7;
+    outline: none;
+  }
+  .rte-content:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-muted); pointer-events: none;
+  }
+
+  /* ─── SECTION WITH AI BUTTON ─── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .ai-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: var(--radius-full);
+    border: 1px solid rgba(99,102,241,0.3);
+    background: rgba(99,102,241,0.08);
+    color: var(--primary-light); font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all var(--transition);
+    font-family: var(--font);
+  }
+  .ai-btn:hover { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.5); transform: translateY(-1px); }
+
+  .char-count { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 6px; }
+
+  /* ─── TAG INPUT ─── */
+  .tag-input-wrap {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding: 10px 12px; min-height: 50px;
+    background: var(--input-bg); border: 1px solid var(--input-border);
+    border-radius: var(--radius-md); cursor: text;
+    transition: all var(--transition);
+  }
+  .tag-input-wrap:focus-within {
+    border-color: var(--primary); box-shadow: 0 0 0 3px var(--input-focus);
+  }
+  .tag-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.25); border-radius: var(--radius-full);
+    color: var(--primary-light); font-size: 13px; font-weight: 500;
+  }
+  .tag-chip .rm {
+    width: 14px; height: 14px; cursor: pointer; opacity: 0.6;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; transition: opacity var(--transition);
+    font-size: 12px;
+  }
+  .tag-chip .rm:hover { opacity: 1; }
+  .tag-input-inner {
+    border: none; background: transparent; outline: none;
+    color: var(--text-primary); font-family: var(--font);
+    font-size: 14px; min-width: 120px; flex: 1;
+  }
+  .tag-input-inner::placeholder { color: var(--text-muted); }
+
+  /* ─── AI SUGGESTION CHIPS ─── */
+  .ai-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .suggest-chip {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: var(--radius-full);
+    border: 1px dashed rgba(6,182,212,0.4);
+    background: rgba(6,182,212,0.06);
+    color: var(--accent); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all var(--transition);
+  }
+  .suggest-chip:hover { background: rgba(6,182,212,0.12); border-style: solid; transform: translateY(-1px); }
+  .suggest-chip .plus { font-size: 14px; opacity: 0.8; }
+
+  /* ─── EXPERIENCE SLIDER ─── */
+  .exp-slider-wrap { position: relative; }
+  .exp-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-muted);
+    margin-bottom: 6px; font-weight: 500;
+  }
+  input[type="range"] {
+    width: 100%; appearance: none; height: 6px;
+    background: linear-gradient(to right, var(--primary) var(--val,40%), var(--border) var(--val,40%));
+    border-radius: var(--radius-full); outline: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none; width: 20px; height: 20px;
+    background: var(--primary); border-radius: 50%;
+    border: 3px solid var(--bg-card);
+    box-shadow: 0 2px 8px rgba(99,102,241,0.5);
+    transition: transform var(--transition);
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .exp-value-display {
+    text-align: center; margin-top: 8px;
+    font-size: 13px; font-weight: 600; color: var(--primary-light);
+  }
+
+  /* ─── SALARY RANGE ─── */
+  .salary-row { display: flex; align-items: center; gap: 12px; }
+  .salary-row .sep { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
+  .salary-row .form-input { flex: 1; }
+  .salary-row select { width: 90px; flex-shrink: 0; }
+
+  /* ─── TOGGLE ─── */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; background: var(--bg-elevated);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    margin-bottom: 12px;
+  }
+  .toggle-info { flex: 1; }
+  .toggle-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .toggle-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .toggle-badge {
+    font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: var(--radius-full); background: rgba(16,185,129,0.12);
+    color: var(--success); margin-left: 8px; border: 1px solid rgba(16,185,129,0.2);
+  }
+  .toggle-switch {
+    position: relative; width: 44px; height: 24px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: var(--border); border-radius: 12px;
+    transition: background var(--transition);
+  }
+  .toggle-slider::after {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px;
+    transition: transform var(--transition);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+  .toggle-switch input:checked + .toggle-slider::after { transform: translateX(20px); }
+
+  /* ─── CHECKBOXES ─── */
+  .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+  .checkbox-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--input-bg);
+    border: 1px solid var(--input-border); border-radius: var(--radius-md);
+    cursor: pointer; transition: all var(--transition);
+  }
+  .checkbox-card:hover { border-color: var(--border-hover); background: var(--bg-elevated); }
+  .checkbox-card.checked { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.06); }
+  .custom-checkbox {
+    width: 16px; height: 16px; border-radius: 4px;
+    border: 2px solid var(--text-muted); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition);
+    background: transparent;
+  }
+  .checkbox-card.checked .custom-checkbox { background: var(--primary); border-color: var(--primary); }
+  .checkbox-card.checked .custom-checkbox::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 700; }
+  .checkbox-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .checkbox-card.checked .checkbox-label { color: var(--primary-light); }
+
+  /* ─── DATE PICKER ─── */
+  input[type="date"].form-input {
+    color-scheme: dark;
+  }
+  [data-theme="light"] input[type="date"].form-input { color-scheme: light; }
+
+  /* ─── REVIEW PREVIEW ─── */
+  .review-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .review-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(99,102,241,0.08), transparent);
+  }
+  .review-job-title {
+    font-size: 22px; font-weight: 800; color: var(--text-primary);
+    letter-spacing: -0.4px;
+  }
+  .review-company { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+  .review-meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .meta-badge {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: var(--radius-full);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
+  }
+  .review-body { padding: 24px 28px; }
+  .review-section { margin-bottom: 20px; }
+  .review-section-title {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px;
+  }
+  .review-section p { font-size: 14px; line-height: 1.7; color: var(--text-secondary); }
+  .review-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-pill {
+    padding: 4px 12px; border-radius: var(--radius-full);
+    background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+    font-size: 12px; font-weight: 500; color: var(--primary-light);
+  }
+
+  /* ─── PUBLISH OPTIONS ─── */
+  .publish-option {
+    padding: 16px 20px; border-radius: var(--radius-md);
+    border: 1px solid var(--border); background: var(--bg-elevated);
+    margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all var(--transition);
+  }
+  .publish-option:hover { border-color: var(--border-hover); }
+  .publish-option-left { display: flex; align-items: center; gap: 12px; }
+  .publish-icon { font-size: 20px; }
+  .publish-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .publish-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .price-badge {
+    padding: 4px 10px; border-radius: var(--radius-full);
+    background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25);
+    font-size: 12px; font-weight: 700; color: var(--warning);
+    margin-left: 8px;
+  }
+
+  .reach-card {
+    padding: 16px 20px; border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(99,102,241,0.06));
+    border: 1px solid rgba(6,182,212,0.2);
+    display: flex; align-items: center; gap: 14px; margin-bottom: 24px;
+  }
+  .reach-icon { font-size: 24px; }
+  .reach-text { font-size: 14px; color: var(--text-secondary); }
+  .reach-text strong { color: var(--accent); font-weight: 700; }
+
+  .cost-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-radius: var(--radius-md);
+    background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 24px;
+  }
+  .cost-label { font-size: 13px; color: var(--text-secondary); }
+  .cost-value { font-size: 16px; font-weight: 700; color: var(--success); }
+
+  /* ─── NAV BUTTONS ─── */
+  .nav-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 32px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 22px; border-radius: var(--radius-md);
+    font-family: var(--font); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all var(--transition); border: none;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-hover); }
+  .btn-primary {
+    background: var(--primary-gradient); color: #fff;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(99,102,241,0.5); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-success {
+    background: linear-gradient(135deg, #059669, #10B981);
+    color: #fff; box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+    padding: 13px 28px; font-size: 15px;
+  }
+  .btn-success:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(16,185,129,0.45); }
+
+  /* ─── SUCCESS STATE ─── */
+  .success-state {
+    display: none;
+    text-align: center; padding: 60px 24px;
+    animation: fadeSlideIn 0.4s ease;
+  }
+  .success-state.active { display: block; }
+
+  .success-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(16,185,129,0.12); border: 2px solid rgba(16,185,129,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; margin: 0 auto 24px;
+    animation: successPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes successPop {
+    from { transform: scale(0.3); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .success-title {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+    color: var(--text-primary); margin-bottom: 10px;
+  }
+  .success-subtitle { font-size: 15px; color: var(--text-secondary); margin-bottom: 36px; }
+
+  .success-job-card {
+    max-width: 460px; margin: 0 auto 32px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px 24px; text-align: left;
+    box-shadow: var(--shadow);
+  }
+  .success-job-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+  .success-job-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .success-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ─── DIVIDER ─── */
+  .form-divider {
+    height: 1px; background: var(--border); margin: 28px 0;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="../dashboard.html" class="back-link">
+      <i data-lucide="arrow-left" style="width:15px;height:15px"></i>
+      Dashboard
+    </a>
+    <div class="logo">✦ TalentArc</div>
+    <div class="step-indicator" id="stepIndicatorText"><span>Step 2</span> of 5 · Job Details</div>
+  </div>
+  <div class="topbar-right">
+    <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+      <i data-lucide="sun" style="width:16px;height:16px" id="themeIcon"></i>
+    </button>
+  </div>
+</header>
+
+<!-- PROGRESS BAR -->
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill" style="width:40%"></div>
+</div>
+
+<!-- STEPS NAV -->
+<div class="wizard-wrap" style="padding-bottom:0;padding-top:32px;">
+  <div style="display:flex;align-items:flex-start;gap:0;width:100%;max-width:100%;">
+    <div class="step-node done" id="sn1">
+      <div class="step-circle">✓</div>
+      <div class="step-label">Basics</div>
+    </div>
+    <div class="step-connector filled" id="sc1"></div>
+    <div class="step-node active" id="sn2">
+      <div class="step-circle">2</div>
+      <div class="step-label">Details</div>
+    </div>
+    <div class="step-connector" id="sc2"></div>
+    <div class="step-node" id="sn3">
+      <div class="step-circle">3</div>
+      <div class="step-label">Skills</div>
+    </div>
+    <div class="step-connector" id="sc3"></div>
+    <div class="step-node" id="sn4">
+      <div class="step-circle">4</div>
+      <div class="step-label">Compensation</div>
+    </div>
+    <div class="step-connector" id="sc4"></div>
+    <div class="step-node" id="sn5">
+      <div class="step-circle">5</div>
+      <div class="step-label">Review</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN WIZARD CONTENT -->
+<main class="wizard-wrap">
+
+  <!-- ═══════════════════════ STEP 1: JOB BASICS ═══════════════════════ -->
+  <div class="step-panel" id="step1">
+    <div class="panel-header">
+      <div class="panel-title">Let's start with the basics</div>
+      <div class="panel-subtitle">Tell candidates what this role is about</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Job Title <span class="required">*</span></label>
+      <input type="text" class="form-input large" placeholder="e.g. Senior Software Engineer" id="jobTitle"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Department <span class="required">*</span></label>
+      <select class="form-input" id="deptSelect">
+        <option value="">Select department…</option>
+        <option>Engineering</option>
+        <option>Product</option>
+        <option>Design</option>
+        <option>Marketing</option>
+        <option>Sales</option>
+        <option>Finance</option>
+        <option>Operations</option>
+        <option>Human Resources</option>
+        <option>Legal</option>
+        <option>Customer Success</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Job Type</label>
+      <div class="pill-group" id="jobTypePills">
+        <div class="pill-option" data-group="type">Full-time</div>
+        <div class="pill-option" data-group="type">Part-time</div>
+        <div class="pill-option" data-group="type">Contract</div>
+        <div class="pill-option" data-group="type">Internship</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Work Mode</label>
+      <div class="pill-group" id="workModePills">
+        <div class="pill-option" data-group="mode">🌐 Remote</div>
+        <div class="pill-option selected" data-group="mode">🔀 Hybrid</div>
+        <div class="pill-option" data-group="mode">🏢 On-site</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Number of Openings</label>
+      <div class="stepper">
+        <button class="stepper-btn" onclick="adjustStepper(-1)" aria-label="Decrease">−</button>
+        <div class="stepper-value" id="stepperVal">1</div>
+        <button class="stepper-btn" onclick="adjustStepper(1)" aria-label="Increase">+</button>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="goToStep(2)">
+        Next <i data-lucide="arrow-right" style="width:15px;height:15px"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ STEP 2: JOB DETAILS ═══════════════════════ -->
+  <div class="step-panel active" id="step2">
+    <div class="panel-header">
+      <div class="panel-title">Describe the role</div>
+      <div class="panel-subtitle">Give candidates a clear picture of what they'll be doing</div>
+    </div>
+
+    <div class="form-group">
+      <div class="section-header">
+        <label class="form-label" style="margin-bottom:0">Job Description <span class="required">*</span></label>
+        <button class="ai-btn" onclick="generateAI('desc')">
+          <i data-lucide="sparkles" style="width:12px;height:12px"></i>
+          Generate with AI
+        </button>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="rte-wrap" id="rteWrap">
+          <div class="rte-toolbar">
+            <button class="rte-btn" title="Bold" onclick="execCmd('bold')"><b>B</b></button>
+            <button class="rte-btn" title="Italic" onclick="execCmd('italic')"><i>I</i></button>
+            <button class="rte-btn" title="Underline" onclick="execCmd('underline')"><u>U</u></button>
+            <div class="rte-divider"></div>
+            <button class="rte-btn" title="Bullet List" onclick="execCmd('insertUnorderedList')">
+              <i data-lucide="list" style="width:14px;height:14px"></i>
+            </button>
+            <button class="rte-btn" title="Numbered List" onclick="execCmd('insertOrderedList')">
+              <i data-lucide="list-ordered" style="width:14px;height:14px"></i>
+            </button>
+            <div class="rte-divider"></div>
+            <button class="rte-btn" title="Heading" onclick="execCmd('formatBlock','h3')">
+              <i data-lucide="heading" style="width:14px;height:14px"></i>
+            </button>
+            <button class="rte-btn" title="Quote" onclick="execCmd('formatBlock','blockquote')">
+              <i data-lucide="quote" style="width:14px;height:14px"></i>
+            </button>
+            <button class="rte-btn" title="Link" onclick="insertLink()">
+              <i data-lucide="link" style="width:14px;height:14px"></i>
+            </button>
+            <div class="rte-divider"></div>
+            <button class="rte-btn" title="Undo" onclick="execCmd('undo')">
+              <i data-lucide="undo-2" style="width:14px;height:14px"></i>
+            </button>
+            <button class="rte-btn" title="Redo" onclick="execCmd('redo')">
+              <i data-lucide="redo-2" style="width:14px;height:14px"></i>
+            </button>
+          </div>
+          <div class="rte-content" id="rteContent" contenteditable="true"
+            data-placeholder="Describe the role, company culture, and what makes this opportunity unique…"
+            oninput="updateCharCount(this.innerText.length,'descCount')">
+          </div>
+        </div>
+        <div class="char-count"><span id="descCount">0</span> / 5000 characters</div>
+      </div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <div class="form-group">
+      <div class="section-header">
+        <label class="form-label" style="margin-bottom:0">Responsibilities</label>
+        <button class="ai-btn" onclick="generateAI('resp')">
+          <i data-lucide="sparkles" style="width:12px;height:12px"></i>
+          Generate with AI
+        </button>
+      </div>
+      <textarea class="form-input" id="respTextarea" rows="5"
+        placeholder="• Lead the design and development of scalable systems&#10;• Collaborate cross-functionally with Product and Design&#10;• Mentor junior engineers and conduct code reviews&#10;• Drive technical decisions and architectural improvements"
+        style="margin-top:8px;resize:vertical;line-height:1.7"
+        oninput="updateCharCount(this.value.length,'respCount')"></textarea>
+      <div class="char-count"><span id="respCount">0</span> / 2000 characters</div>
+    </div>
+
+    <div class="form-group">
+      <div class="section-header">
+        <label class="form-label" style="margin-bottom:0">Requirements</label>
+        <button class="ai-btn" onclick="generateAI('req')">
+          <i data-lucide="sparkles" style="width:12px;height:12px"></i>
+          Generate with AI
+        </button>
+      </div>
+      <textarea class="form-input" id="reqTextarea" rows="5"
+        placeholder="• 5+ years of software engineering experience&#10;• Strong proficiency in React and TypeScript&#10;• Experience with cloud platforms (AWS, GCP, or Azure)&#10;• Excellent communication and leadership skills"
+        style="margin-top:8px;resize:vertical;line-height:1.7"
+        oninput="updateCharCount(this.value.length,'reqCount')"></textarea>
+      <div class="char-count"><span id="reqCount">0</span> / 2000 characters</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goToStep(1)">
+        <i data-lucide="arrow-left" style="width:15px;height:15px"></i> Back
+      </button>
+      <button class="btn btn-primary" onclick="goToStep(3)">
+        Next <i data-lucide="arrow-right" style="width:15px;height:15px"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ STEP 3: SKILLS ═══════════════════════ -->
+  <div class="step-panel" id="step3">
+    <div class="panel-header">
+      <div class="panel-title">Skills & Requirements</div>
+      <div class="panel-subtitle">Define what the ideal candidate looks like</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Required Skills <span class="required">*</span></label>
+      <div class="tag-input-wrap" id="reqSkillsWrap" onclick="focusTagInput('reqSkillInput')">
+        <div class="tag-chip">React <span class="rm" onclick="removeTag(this, 'reqSkillsWrap')">×</span></div>
+        <div class="tag-chip">TypeScript <span class="rm" onclick="removeTag(this, 'reqSkillsWrap')">×</span></div>
+        <div class="tag-chip">Node.js <span class="rm" onclick="removeTag(this, 'reqSkillsWrap')">×</span></div>
+        <input class="tag-input-inner" id="reqSkillInput" placeholder="Type a skill, press Enter…"
+          onkeydown="addTag(event, this, 'reqSkillsWrap')"/>
+      </div>
+      <div class="ai-suggestions">
+        <div class="suggest-chip" onclick="addSuggestChip(this, 'reqSkillsWrap')"><span class="plus">+</span> Add GraphQL?</div>
+        <div class="suggest-chip" onclick="addSuggestChip(this, 'reqSkillsWrap')"><span class="plus">+</span> Add AWS?</div>
+        <div class="suggest-chip" onclick="addSuggestChip(this, 'reqSkillsWrap')"><span class="plus">+</span> Add PostgreSQL?</div>
+        <div class="suggest-chip" onclick="addSuggestChip(this, 'reqSkillsWrap')"><span class="plus">+</span> Add Docker?</div>
+        <div class="suggest-chip" onclick="addSuggestChip(this, 'reqSkillsWrap')"><span class="plus">+</span> Add CI/CD?</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Nice-to-have Skills</label>
+      <div class="tag-input-wrap" id="niceSkillsWrap" onclick="focusTagInput('niceSkillInput')">
+        <div class="tag-chip" style="background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.25);color:#06B6D4">Rust <span class="rm" onclick="removeTag(this, 'niceSkillsWrap')">×</span></div>
+        <input class="tag-input-inner" id="niceSkillInput" placeholder="Type a skill, press Enter…"
+          onkeydown="addTag(event, this, 'niceSkillsWrap')"/>
+      </div>
+      <div class="ai-suggestions">
+        <div class="suggest-chip" onclick="addSuggestChip(this, 'niceSkillsWrap')"><span class="plus">+</span> Add Kubernetes?</div>
+        <div class="suggest-chip" onclick="addSuggestChip(this, 'niceSkillsWrap')"><span class="plus">+</span> Add Terraform?</div>
+        <div class="suggest-chip" onclick="addSuggestChip(this, 'niceSkillsWrap')"><span class="plus">+</span> Add Redis?</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Education Level</label>
+      <select class="form-input" id="eduSelect">
+        <option value="">No preference</option>
+        <option>High School / GED</option>
+        <option>Associate's Degree</option>
+        <option selected>Bachelor's Degree</option>
+        <option>Master's Degree</option>
+        <option>PhD / Doctorate</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Experience Level</label>
+      <div class="exp-slider-wrap">
+        <div class="exp-labels">
+          <span>Entry</span><span>Mid</span><span>Senior</span><span>Lead</span><span>Executive</span>
+        </div>
+        <input type="range" min="0" max="4" value="2" id="expSlider" oninput="updateExpSlider(this)"/>
+        <div class="exp-value-display" id="expDisplay">Senior</div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goToStep(2)">
+        <i data-lucide="arrow-left" style="width:15px;height:15px"></i> Back
+      </button>
+      <button class="btn btn-primary" onclick="goToStep(4)">
+        Next <i data-lucide="arrow-right" style="width:15px;height:15px"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ STEP 4: COMPENSATION ═══════════════════════ -->
+  <div class="step-panel" id="step4">
+    <div class="panel-header">
+      <div class="panel-title">Compensation & Benefits</div>
+      <div class="panel-subtitle">Attract top talent with competitive packages</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Salary Range (Annual)</label>
+      <div class="salary-row">
+        <select class="form-input" style="width:90px;">
+          <option>USD</option><option>EUR</option><option>GBP</option><option>CAD</option><option>AUD</option>
+        </select>
+        <input type="number" class="form-input" placeholder="Min (e.g. 120,000)" id="salMin"/>
+        <span class="sep">—</span>
+        <input type="number" class="form-input" placeholder="Max (e.g. 180,000)" id="salMax"/>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="toggle-title">Show salary publicly</div>
+        <div class="toggle-desc">Listings with salary ranges get 42% more applicants</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" checked id="salaryToggle" onchange="handleToggle(this)"/>
+        <div class="toggle-slider"></div>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="toggle-title">Equity / Stock Options</div>
+        <div class="toggle-desc">Include equity compensation in this role</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="equityToggle" onchange="handleToggle(this)"/>
+        <div class="toggle-slider"></div>
+      </label>
+    </div>
+
+    <div class="form-group" style="margin-top:24px;">
+      <label class="form-label">Benefits Included</label>
+      <div class="checkbox-grid" id="benefitsGrid">
+        <div class="checkbox-card checked" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">🏥 Health Insurance</span>
+        </div>
+        <div class="checkbox-card checked" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">🦷 Dental & Vision</span>
+        </div>
+        <div class="checkbox-card checked" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">💰 401(k) Match</span>
+        </div>
+        <div class="checkbox-card checked" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">🏖️ Unlimited PTO</span>
+        </div>
+        <div class="checkbox-card" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">🏠 Remote Stipend</span>
+        </div>
+        <div class="checkbox-card checked" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">📚 Learning Budget</span>
+        </div>
+        <div class="checkbox-card" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">💪 Gym Membership</span>
+        </div>
+        <div class="checkbox-card" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">🍔 Catered Meals</span>
+        </div>
+        <div class="checkbox-card" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">👶 Parental Leave</span>
+        </div>
+        <div class="checkbox-card" onclick="toggleCheckbox(this)">
+          <div class="custom-checkbox"></div>
+          <span class="checkbox-label">🧠 Mental Wellness</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Application Deadline</label>
+      <input type="date" class="form-input" id="deadlineDate" style="max-width:260px;"/>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goToStep(3)">
+        <i data-lucide="arrow-left" style="width:15px;height:15px"></i> Back
+      </button>
+      <button class="btn btn-primary" onclick="goToStep(5)">
+        Next <i data-lucide="arrow-right" style="width:15px;height:15px"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ STEP 5: REVIEW & PUBLISH ═══════════════════════ -->
+  <div class="step-panel" id="step5">
+    <div class="panel-header">
+      <div class="panel-title">Review & Publish</div>
+      <div class="panel-subtitle">Everything looks great! Review your posting before going live.</div>
+    </div>
+
+    <!-- JOB PREVIEW CARD -->
+    <div class="review-card">
+      <div class="review-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="review-job-title">Senior Software Engineer</div>
+            <div class="review-company">Acme Corp · Engineering</div>
+          </div>
+          <span style="padding:5px 14px;border-radius:999px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);font-size:12px;font-weight:700;color:#10B981;">
+            LIVE PREVIEW
+          </span>
+        </div>
+        <div class="review-meta-row">
+          <div class="meta-badge"><i data-lucide="briefcase" style="width:12px;height:12px"></i> Full-time</div>
+          <div class="meta-badge"><i data-lucide="map-pin" style="width:12px;height:12px"></i> Hybrid</div>
+          <div class="meta-badge"><i data-lucide="dollar-sign" style="width:12px;height:12px"></i> $120K – $180K</div>
+          <div class="meta-badge"><i data-lucide="users" style="width:12px;height:12px"></i> 2 openings</div>
+          <div class="meta-badge"><i data-lucide="graduation-cap" style="width:12px;height:12px"></i> Bachelor's+</div>
+        </div>
+      </div>
+      <div class="review-body">
+        <div class="review-section">
+          <div class="review-section-title">About the Role</div>
+          <p>We're looking for a talented Senior Software Engineer to join our growing engineering team. You'll work on cutting-edge products that serve millions of users worldwide, collaborating with a world-class team to build robust, scalable systems.</p>
+        </div>
+        <div class="review-section">
+          <div class="review-section-title">Responsibilities</div>
+          <p>• Lead design and development of scalable systems<br>• Collaborate cross-functionally with Product & Design<br>• Mentor junior engineers and conduct code reviews<br>• Drive technical decisions and architectural improvements</p>
+        </div>
+        <div class="review-section">
+          <div class="review-section-title">Required Skills</div>
+          <div class="review-skills">
+            <span class="skill-pill">React</span>
+            <span class="skill-pill">TypeScript</span>
+            <span class="skill-pill">Node.js</span>
+            <span class="skill-pill">GraphQL</span>
+            <span class="skill-pill">AWS</span>
+          </div>
+        </div>
+        <div class="review-section">
+          <div class="review-section-title">Benefits</div>
+          <p style="color:var(--text-secondary);font-size:13px;">🏥 Health · 🦷 Dental & Vision · 💰 401(k) · 🏖️ PTO · 📚 Learning Budget</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUBLISH OPTIONS -->
+    <label class="form-label">Boost Your Listing</label>
+
+    <div class="publish-option">
+      <div class="publish-option-left">
+        <span class="publish-icon">⭐</span>
+        <div>
+          <div class="publish-title">Publish as Featured <span class="price-badge">+$99</span></div>
+          <div class="publish-desc">Pinned at top of search results for 30 days · 3× more visibility</div>
+        </div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="featuredToggle" onchange="updateCost()"/>
+        <div class="toggle-slider"></div>
+      </label>
+    </div>
+
+    <div class="publish-option">
+      <div class="publish-option-left">
+        <span class="publish-icon">🔥</span>
+        <div>
+          <div class="publish-title">Publish as Urgent <span class="price-badge">+$49</span></div>
+          <div class="publish-desc">Shows "Urgent Hire" badge · Priority email notifications</div>
+        </div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="urgentToggle" onchange="updateCost()"/>
+        <div class="toggle-slider"></div>
+      </label>
+    </div>
+
+    <!-- REACH ESTIMATE -->
+    <div class="reach-card" style="margin-top:20px;">
+      <div class="reach-icon">🎯</div>
+      <div>
+        <div class="reach-text"><strong>~2,400 matched candidates</strong> will be notified about this role</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Based on your skills requirements and experience level</div>
+      </div>
+    </div>
+
+    <!-- COST -->
+    <div class="cost-row">
+      <div>
+        <div class="cost-label">Total cost</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">1 of 15 job slots used this month</div>
+      </div>
+      <div class="cost-value" id="costDisplay">Free</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goToStep(4)">
+        <i data-lucide="arrow-left" style="width:15px;height:15px"></i> Back
+      </button>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="saveDraft()">
+          <i data-lucide="save" style="width:15px;height:15px"></i> Save Draft
+        </button>
+        <button class="btn btn-success" onclick="publishJob()">
+          <i data-lucide="zap" style="width:15px;height:15px"></i> Publish Job
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ SUCCESS STATE ═══════════════════════ -->
+  <div class="success-state" id="successState">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Job Published Successfully!</div>
+    <div class="success-subtitle">Your job posting is now live and visible to <strong>2.4M+ professionals</strong> on TalentArc.</div>
+
+    <div class="success-job-card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--primary-gradient);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">💼</div>
+        <div>
+          <div class="success-job-title">Senior Software Engineer</div>
+          <div style="font-size:13px;color:var(--text-secondary);">Acme Corp · Engineering</div>
+        </div>
+      </div>
+      <div class="success-job-meta">
+        <div class="meta-badge" style="font-size:11px;"><i data-lucide="eye" style="width:11px;height:11px"></i> Live</div>
+        <div class="meta-badge" style="font-size:11px;"><i data-lucide="briefcase" style="width:11px;height:11px"></i> Full-time</div>
+        <div class="meta-badge" style="font-size:11px;"><i data-lucide="map-pin" style="width:11px;height:11px"></i> Hybrid</div>
+      </div>
+      <div style="margin-top:14px;padding:10px 14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;font-size:12px;color:#10B981;">
+        🎯 Expected to reach ~2,400 matched candidates in the next 24 hours
+      </div>
+    </div>
+
+    <div class="success-actions">
+      <button class="btn btn-ghost" onclick="alert('Opening job listing…')">
+        <i data-lucide="external-link" style="width:15px;height:15px"></i> View Job
+      </button>
+      <button class="btn btn-primary" onclick="resetWizard()">
+        <i data-lucide="plus" style="width:15px;height:15px"></i> Post Another
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ─── THEME ───
+  const savedTheme = localStorage.getItem('ta-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  function toggleTheme() {
+    const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('ta-theme', t);
+    updateThemeIcon();
+  }
+  function updateThemeIcon() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const icon = document.getElementById('themeIcon');
+    icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+    lucide.createIcons();
+  }
+  updateThemeIcon();
+
+  // ─── STEP MANAGEMENT ───
+  let currentStep = 2;
+  const stepMeta = {
+    1: { text: '<span>Step 1</span> of 5 · Job Basics', progress: '20%' },
+    2: { text: '<span>Step 2</span> of 5 · Job Details', progress: '40%' },
+    3: { text: '<span>Step 3</span> of 5 · Skills & Requirements', progress: '60%' },
+    4: { text: '<span>Step 4</span> of 5 · Compensation', progress: '80%' },
+    5: { text: '<span>Step 5</span> of 5 · Review & Publish', progress: '100%' }
+  };
+  const expLabels = ['Entry', 'Mid', 'Senior', 'Lead', 'Executive'];
+
+  function goToStep(n) {
+    document.getElementById(`step${currentStep}`)?.classList.remove('active');
+    currentStep = n;
+    document.getElementById(`step${n}`)?.classList.add('active');
+    document.getElementById('progressFill').style.width = stepMeta[n].progress;
+    document.getElementById('stepIndicatorText').innerHTML = stepMeta[n].text;
+    updateStepNodes(n);
+    lucide.createIcons();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateStepNodes(active) {
+    for (let i = 1; i <= 5; i++) {
+      const node = document.getElementById(`sn${i}`);
+      const circle = node.querySelector('.step-circle');
+      node.className = 'step-node';
+      if (i < active) {
+        node.classList.add('done');
+        circle.innerHTML = '✓';
+      } else if (i === active) {
+        node.classList.add('active');
+        circle.innerHTML = i;
+      } else {
+        circle.innerHTML = i;
+      }
+    }
+    for (let i = 1; i <= 4; i++) {
+      const c = document.getElementById(`sc${i}`);
+      c.className = 'step-connector' + (i < active ? ' filled' : '');
+    }
+  }
+
+  // ─── PILL SELECTOR ───
+  document.querySelectorAll('.pill-option').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const group = pill.dataset.group;
+      document.querySelectorAll(`.pill-option[data-group="${group}"]`).forEach(p => p.classList.remove('selected'));
+      pill.classList.add('selected');
+    });
+  });
+
+  // ─── STEPPER ───
+  let openings = 1;
+  function adjustStepper(d) {
+    openings = Math.max(1, Math.min(50, openings + d));
+    document.getElementById('stepperVal').textContent = openings;
+  }
+
+  // ─── RICH TEXT EDITOR ───
+  function execCmd(cmd, val = null) {
+    document.getElementById('rteContent').focus();
+    document.execCommand(cmd, false, val);
+  }
+  function insertLink() {
+    const url = prompt('Enter URL:');
+    if (url) execCmd('createLink', url);
+  }
+  function updateCharCount(len, id) {
+    document.getElementById(id).textContent = len;
+  }
+
+  // ─── AI GENERATE (simulated) ───
+  const aiContent = {
+    desc: 'We are seeking an exceptional <strong>Senior Software Engineer</strong> to join our world-class engineering team. In this role, you will architect and build highly scalable distributed systems that power experiences for millions of users globally. You\'ll work in a fast-paced, collaborative environment where technical excellence and innovation are celebrated.',
+    resp: `• Architect and develop high-performance, scalable backend services and APIs\n• Lead technical design discussions and drive architectural decisions\n• Collaborate closely with Product Managers and Designers to define technical requirements\n• Mentor and guide junior and mid-level engineers through code reviews\n• Champion engineering best practices, testing, and continuous delivery`,
+    req: `• 5+ years of professional software engineering experience\n• Expert-level proficiency in React, TypeScript, and modern JavaScript\n• Experience designing and building RESTful APIs and microservices\n• Strong understanding of cloud infrastructure (AWS preferred)\n• Excellent problem-solving skills and attention to detail\n• Strong communication skills with ability to explain technical concepts clearly`
+  };
+
+  function generateAI(type) {
+    const btns = document.querySelectorAll('.ai-btn');
+    const btn = event.currentTarget;
+    btn.innerHTML = '<i data-lucide="loader-2" style="width:12px;height:12px;animation:spin 1s linear infinite"></i> Generating…';
+    btn.disabled = true;
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+    lucide.createIcons();
+    setTimeout(() => {
+      if (type === 'desc') {
+        document.getElementById('rteContent').innerHTML = aiContent.desc;
+        updateCharCount(document.getElementById('rteContent').innerText.length, 'descCount');
+      } else if (type === 'resp') {
+        document.getElementById('respTextarea').value = aiContent.resp;
+        updateCharCount(aiContent.resp.length, 'respCount');
+      } else if (type === 'req') {
+        document.getElementById('reqTextarea').value = aiContent.req;
+        updateCharCount(aiContent.req.length, 'reqCount');
+      }
+      btn.innerHTML = '<i data-lucide="sparkles" style="width:12px;height:12px"></i> Generate with AI';
+      btn.disabled = false;
+      lucide.createIcons();
+    }, 1600);
+  }
+
+  // ─── TAG INPUT ───
+  function addTag(e, input, wrapId) {
+    if (e.key === 'Enter' && input.value.trim()) {
+      e.preventDefault();
+      const wrap = document.getElementById(wrapId);
+      const chip = document.createElement('div');
+      const isNice = wrapId === 'niceSkillsWrap';
+      chip.className = 'tag-chip';
+      if (isNice) chip.style.cssText = 'background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.25);color:#06B6D4';
+      chip.innerHTML = `${input.value.trim()} <span class="rm" onclick="removeTag(this,'${wrapId}')">×</span>`;
+      wrap.insertBefore(chip, input);
+      input.value = '';
+    }
+  }
+  function removeTag(rm, wrapId) {
+    rm.parentElement.remove();
+  }
+  function focusTagInput(id) { document.getElementById(id)?.focus(); }
+
+  function addSuggestChip(chip, wrapId) {
+    const text = chip.textContent.replace('+ Add ','').replace('?','').trim();
+    const wrap = document.getElementById(wrapId);
+    const input = wrap.querySelector('.tag-input-inner');
+    const newChip = document.createElement('div');
+    const isNice = wrapId === 'niceSkillsWrap';
+    newChip.className = 'tag-chip';
+    if (isNice) newChip.style.cssText = 'background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.25);color:#06B6D4';
+    newChip.innerHTML = `${text} <span class="rm" onclick="removeTag(this,'${wrapId}')">×</span>`;
+    wrap.insertBefore(newChip, input);
+    chip.style.opacity = '0.4';
+    chip.style.pointerEvents = 'none';
+  }
+
+  // ─── EXPERIENCE SLIDER ───
+  function updateExpSlider(el) {
+    const pct = (el.value / 4) * 100;
+    el.style.setProperty('--val', pct + '%');
+    document.getElementById('expDisplay').textContent = expLabels[el.value];
+  }
+  // Init slider
+  const sliderEl = document.getElementById('expSlider');
+  sliderEl.style.setProperty('--val', '50%');
+
+  // ─── TOGGLE ───
+  function handleToggle(el) { /* visual handled by CSS */ }
+
+  // ─── CHECKBOX ───
+  function toggleCheckbox(card) {
+    card.classList.toggle('checked');
+  }
+
+  // ─── COST UPDATE ───
+  function updateCost() {
+    const feat = document.getElementById('featuredToggle').checked ? 99 : 0;
+    const urgent = document.getElementById('urgentToggle').checked ? 49 : 0;
+    const total = feat + urgent;
+    document.getElementById('costDisplay').textContent = total === 0 ? 'Free' : `$${total}`;
+    document.getElementById('costDisplay').style.color = total === 0 ? 'var(--success)' : 'var(--warning)';
+  }
+
+  // ─── SAVE DRAFT ───
+  function saveDraft() {
+    const btn = event.currentTarget;
+    btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px"></i> Saved!';
+    btn.style.color = 'var(--success)';
+    lucide.createIcons();
+    setTimeout(() => {
+      btn.innerHTML = '<i data-lucide="save" style="width:15px;height:15px"></i> Save Draft';
+      btn.style.color = '';
+      lucide.createIcons();
+    }, 2000);
+  }
+
+  // ─── PUBLISH ───
+  function publishJob() {
+    document.getElementById('step5').classList.remove('active');
+    document.getElementById('successState').classList.add('active');
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('stepIndicatorText').innerHTML = '<span>Published</span> · Live Now 🎉';
+    lucide.createIcons();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetWizard() {
+    document.getElementById('successState').classList.remove('active');
+    currentStep = 1;
+    goToStep(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─── INIT ───
+  lucide.createIcons();
+</script>
+</body>
+</html>

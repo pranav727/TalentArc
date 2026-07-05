@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications — TalentArc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    /* ─── CSS Custom Properties ──────────────────────────────────────── */
+    :root {
+      --primary: #6366F1;
+      --primary-light: #818CF8;
+      --primary-glow: rgba(99,102,241,0.18);
+      --accent: #06B6D4;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+
+      --bg-0: #0A0A0F;
+      --bg-1: #0F0F17;
+      --bg-2: #13131E;
+      --bg-3: #1A1A28;
+      --bg-4: #1E1E2E;
+      --bg-5: #252538;
+
+      --text-primary: #E2E8F0;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+
+      --sidebar-w: 260px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 999px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+
+      --transition: 0.2s ease;
+    }
+
+    [data-theme="light"] {
+      --bg-0: #F0F0F8;
+      --bg-1: #FAFAFA;
+      --bg-2: #FFFFFF;
+      --bg-3: #F4F4FB;
+      --bg-4: #EEEEF8;
+      --bg-5: #E8E8F4;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --border: rgba(0,0,0,0.08);
+      --border-hover: rgba(0,0,0,0.15);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+      --primary-glow: rgba(99,102,241,0.10);
+    }
+
+    /* ─── Reset ──────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-0);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+    input { font-family: inherit; }
+
+    /* ─── Scrollbar ──────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: var(--radius-full); }
+
+    /* ─── Sidebar ────────────────────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--bg-1);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      z-index: 40;
+      transition: background var(--transition);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 16px var(--primary-glow);
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 17px; font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-light), #C4B5FD);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-section-label {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-muted);
+      padding: 16px 20px 6px;
+    }
+
+    .sidebar-nav { padding: 8px 12px; flex: 1; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover { background: var(--bg-3); color: var(--text-primary); }
+    .nav-item.active {
+      background: var(--primary-glow);
+      color: var(--primary-light);
+    }
+    .nav-item.active .nav-icon { color: var(--primary-light); }
+    .nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--primary);
+      color: #fff;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      min-width: 18px; text-align: center;
+    }
+    .nav-badge.green { background: var(--success); }
+
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .user-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .user-card:hover { background: var(--bg-3); }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-role { font-size: 11px; color: var(--text-muted); }
+
+    /* ─── Main Content ───────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--bg-0);
+      display: flex;
+      flex-direction: column;
+      transition: background var(--transition);
+    }
+
+    /* ─── Top Bar ────────────────────────────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 30;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+      transition: background var(--transition);
+    }
+    [data-theme="light"] .topbar {
+      background: rgba(250,250,250,0.85);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+    .page-title {
+      font-size: 20px; font-weight: 700;
+    }
+    .unread-badge {
+      background: var(--primary);
+      color: #fff;
+      font-size: 12px; font-weight: 700;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      animation: pulse-badge 2s infinite;
+    }
+    @keyframes pulse-badge {
+      0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.5); }
+      50% { box-shadow: 0 0 0 6px rgba(99,102,241,0); }
+    }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600;
+      transition: all var(--transition);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--bg-3); color: var(--text-primary); border-color: var(--border-hover); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(99,102,241,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(99,102,241,0.5);
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .theme-toggle:hover { background: var(--bg-4); color: var(--text-primary); }
+
+    /* ─── Filter Tabs ────────────────────────────────────────────────── */
+    .filter-bar {
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-1);
+      display: flex; align-items: center; gap: 2px;
+      overflow-x: auto;
+      transition: background var(--transition);
+    }
+    .filter-tab {
+      padding: 14px 16px;
+      font-size: 13px; font-weight: 500;
+      color: var(--text-muted);
+      border: none; background: transparent;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .filter-tab:hover { color: var(--text-primary); }
+    .filter-tab.active {
+      color: var(--primary-light);
+      border-bottom-color: var(--primary-light);
+    }
+    .filter-count {
+      background: var(--bg-3);
+      color: var(--text-muted);
+      font-size: 11px; font-weight: 600;
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+    }
+    .filter-tab.active .filter-count {
+      background: var(--primary-glow);
+      color: var(--primary-light);
+    }
+
+    /* ─── Content Area ───────────────────────────────────────────────── */
+    .content {
+      padding: 24px 32px;
+      flex: 1;
+    }
+
+    /* ─── Notification Cards ─────────────────────────────────────────── */
+    .notifications-list {
+      display: flex; flex-direction: column; gap: 8px;
+      max-width: 820px;
+    }
+
+    .notif-card {
+      position: relative;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      display: flex; gap: 16px;
+      cursor: pointer;
+      transition: all var(--transition);
+      overflow: hidden;
+      animation: slideIn 0.3s ease both;
+    }
+    .notif-card:hover {
+      background: var(--bg-3);
+      border-color: var(--border-hover);
+      transform: translateX(3px);
+    }
+    .notif-card.unread {
+      background: rgba(99,102,241,0.06);
+      border-color: rgba(99,102,241,0.2);
+      border-left: 3px solid var(--primary);
+    }
+    [data-theme="light"] .notif-card.unread {
+      background: rgba(99,102,241,0.05);
+    }
+    .notif-card.unread:hover {
+      background: rgba(99,102,241,0.1);
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .notif-icon-wrap {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .notif-icon-wrap.type-interview { background: rgba(99,102,241,0.15); }
+    .notif-icon-wrap.type-shortlist { background: rgba(16,185,129,0.15); }
+    .notif-icon-wrap.type-view      { background: rgba(6,182,212,0.15); }
+    .notif-icon-wrap.type-ai        { background: rgba(245,158,11,0.15); }
+    .notif-icon-wrap.type-app       { background: rgba(99,102,241,0.15); }
+    .notif-icon-wrap.type-resume    { background: rgba(16,185,129,0.15); }
+    .notif-icon-wrap.type-message   { background: rgba(6,182,212,0.15); }
+    .notif-icon-wrap.type-salary    { background: rgba(245,158,11,0.15); }
+    .notif-icon-wrap.type-security  { background: rgba(239,68,68,0.15); }
+
+    .unread-dot {
+      position: absolute;
+      top: -3px; right: -3px;
+      width: 10px; height: 10px;
+      background: var(--primary);
+      border-radius: 50%;
+      border: 2px solid var(--bg-2);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 12px; margin-bottom: 4px;
+    }
+    .notif-title {
+      font-size: 14px; font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+    .notif-card.unread .notif-title { font-weight: 600; }
+    .notif-time {
+      font-size: 12px; color: var(--text-muted);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .notif-desc {
+      font-size: 13px; color: var(--text-secondary);
+      line-height: 1.55; margin-bottom: 12px;
+    }
+    .notif-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .btn-notif {
+      padding: 5px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 600;
+      transition: all var(--transition);
+    }
+    .btn-notif-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-notif-primary:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(99,102,241,0.4);
+    }
+    .btn-notif-ghost {
+      background: var(--bg-3);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-notif-ghost:hover { background: var(--bg-4); color: var(--text-primary); }
+    .btn-notif-danger {
+      background: rgba(239,68,68,0.1);
+      color: var(--error);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .btn-notif-danger:hover { background: rgba(239,68,68,0.2); }
+    .btn-notif-success {
+      background: rgba(16,185,129,0.1);
+      color: var(--success);
+      border: 1px solid rgba(16,185,129,0.2);
+    }
+    .btn-notif-success:hover { background: rgba(16,185,129,0.2); }
+
+    /* Animation delays for cards */
+    .notif-card:nth-child(1) { animation-delay: 0.05s; }
+    .notif-card:nth-child(2) { animation-delay: 0.10s; }
+    .notif-card:nth-child(3) { animation-delay: 0.15s; }
+    .notif-card:nth-child(4) { animation-delay: 0.20s; }
+    .notif-card:nth-child(5) { animation-delay: 0.25s; }
+    .notif-card:nth-child(6) { animation-delay: 0.30s; }
+    .notif-card:nth-child(7) { animation-delay: 0.35s; }
+    .notif-card:nth-child(8) { animation-delay: 0.40s; }
+    .notif-card:nth-child(9) { animation-delay: 0.45s; }
+
+    /* ─── Empty State ────────────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 64px 24px;
+      display: none;
+    }
+    .empty-state-icon {
+      font-size: 48px; margin-bottom: 16px;
+    }
+    .empty-state-title {
+      font-size: 18px; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 8px;
+    }
+    .empty-state-desc {
+      font-size: 14px; color: var(--text-muted);
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .topbar { padding: 0 16px; }
+      .filter-bar { padding: 0 16px; }
+      .content { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+  <aside class="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-text">TalentArc</span>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="sidebar-section-label">Main</div>
+
+      <div class="nav-item" onclick="location.href='dashboard.html'">
+        <i data-lucide="layout-dashboard" class="nav-icon"></i>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="location.href='profile.html'">
+        <i data-lucide="user" class="nav-icon"></i>
+        My Profile
+      </div>
+      <div class="nav-item" onclick="location.href='jobs.html'">
+        <i data-lucide="briefcase" class="nav-icon"></i>
+        Browse Jobs
+        <span class="nav-badge green">New</span>
+      </div>
+      <div class="nav-item" onclick="location.href='applications.html'">
+        <i data-lucide="file-text" class="nav-icon"></i>
+        Applications
+        <span class="nav-badge">4</span>
+      </div>
+      <div class="nav-item active" aria-current="page">
+        <i data-lucide="bell" class="nav-icon"></i>
+        Notifications
+        <span class="nav-badge">7</span>
+      </div>
+      <div class="nav-item" onclick="location.href='messages.html'">
+        <i data-lucide="message-square" class="nav-icon"></i>
+        Messages
+        <span class="nav-badge">2</span>
+      </div>
+
+      <div class="sidebar-section-label">Career</div>
+
+      <div class="nav-item" onclick="location.href='resume.html'">
+        <i data-lucide="file-badge" class="nav-icon"></i>
+        Resume Studio
+      </div>
+      <div class="nav-item" onclick="location.href='interviews.html'">
+        <i data-lucide="calendar-check" class="nav-icon"></i>
+        Interviews
+      </div>
+      <div class="nav-item" onclick="location.href='salary.html'">
+        <i data-lucide="trending-up" class="nav-icon"></i>
+        Salary Insights
+      </div>
+      <div class="nav-item" onclick="location.href='saved.html'">
+        <i data-lucide="bookmark" class="nav-icon"></i>
+        Saved Jobs
+      </div>
+
+      <div class="sidebar-section-label">Settings</div>
+
+      <div class="nav-item" onclick="location.href='settings.html'">
+        <i data-lucide="settings" class="nav-icon"></i>
+        Settings
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">PS</div>
+        <div>
+          <div class="user-name">Priya Sharma</div>
+          <div class="user-role">Software Engineer</div>
+        </div>
+        <i data-lucide="chevron-up" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto;"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ─────────────────────────────────────────────────── -->
+  <main class="main" role="main">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title">Notifications</h1>
+        <span class="unread-badge" id="unreadBadge">7 unread</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-ghost" onclick="markAllRead()" aria-label="Mark all notifications as read">
+          <i data-lucide="check-check" style="width:14px;height:14px;"></i>
+          Mark all as read
+        </button>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">
+          <i data-lucide="moon" style="width:16px;height:16px;" id="themeIcon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Filter Tabs -->
+    <div class="filter-bar" role="tablist" aria-label="Notification filters">
+      <button class="filter-tab active" role="tab" aria-selected="true"  onclick="filterNotifs('all', this)">
+        All <span class="filter-count">9</span>
+      </button>
+      <button class="filter-tab" role="tab" aria-selected="false" onclick="filterNotifs('unread', this)">
+        Unread <span class="filter-count">3</span>
+      </button>
+      <button class="filter-tab" role="tab" aria-selected="false" onclick="filterNotifs('applications', this)">
+        Applications <span class="filter-count">2</span>
+      </button>
+      <button class="filter-tab" role="tab" aria-selected="false" onclick="filterNotifs('jobs', this)">
+        Jobs <span class="filter-count">2</span>
+      </button>
+      <button class="filter-tab" role="tab" aria-selected="false" onclick="filterNotifs('messages', this)">
+        Messages <span class="filter-count">1</span>
+      </button>
+      <button class="filter-tab" role="tab" aria-selected="false" onclick="filterNotifs('alerts', this)">
+        Alerts <span class="filter-count">1</span>
+      </button>
+    </div>
+
+    <!-- Notifications -->
+    <div class="content">
+      <div class="notifications-list" id="notifList" role="list">
+
+        <!-- 1. Interview Invitation – UNREAD -->
+        <article class="notif-card unread" data-category="applications" data-id="1" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-interview">
+            🔔
+            <span class="unread-dot" aria-hidden="true"></span>
+          </div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">Interview Invitation</div>
+              <span class="notif-time">10 minutes ago</span>
+            </div>
+            <p class="notif-desc">Linear has invited you for an interview for the <strong>Principal Engineer</strong> position. Please schedule at your earliest convenience.</p>
+            <div class="notif-actions">
+              <button class="btn-notif btn-notif-primary" onclick="event.stopPropagation()">Schedule Interview</button>
+              <button class="btn-notif btn-notif-ghost" onclick="event.stopPropagation()">View Details</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 2. Shortlisted – UNREAD -->
+        <article class="notif-card unread" data-category="applications" data-id="2" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-shortlist">
+            📊
+            <span class="unread-dot" aria-hidden="true"></span>
+          </div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">You've been Shortlisted!</div>
+              <span class="notif-time">5h ago</span>
+            </div>
+            <p class="notif-desc">Congratulations! <strong>Vercel</strong> shortlisted your application for the <strong>Staff Engineer</strong> position. You're among the top candidates!</p>
+            <div class="notif-actions">
+              <button class="btn-notif btn-notif-primary" onclick="event.stopPropagation()">View Application</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3. Profile Viewed – UNREAD -->
+        <article class="notif-card unread" data-category="jobs" data-id="3" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-view">
+            👁️
+            <span class="unread-dot" aria-hidden="true"></span>
+          </div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">Profile Viewed</div>
+              <span class="notif-time">7h ago</span>
+            </div>
+            <p class="notif-desc">A recruiter from <strong>Stripe</strong> viewed your profile. Your profile is attracting attention from top companies!</p>
+          </div>
+        </article>
+
+        <!-- 4. AI Recommendations – READ -->
+        <article class="notif-card" data-category="jobs" data-id="4" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-ai">✨</div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">AI Job Recommendations</div>
+              <span class="notif-time">Yesterday at 3:45 PM</span>
+            </div>
+            <p class="notif-desc"><strong>5 new jobs</strong> match your profile with <strong>90%+ compatibility</strong>. These roles align with your skills in distributed systems and React. Check them out!</p>
+            <div class="notif-actions">
+              <button class="btn-notif btn-notif-primary" onclick="event.stopPropagation()">View Jobs</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 5. Application Received – READ -->
+        <article class="notif-card" data-category="applications" data-id="5" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-app">📧</div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">Application Received</div>
+              <span class="notif-time">2 days ago</span>
+            </div>
+            <p class="notif-desc">Your application for <strong>Senior Software Engineer</strong> at <strong>Stripe</strong> was successfully submitted. We'll notify you of any updates.</p>
+          </div>
+        </article>
+
+        <!-- 6. Resume Downloaded – READ -->
+        <article class="notif-card" data-category="jobs" data-id="6" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-resume">💾</div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">Resume Downloaded</div>
+              <span class="notif-time">2 days ago</span>
+            </div>
+            <p class="notif-desc"><strong>OpenAI's</strong> recruiter downloaded your resume. This typically happens when a recruiter is seriously considering your profile.</p>
+          </div>
+        </article>
+
+        <!-- 7. New Message – READ -->
+        <article class="notif-card" data-category="messages" data-id="7" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-message">💬</div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">New Message</div>
+              <span class="notif-time">3 days ago</span>
+            </div>
+            <p class="notif-desc"><strong>Alex Morrison</strong> from Stripe sent you a message: <em>"Hi Priya, we'd like to discuss an exciting opportunity with you…"</em></p>
+            <div class="notif-actions">
+              <button class="btn-notif btn-notif-primary" onclick="event.stopPropagation();location.href='messages.html'">Reply</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 8. Salary Insight – READ -->
+        <article class="notif-card" data-category="jobs" data-id="8" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-salary">💰</div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">Salary Insight</div>
+              <span class="notif-time">4 days ago</span>
+            </div>
+            <p class="notif-desc">Senior Software Engineers in SF earn <strong>$220K average</strong> this year. Based on your resume and experience, you're likely in the <strong>$180K–$210K</strong> range.</p>
+            <div class="notif-actions">
+              <button class="btn-notif btn-notif-ghost" onclick="event.stopPropagation()">View Details</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 9. Security Alert – READ -->
+        <article class="notif-card" data-category="alerts" data-id="9" role="listitem" onclick="markRead(this)">
+          <div class="notif-icon-wrap type-security">🔒</div>
+          <div class="notif-body">
+            <div class="notif-header">
+              <div class="notif-title">Security Alert</div>
+              <span class="notif-time">1 week ago</span>
+            </div>
+            <p class="notif-desc">A new login was detected from <strong>Chrome</strong> in <strong>New York, NY</strong>. If this was not you, please secure your account immediately.</p>
+            <div class="notif-actions">
+              <button class="btn-notif btn-notif-success" onclick="event.stopPropagation()">Yes, that was me</button>
+              <button class="btn-notif btn-notif-danger" onclick="event.stopPropagation()">Report</button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState" aria-live="polite">
+        <div class="empty-state-icon">🔔</div>
+        <div class="empty-state-title">No notifications here</div>
+        <div class="empty-state-desc">You're all caught up! Check back later.</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ── Init Lucide ──────────────────────────────────────────────────────
+    lucide.createIcons();
+
+    // ── Theme ────────────────────────────────────────────────────────────
+    const root = document.documentElement;
+    const themeIcon = document.getElementById('themeIcon');
+    const stored = localStorage.getItem('ta-theme') || 'dark';
+    root.setAttribute('data-theme', stored);
+    updateThemeIcon(stored);
+
+    function toggleTheme() {
+      const cur = root.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('ta-theme', next);
+      updateThemeIcon(next);
+    }
+
+    function updateThemeIcon(theme) {
+      themeIcon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+      lucide.createIcons();
+    }
+
+    // ── Unread Count ─────────────────────────────────────────────────────
+    let unreadCount = 3;
+    function updateBadge() {
+      const el = document.getElementById('unreadBadge');
+      if (unreadCount <= 0) {
+        el.style.display = 'none';
+      } else {
+        el.textContent = `${unreadCount} unread`;
+        el.style.display = '';
+      }
+    }
+
+    // ── Mark Read ────────────────────────────────────────────────────────
+    function markRead(card) {
+      if (card.classList.contains('unread')) {
+        card.classList.remove('unread');
+        const dot = card.querySelector('.unread-dot');
+        if (dot) dot.remove();
+        unreadCount = Math.max(0, unreadCount - 1);
+        updateBadge();
+      }
+    }
+
+    // ── Mark All Read ────────────────────────────────────────────────────
+    function markAllRead() {
+      document.querySelectorAll('.notif-card.unread').forEach(card => markRead(card));
+    }
+
+    // ── Filter Tabs ──────────────────────────────────────────────────────
+    function filterNotifs(type, btn) {
+      // Update tab state
+      document.querySelectorAll('.filter-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+
+      const cards = document.querySelectorAll('.notif-card');
+      let visible = 0;
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        const isUnread = card.classList.contains('unread');
+        let show = false;
+        if (type === 'all') show = true;
+        else if (type === 'unread') show = isUnread;
+        else show = (cat === type);
+
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+
+      document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+    }
+  </script>
+</body>
+</html>

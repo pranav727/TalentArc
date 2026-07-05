@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Company Profile Editor · TalentArc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ─────────────────────────────────────────
+       DESIGN TOKENS
+     ───────────────────────────────────────── */
+    :root {
+      --primary:        #6366F1;
+      --primary-light:  #818CF8;
+      --primary-dark:   #4F46E5;
+      --accent:         #06B6D4;
+      --success:        #10B981;
+      --warning:        #F59E0B;
+      --error:          #EF4444;
+      --purple:         #A855F7;
+
+      /* Radius */
+      --r-sm:  8px;
+      --r-md:  12px;
+      --r-lg:  16px;
+      --r-xl:  20px;
+      --r-pill:999px;
+
+      /* Transitions */
+      --t-fast: 0.15s ease;
+      --t-base: 0.25s ease;
+      --t-slow: 0.4s ease;
+
+      /* Sidebar */
+      --sidebar-w: 240px;
+    }
+
+    /* Dark theme */
+    [data-theme="dark"] {
+      --bg-base:    #0A0A0F;
+      --bg-1:       #0F0F17;
+      --bg-2:       #13131E;
+      --bg-3:       #1A1A28;
+      --bg-4:       #1E1E2E;
+      --bg-5:       #242438;
+      --bg-hover:   #252535;
+      --border:     rgba(255,255,255,0.06);
+      --border-2:   rgba(255,255,255,0.10);
+      --text-1:     #E2E8F0;
+      --text-2:     #94A3B8;
+      --text-3:     #64748B;
+      --shadow:     0 4px 24px rgba(0,0,0,0.5);
+      --shadow-sm:  0 2px 8px  rgba(0,0,0,0.3);
+      --glow:       0 0 20px rgba(99,102,241,0.15);
+    }
+
+    /* Light theme */
+    [data-theme="light"] {
+      --bg-base:    #F0F0F8;
+      --bg-1:       #FAFAFA;
+      --bg-2:       #FFFFFF;
+      --bg-3:       #F5F5FF;
+      --bg-4:       #EDEDFA;
+      --bg-5:       #E8E8F5;
+      --bg-hover:   #F0F0FF;
+      --border:     rgba(0,0,0,0.08);
+      --border-2:   rgba(0,0,0,0.12);
+      --text-1:     #0F172A;
+      --text-2:     #475569;
+      --text-3:     #94A3B8;
+      --shadow:     0 4px 24px rgba(0,0,0,0.08);
+      --shadow-sm:  0 2px 8px  rgba(0,0,0,0.05);
+      --glow:       0 0 20px rgba(99,102,241,0.08);
+    }
+
+    /* ─────────────────────────────────────────
+       RESET & BASE
+     ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+      transition: background var(--t-base), color var(--t-base);
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ─────────────────────────────────────────
+       LAYOUT SHELL
+     ───────────────────────────────────────── */
+    .app-shell { display: flex; min-height: 100vh; }
+
+    /* ─────────────────────────────────────────
+       SIDEBAR
+     ───────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0;
+      display: flex; flex-direction: column; background: var(--bg-2); border-right: 1px solid var(--border);
+      z-index: 100; transition: transform var(--t-base), background var(--t-base); overflow: hidden;
+    }
+    .sidebar::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(99,102,241,0.04) 0%, transparent 60%); pointer-events: none;
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px; padding: 22px 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), var(--purple));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.4); flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 15px; font-weight: 700; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--primary-light), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; scrollbar-width: none; }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+    .nav-section-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
+      padding: 12px 10px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r-sm);
+      color: var(--text-2); font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all var(--t-fast); position: relative; margin-bottom: 2px;
+      white-space: nowrap; overflow: hidden;
+    }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-1); }
+    .nav-item.active { background: rgba(99,102,241,0.15); color: var(--primary-light); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px;
+      background: linear-gradient(180deg, var(--primary), var(--purple)); border-radius: 0 3px 3px 0;
+    }
+    .nav-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+    .nav-label { flex: 1; }
+    .nav-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill); line-height: 1.4; }
+    .badge-number { background: var(--error); color: #fff; }
+
+    .sidebar-profile {
+      padding: 14px 14px 18px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background var(--t-fast);
+    }
+    .sidebar-profile:hover { background: var(--bg-hover); }
+    .profile-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0; border: 2px solid rgba(99,102,241,0.4);
+    }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-name { font-size: 12.5px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-role { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .settings-btn {
+      width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      color: var(--text-3); transition: all var(--t-fast); flex-shrink: 0;
+    }
+    .settings-btn:hover { background: var(--border-2); color: var(--text-1); }
+
+    /* ─────────────────────────────────────────
+       MAIN AREA
+     ───────────────────────────────────────── */
+    .main-area { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ─────────────────────────────────────────
+       TOP HEADER
+     ───────────────────────────────────────── */
+    .top-header {
+      position: sticky; top: 0; z-index: 90; background: rgba(10,10,15,0.75); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 28px;
+      height: 66px; display: flex; align-items: center; gap: 20px; transition: background var(--t-base);
+    }
+    [data-theme="light"] .top-header { background: rgba(250,250,250,0.85); }
+    .header-greeting { flex: 1; }
+    .header-greeting h1 { font-size: 16px; font-weight: 700; color: var(--text-1); letter-spacing: -0.2px; }
+    .header-greeting p { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center;
+      color: var(--text-2); background: var(--bg-3); border: 1px solid var(--border); cursor: pointer; transition: all var(--t-fast);
+      position: relative;
+    }
+    .icon-btn:hover { background: var(--bg-4); color: var(--text-1); border-color: var(--border-2); }
+    .theme-toggle { width: 36px; height: 36px; }
+    .menu-toggle { display: none; }
+
+    /* ─────────────────────────────────────────
+       PAGE CONTENT
+     ───────────────────────────────────────── */
+    .page-content { padding: 24px 28px; flex: 1; display: flex; flex-direction: column; gap: 20px; max-width: 900px; width: 100%; margin: 0 auto; }
+
+    /* Editor Tabs */
+    .editor-tabs { display: flex; border-bottom: 1px solid var(--border); padding-bottom: 2px; gap: 16px; }
+    .e-tab {
+      padding: 10px 16px; font-size: 13.5px; font-weight: 500; color: var(--text-2); border-bottom: 2px solid transparent;
+      cursor: pointer; transition: all var(--t-fast); display: flex; align-items: center; gap: 6px;
+    }
+    .e-tab:hover { color: var(--text-1); }
+    .e-tab.active { color: var(--primary-light); border-color: var(--primary); font-weight: 600; }
+
+    /* Form Panels */
+    .panel { display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.2s ease; }
+    .panel.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Form Elements */
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .label { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .label span { color: var(--text-3); font-weight: 400; font-size: 11px; margin-left: 4px; }
+    .input {
+      width: 100%; padding: 10px 14px; background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--r-md); color: var(--text-1); font-family: inherit; font-size: 13.5px; outline: none;
+      transition: all var(--t-fast);
+    }
+    .input:focus { border-color: var(--primary); background: var(--bg-3); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+    .textarea { height: 120px; resize: vertical; }
+
+    /* File/Image Upload Zones */
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: var(--r-lg); padding: 24px; text-align: center;
+      cursor: pointer; transition: all var(--t-base); background: var(--bg-2); display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .upload-zone:hover { border-color: var(--primary); background: var(--bg-3); }
+    .upload-icon { color: var(--text-3); }
+    .upload-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .upload-desc { font-size: 11.5px; color: var(--text-3); }
+
+    /* Logo Previews */
+    .logo-uploader { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+    .logo-preview-box {
+      width: 64px; height: 64px; border-radius: var(--r-lg); display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 28px; color: #fff; background: linear-gradient(135deg, #635BFF, #8B83FF); flex-shrink: 0;
+    }
+
+    /* Benefits Checklist Grid */
+    .benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .benefit-item {
+      padding: 12px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-2);
+      display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; transition: all var(--t-fast);
+    }
+    .benefit-item:hover { border-color: var(--border-2); background: var(--bg-3); }
+    .benefit-item.active { border-color: var(--primary); background: rgba(99,102,241,0.03); }
+    .checkbox { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+    .benefit-lbl { font-size: 12.5px; font-weight: 500; color: var(--text-1); }
+
+    /* Culture/Values Cards List */
+    .cards-list { display: flex; flex-direction: column; gap: 12px; }
+    .value-card {
+      border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px; background: var(--bg-2);
+      display: flex; flex-direction: column; gap: 10px; position: relative;
+    }
+    .remove-btn { position: absolute; right: 12px; top: 12px; color: var(--text-3); cursor: pointer; transition: color var(--t-fast); }
+    .remove-btn:hover { color: var(--error); }
+    
+    .btn-add {
+      padding: 10px; border: 1px dashed var(--primary); border-radius: var(--r-lg); color: var(--primary-light);
+      font-weight: 600; font-size: 13px; text-align: center; cursor: pointer; transition: all var(--t-fast);
+    }
+    .btn-add:hover { background: rgba(99,102,241,0.03); border-color: var(--primary-light); }
+
+    /* Footer buttons */
+    .editor-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 10px; }
+    .btn {
+      padding: 10px 18px; border-radius: var(--r-pill); font-size: 13.5px; font-weight: 600; display: inline-flex;
+      align-items: center; gap: 6px; transition: all var(--t-fast); cursor: pointer;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; box-shadow: var(--glow); }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary { border: 1px solid var(--border); color: var(--text-2); }
+    .btn-secondary:hover { border-color: var(--border-2); color: var(--text-1); background: var(--bg-hover); }
+
+    /* Media grid */
+    .media-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .media-thumbnail {
+      position: relative; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border); height: 100px;
+      background: var(--bg-3); display: flex; align-items: center; justify-content: center;
+    }
+    .media-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+    .media-remove {
+      position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.6); color: #fff; width: 20px; height: 20px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; }
+      .menu-toggle { display: flex; }
+      .top-header { padding: 0 16px; }
+      .page-content { padding: 16px; }
+      .form-row { grid-template-columns: 1fr; }
+      .benefits-grid { grid-template-columns: 1fr 1fr; }
+      .media-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-text">TalentArc</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Employer Portal</div>
+      <a href="./dashboard.html" class="nav-item">
+        <i data-lucide="layout-dashboard" class="nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="./company-profile.html" class="nav-item active">
+        <i data-lucide="building" class="nav-icon"></i>
+        <span class="nav-label">Company Profile</span>
+      </a>
+      <a href="./post-job.html" class="nav-item">
+        <i data-lucide="plus-circle" class="nav-icon"></i>
+        <span class="nav-label">Post a Job</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="briefcase" class="nav-icon"></i>
+        <span class="nav-label">Manage Jobs</span>
+        <span class="nav-badge badge-number">12</span>
+      </a>
+      <a href="./applicants.html" class="nav-item">
+        <i data-lucide="users" class="nav-icon"></i>
+        <span class="nav-label">Applicants</span>
+        <span class="nav-badge badge-number">89</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="search" class="nav-icon"></i>
+        <span class="nav-label">Candidate Search</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="calendar" class="nav-icon"></i>
+        <span class="nav-label">Interviews</span>
+      </a>
+    </nav>
+    <div class="sidebar-profile">
+      <div class="profile-avatar">ST</div>
+      <div class="profile-info">
+        <div class="profile-name">Stripe</div>
+        <div class="profile-role">Premium Employer</div>
+      </div>
+      <button class="settings-btn" aria-label="Settings">
+        <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+        <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+      </button>
+      <div class="header-greeting">
+        <h1>Company Profile</h1>
+        <p>Manage your public company page, photos, culture, and benefits</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+          <i data-lucide="sun" id="themeIcon" style="width: 18px; height: 18px;"></i>
+        </button>
+        <a href="../public/company.html" class="btn btn-secondary" style="height:36px;padding:0 14px;"><i data-lucide="eye" style="width:14px;height:14px;"></i> View Public Page</a>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="page-content">
+      <!-- TABS -->
+      <section class="editor-tabs">
+        <div class="e-tab active" onclick="switchTab('details')"><i data-lucide="info" style="width:14px;height:14px;"></i> Details</div>
+        <div class="e-tab" onclick="switchTab('media')"><i data-lucide="image" style="width:14px;height:14px;"></i> Media &amp; Gallery</div>
+        <div class="e-tab" onclick="switchTab('benefits')"><i data-lucide="gift" style="width:14px;height:14px;"></i> Perks &amp; Benefits</div>
+        <div class="e-tab" onclick="switchTab('culture')"><i data-lucide="smile" style="width:14px;height:14px;"></i> Culture &amp; Values</div>
+      </section>
+
+      <!-- PANELS -->
+      <!-- Details Panel -->
+      <div class="panel active" id="panel-details">
+        <div class="logo-uploader">
+          <div class="logo-preview-box">S</div>
+          <div>
+            <div class="label" style="margin-bottom:4px;">Company Logo</div>
+            <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;">Upload New Logo</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="label">Company Name</label>
+            <input type="text" class="input" value="Stripe" />
+          </div>
+          <div class="form-group">
+            <label class="label">Tagline <span>Sub-headline</span></label>
+            <input type="text" class="input" value="Building the economic infrastructure of the internet" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="label">About Company</label>
+          <textarea class="input textarea" placeholder="Describe what your company does, its mission, and history...">Stripe is a financial infrastructure platform for businesses. Millions of companies—from the world's largest enterprises to the most ambitious startups—use Stripe to accept payments, grow their revenue, and accelerate new business opportunities.</textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="label">Industry</label>
+            <input type="text" class="input" value="FinTech · Software" />
+          </div>
+          <div class="form-group">
+            <label class="label">Company Size</label>
+            <input type="text" class="input" value="5,000 – 10,000 employees" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="label">Headquarters Location</label>
+            <input type="text" class="input" value="San Francisco, CA" />
+          </div>
+          <div class="form-group">
+            <label class="label">Website URL</label>
+            <input type="text" class="input" value="https://stripe.com" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Media Panel -->
+      <div class="panel" id="panel-media">
+        <div class="form-group">
+          <label class="label">Hero Cover Image <span>Header Image</span></label>
+          <div class="upload-zone">
+            <i data-lucide="cloud-upload" class="upload-icon" style="width:36px;height:36px;"></i>
+            <span class="upload-title">Upload cover image</span>
+            <span class="upload-desc">Recommended size: 1200x400px (Max 5MB)</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="label">Office &amp; Team Gallery</label>
+          <div class="media-grid">
+            <div class="media-thumbnail">
+              <div style="font-size:12px;color:var(--text-3);">SF Office</div>
+              <div class="media-remove">&times;</div>
+            </div>
+            <div class="media-thumbnail">
+              <div style="font-size:12px;color:var(--text-3);">Team Summit</div>
+              <div class="media-remove">&times;</div>
+            </div>
+            <div class="media-thumbnail">
+              <div style="font-size:12px;color:var(--text-3);">Hackathon</div>
+              <div class="media-remove">&times;</div>
+            </div>
+            <div class="upload-zone" style="height:100px;padding:0;justify-content:center;">
+              <i data-lucide="plus" style="width:20px;height:20px;color:var(--primary);"></i>
+              <span style="font-size:11px;color:var(--text-3);">Add Photo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Benefits Panel -->
+      <div class="panel" id="panel-benefits">
+        <label class="label" style="margin-bottom:4px;">Select Company Benefits &amp; Perks</label>
+        <div class="benefits-grid">
+          <div class="benefit-item active" onclick="toggleBenefit(this)">
+            <input type="checkbox" class="checkbox" checked />
+            <span class="benefit-lbl">Health/Dental Insurance</span>
+          </div>
+          <div class="benefit-item active" onclick="toggleBenefit(this)">
+            <input type="checkbox" class="checkbox" checked />
+            <span class="benefit-lbl">Unlimited PTO</span>
+          </div>
+          <div class="benefit-item active" onclick="toggleBenefit(this)">
+            <input type="checkbox" class="checkbox" checked />
+            <span class="benefit-lbl">Learning Stipend</span>
+          </div>
+          <div class="benefit-item active" onclick="toggleBenefit(this)">
+            <input type="checkbox" class="checkbox" checked />
+            <span class="benefit-lbl">Remote Stipend</span>
+          </div>
+          <div class="benefit-item active" onclick="toggleBenefit(this)">
+            <input type="checkbox" class="checkbox" checked />
+            <span class="benefit-lbl">401(k) Match</span>
+          </div>
+          <div class="benefit-item" onclick="toggleBenefit(this)">
+            <input type="checkbox" class="checkbox" />
+            <span class="benefit-lbl">Free Office Lunch</span>
+          </div>
+          <div class="benefit-item" onclick="toggleBenefit(this)">
+            <input type="checkbox" class="checkbox" />
+            <span class="benefit-lbl">Gym Membership</span>
+          </div>
+          <div class="benefit-item" onclick="toggleBenefit(this)">
+            <input type="checkbox" class="checkbox" />
+            <span class="benefit-lbl">Equity Grants</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Culture Panel -->
+      <div class="panel" id="panel-culture">
+        <label class="label">Company Core Values <span>Max 4 values</span></label>
+        <div class="cards-list" id="valuesList">
+          <div class="value-card">
+            <span class="remove-btn" onclick="removeValueCard(this)">&times;</span>
+            <div class="form-group">
+              <label class="label" style="font-size:12px;">Value Title</label>
+              <input type="text" class="input" value="Users First" />
+            </div>
+            <div class="form-group">
+              <label class="label" style="font-size:12px;">Description</label>
+              <textarea class="input textarea" style="height:60px;">We start with the user's challenges and work backwards to create solutions that simplify payments.</textarea>
+            </div>
+          </div>
+
+          <div class="value-card">
+            <span class="remove-btn" onclick="removeValueCard(this)">&times;</span>
+            <div class="form-group">
+              <label class="label" style="font-size:12px;">Value Title</label>
+              <input type="text" class="input" value="Move Fast" />
+            </div>
+            <div class="form-group">
+              <label class="label" style="font-size:12px;">Description</label>
+              <textarea class="input textarea" style="height:60px;">Continuous delivery and iteration are key to our economic infrastructure mission.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-add" onclick="addValueCard()">+ Add Core Value</div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <footer class="editor-footer">
+        <button class="btn btn-secondary">Discard Changes</button>
+        <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────
+  // THEME MANAGEMENT
+  // ─────────────────────────────────────────
+  const themeToggleBtn = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  
+  function getTheme() { return localStorage.getItem('tarc-employer-theme') || 'dark'; }
+  
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      themeIcon.setAttribute('data-lucide', 'sun');
+    } else {
+      themeIcon.setAttribute('data-lucide', 'moon');
+    }
+    if (window.lucide) lucide.createIcons();
+    localStorage.setItem('tarc-employer-theme', theme);
+  }
+  
+  themeToggleBtn.addEventListener('click', () => {
+    applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(getTheme());
+
+  // ─────────────────────────────────────────
+  // MOBILE NAVIGATION
+  // ─────────────────────────────────────────
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && e.target !== menuToggle && sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // ─────────────────────────────────────────
+  // TAB SWITCHING
+  // ─────────────────────────────────────────
+  function switchTab(tabId) {
+    document.querySelectorAll('.e-tab').forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`panel-${tabId}`).classList.add('active');
+  }
+
+  // ─────────────────────────────────────────
+  // INTERACTIVE BEHAVIORS
+  // ─────────────────────────────────────────
+  function toggleBenefit(el) {
+    const chk = el.querySelector('.checkbox');
+    if (event.target !== chk) {
+      chk.checked = !chk.checked;
+    }
+    el.classList.toggle('active', chk.checked);
+  }
+
+  function removeValueCard(btn) {
+    btn.closest('.value-card').remove();
+  }
+
+  function addValueCard() {
+    const container = document.getElementById('valuesList');
+    const newCard = document.createElement('div');
+    newCard.className = 'value-card';
+    newCard.innerHTML = `
+      <span class="remove-btn" onclick="removeValueCard(this)">&times;</span>
+      <div class="form-group">
+        <label class="label" style="font-size:12px;">Value Title</label>
+        <input type="text" class="input" placeholder="e.g. Integrity" />
+      </div>
+      <div class="form-group">
+        <label class="label" style="font-size:12px;">Description</label>
+        <textarea class="input textarea" style="height:60px;" placeholder="Describe how this value guides your team..."></textarea>
+      </div>
+    `;
+    container.appendChild(newCard);
+  }
+
+  function saveProfile() {
+    alert("Company profile updated successfully!");
+  }
+</script>
+</body>
+</html>

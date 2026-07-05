@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentArc · Job Seeker Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../assets/js/auth-store.js"></script>
+
+  <style>
+    /* ─────────────────────────────────────────
+       DESIGN TOKENS
+     ───────────────────────────────────────── */
+    :root {
+      --primary:        #6366F1;
+      --primary-light:  #818CF8;
+      --primary-dark:   #4F46E5;
+      --accent:         #06B6D4;
+      --success:        #10B981;
+      --warning:        #F59E0B;
+      --error:          #EF4444;
+      --purple:         #A855F7;
+
+      /* Radius */
+      --r-sm:  8px;
+      --r-md:  12px;
+      --r-lg:  16px;
+      --r-xl:  20px;
+      --r-pill:999px;
+
+      /* Transitions */
+      --t-fast: 0.15s ease;
+      --t-base: 0.25s ease;
+      --t-slow: 0.4s ease;
+
+      /* Sidebar */
+      --sidebar-w: 240px;
+    }
+
+    /* Dark theme */
+    [data-theme="dark"] {
+      --bg-base:    #0A0A0F;
+      --bg-1:       #0F0F17;
+      --bg-2:       #13131E;
+      --bg-3:       #1A1A28;
+      --bg-4:       #1E1E2E;
+      --bg-5:       #242438;
+      --bg-hover:   #252535;
+      --border:     rgba(255,255,255,0.06);
+      --border-2:   rgba(255,255,255,0.10);
+      --text-1:     #E2E8F0;
+      --text-2:     #94A3B8;
+      --text-3:     #64748B;
+      --shadow:     0 4px 24px rgba(0,0,0,0.5);
+      --shadow-sm:  0 2px 8px  rgba(0,0,0,0.3);
+      --glow:       0 0 20px rgba(99,102,241,0.15);
+    }
+
+    /* Light theme */
+    [data-theme="light"] {
+      --bg-base:    #F0F0F8;
+      --bg-1:       #FAFAFA;
+      --bg-2:       #FFFFFF;
+      --bg-3:       #F5F5FF;
+      --bg-4:       #EDEDFA;
+      --bg-5:       #E8E8F5;
+      --bg-hover:   #F0F0FF;
+      --border:     rgba(0,0,0,0.08);
+      --border-2:   rgba(0,0,0,0.12);
+      --text-1:     #0F172A;
+      --text-2:     #475569;
+      --text-3:     #94A3B8;
+      --shadow:     0 4px 24px rgba(0,0,0,0.08);
+      --shadow-sm:  0 2px 8px  rgba(0,0,0,0.05);
+      --glow:       0 0 20px rgba(99,102,241,0.08);
+    }
+
+    /* ─────────────────────────────────────────
+       RESET & BASE
+     ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+      transition: background var(--t-base), color var(--t-base);
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    ul { list-style: none; }
+
+    /* ─────────────────────────────────────────
+       LAYOUT SHELL
+     ───────────────────────────────────────── */
+    .app-shell { display: flex; min-height: 100vh; }
+
+    /* ─────────────────────────────────────────
+       SIDEBAR
+     ───────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0;
+      display: flex; flex-direction: column; background: var(--bg-2); border-right: 1px solid var(--border);
+      z-index: 100; transition: transform var(--t-base), background var(--t-base); overflow: hidden;
+    }
+    .sidebar::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(99,102,241,0.04) 0%, transparent 60%); pointer-events: none;
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px; padding: 22px 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), var(--purple));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.4); flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 15px; font-weight: 700; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--primary-light), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; scrollbar-width: none; }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+    .nav-section-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
+      padding: 12px 10px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-sm);
+      color: var(--text-2); font-size: 13.5px; font-weight: 500; cursor: pointer;
+      transition: all var(--t-fast); position: relative; margin-bottom: 2px;
+      white-space: nowrap; overflow: hidden;
+    }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-1); }
+    .nav-item.active { background: rgba(99,102,241,0.15); color: var(--primary-light); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px;
+      background: linear-gradient(180deg, var(--primary), var(--purple)); border-radius: 0 3px 3px 0;
+    }
+    .nav-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+    .nav-label { flex: 1; }
+    .nav-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill); line-height: 1.4; }
+    .badge-number { background: var(--error); color: #fff; }
+    .badge-new { background: linear-gradient(135deg, var(--primary), var(--purple)); color: #fff; font-size: 9px; }
+
+    .sidebar-profile {
+      padding: 14px 14px 18px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background var(--t-fast);
+    }
+    .sidebar-profile:hover { background: var(--bg-hover); }
+    .profile-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0; border: 2px solid rgba(99,102,241,0.4);
+    }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-name { font-size: 12.5px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-role { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ─────────────────────────────────────────
+       MAIN AREA
+     ───────────────────────────────────────── */
+    .main-area { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ─────────────────────────────────────────
+       TOP HEADER
+     ───────────────────────────────────────── */
+    .top-header {
+      position: sticky; top: 0; z-index: 90; background: rgba(10,10,15,0.75); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 28px;
+      height: 66px; display: flex; align-items: center; gap: 20px; transition: background var(--t-base);
+    }
+    [data-theme="light"] .top-header { background: rgba(250,250,250,0.85); }
+    .header-greeting { flex: 1; }
+    .header-greeting h1 { font-size: 16px; font-weight: 700; color: var(--text-1); letter-spacing: -0.2px; }
+    .header-greeting p { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center;
+      color: var(--text-2); background: var(--bg-3); border: 1px solid var(--border); cursor: pointer; transition: all var(--t-fast);
+      position: relative;
+    }
+    .icon-btn:hover { background: var(--bg-4); color: var(--text-1); border-color: var(--border-2); }
+    .notif-dot {
+      position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--error);
+      border-radius: 50%; border: 1.5px solid var(--bg-2);
+    }
+    .theme-toggle { width: 36px; height: 36px; }
+    .menu-toggle { display: none; }
+
+    /* ─────────────────────────────────────────
+       PAGE CONTENT (TAB PANELS)
+     ───────────────────────────────────────── */
+    .page-content { padding: 24px 28px; flex: 1; display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.25s ease-out; }
+    .page-content.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Grid Layouts */
+    .content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+    .content-left { display: flex; flex-direction: column; gap: 20px; }
+    .content-right { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 86px; }
+
+    /* Shared Card Styling */
+    .card {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px;
+      transition: box-shadow var(--t-base), border-color var(--t-base), transform var(--t-fast);
+    }
+    .card:hover { box-shadow: var(--glow), var(--shadow); border-color: var(--border-2); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .card-title { font-size: 14.5px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 8px; }
+    .card-link { font-size: 12px; color: var(--primary-light); font-weight: 500; cursor: pointer; }
+    .card-link:hover { color: var(--primary); }
+
+    /* ─────────────────────────────────────────
+       TAB 1: OVERVIEW COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .welcome-banner {
+      background: linear-gradient(135deg, #312E81 0%, #4C1D95 40%, #1E1B4B 100%);
+      border: 1px solid rgba(99,102,241,0.3); border-radius: var(--r-xl); padding: 24px;
+      display: flex; align-items: center; gap: 20px; position: relative; overflow: hidden;
+    }
+    .welcome-banner::before {
+      content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(129,140,248,0.2) 0%, transparent 70%); pointer-events: none;
+    }
+    .circle-score-wrap {
+      width: 76px; height: 76px; border-radius: 50%; background: rgba(255,255,255,0.08);
+      border: 3px solid rgba(129,140,248,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .circle-score-val { font-size: 22px; font-weight: 800; color: #fff; }
+    .circle-score-lbl { font-size: 8.5px; font-weight: 600; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .welcome-content { flex: 1; }
+    .welcome-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .welcome-subtitle { font-size: 12.5px; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+    .welcome-bar { background: rgba(255,255,255,0.12); border-radius: var(--r-pill); height: 6px; overflow: hidden; margin-bottom: 8px; width: 80%; }
+    .welcome-bar-fill { height: 100%; background: linear-gradient(90deg, #818CF8, #A78BFA); width: 78%; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .stat-card {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px;
+      display: flex; flex-direction: column; gap: 6px; transition: all var(--t-base); position: relative;
+    }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px; border-radius: var(--r-lg) var(--r-lg) 0 0; }
+    .stat-card.blue::before   { background: #3B82F6; }
+    .stat-card.green::before  { background: var(--success); }
+    .stat-card.orange::before { background: var(--warning); }
+    .stat-card.purple::before { background: var(--purple); }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--border-2); }
+    .stat-header { display: flex; align-items: center; justify-content: space-between; }
+    .stat-icon { font-size: 16px; color: var(--text-3); }
+    .stat-val { font-size: 26px; font-weight: 800; color: var(--text-1); letter-spacing: -0.5px; }
+    .stat-lbl { font-size: 12px; color: var(--text-2); font-weight: 500; }
+    .stat-trend { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: var(--r-pill); }
+    .stat-card.blue .stat-trend { background: rgba(59,130,246,0.1); color: #60A5FA; }
+    .stat-card.green .stat-trend { background: rgba(16,185,129,0.1); color: #34D399; }
+    .stat-card.orange .stat-trend { background: rgba(245,158,11,0.1); color: #FCD34D; }
+    .stat-card.purple .stat-trend { background: rgba(168,85,247,0.1); color: #C084FC; }
+
+    /* Activity items */
+    .activity-list { display: flex; flex-direction: column; gap: 10px; }
+    .activity-item { display: flex; gap: 12px; padding: 10px; border-radius: var(--r-sm); transition: background var(--t-fast); }
+    .activity-item:hover { background: var(--bg-hover); }
+    .act-icon { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-3); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .act-body { flex: 1; }
+    .act-msg { font-size: 13px; font-weight: 500; color: var(--text-1); }
+    .act-time { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+    /* Checklist */
+    .checklist-list { display: flex; flex-direction: column; gap: 10px; }
+    .chk-item { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+    .chk-left { display: flex; align-items: center; gap: 10px; }
+    .chk-bullet { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border-2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .chk-item.checked .chk-bullet { background: var(--success); border-color: var(--success); }
+    .chk-item.checked .chk-bullet::after { content: '✓'; color: #fff; font-size: 9px; font-weight: 800; }
+    .chk-item.checked .chk-lbl { text-decoration: line-through; color: var(--text-3); }
+    .btn-add-action { font-size: 11.5px; font-weight: 600; color: var(--primary-light); cursor: pointer; }
+
+    /* ─────────────────────────────────────────
+       TAB 2: PROFILE COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .profile-card { display: flex; gap: 20px; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    .profile-avatar-large {
+      width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--purple));
+      display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: #fff;
+      border: 3px solid rgba(99,102,241,0.4); flex-shrink: 0;
+    }
+    .profile-info-large { flex: 1; }
+    .profile-name-large { font-size: 20px; font-weight: 700; color: var(--text-1); letter-spacing: -0.3px; }
+    .profile-headline-large { font-size: 13.5px; color: var(--text-2); margin-top: 3px; }
+    .profile-status { display: inline-flex; align-items: center; gap: 4px; background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.2); padding: 2px 10px; border-radius: var(--r-pill); font-size: 11px; font-weight: 600; margin-top: 6px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+    .form-input {
+      width: 100%; padding: 10px 14px; background: var(--bg-3); border: 1px solid var(--border);
+      border-radius: var(--r-md); color: var(--text-1); font-family: inherit; font-size: 13.5px; outline: none;
+      transition: all var(--t-fast);
+    }
+    .form-input:focus { border-color: var(--primary); background: var(--bg-4); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+    .form-input-full { grid-column: span 2; }
+
+    /* ─────────────────────────────────────────
+       TAB 3: RESUME COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: var(--r-lg); padding: 32px 20px; text-align: center;
+      cursor: pointer; transition: all var(--t-base); background: var(--bg-3); display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .upload-zone:hover { border-color: var(--primary); background: var(--bg-4); }
+    .upload-icon { color: var(--text-3); margin-bottom: 4px; }
+    .upload-title { font-size: 14px; font-weight: 600; color: var(--text-1); }
+    .upload-desc { font-size: 12px; color: var(--text-3); }
+
+    .resume-versions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .resume-ver-card {
+      display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;
+      border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-2);
+    }
+    .res-ver-left { display: flex; align-items: center; gap: 12px; }
+    .res-ver-icon { color: var(--primary-light); }
+    .res-ver-name { font-size: 13.5px; font-weight: 600; color: var(--text-1); }
+    .res-ver-date { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+    .res-ver-actions { display: flex; gap: 8px; }
+    .btn-action {
+      width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      background: var(--bg-3); border: 1px solid var(--border); color: var(--text-2); transition: all var(--t-fast);
+    }
+    .btn-action:hover { background: var(--bg-hover); color: var(--text-1); }
+
+    /* ─────────────────────────────────────────
+       TAB 4: JOB BOARD COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .job-search-bar { display: flex; gap: 12px; margin-bottom: 20px; }
+    .search-input-wrap { position: relative; flex: 1; }
+    .search-input-wrap input {
+      width: 100%; height: 42px; padding: 0 16px 0 42px; background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--r-md); font-size: 14px; color: var(--text-1); outline: none; transition: all var(--t-fast);
+    }
+    .search-input-wrap input:focus { border-color: var(--primary); background: var(--bg-3); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+    .search-icon-inline { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; }
+    
+    .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filter-chip {
+      padding: 6px 14px; border-radius: var(--r-pill); font-size: 12.5px; font-weight: 500;
+      background: var(--bg-2); border: 1px solid var(--border); color: var(--text-2); cursor: pointer; transition: all var(--t-fast);
+    }
+    .filter-chip:hover { border-color: var(--border-2); color: var(--text-1); }
+    .filter-chip.active { background: rgba(99,102,241,0.12); border-color: var(--primary); color: var(--primary-light); font-weight: 600; }
+
+    /* Job board split view */
+    .jobs-split-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
+    .jobs-list { display: flex; flex-direction: column; gap: 12px; max-height: 520px; overflow-y: auto; scrollbar-width: none; }
+    .jobs-list::-webkit-scrollbar { display: none; }
+    .mini-job-card {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px;
+      cursor: pointer; transition: all var(--t-base); display: flex; flex-direction: column; gap: 10px;
+    }
+    .mini-job-card:hover { border-color: var(--border-2); transform: translateY(-1.5px); }
+    .mini-job-card.active { border-color: var(--primary); background: rgba(99,102,241,0.03); }
+    .mj-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .mj-title { font-size: 13.5px; font-weight: 600; color: var(--text-1); }
+    .mj-comp { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+    .mj-logo { width: 32px; height: 32px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #fff; }
+    .mj-tags { display: flex; gap: 6px; }
+    .mj-tag { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: var(--r-pill); background: var(--bg-3); color: var(--text-3); }
+
+    .job-detail-card {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 24px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .jd-header { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 18px; }
+    .jd-comp-wrap { display: flex; gap: 14px; align-items: center; }
+    .jd-logo { width: 48px; height: 48px; border-radius: var(--r-lg); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: #fff; }
+    .jd-title { font-size: 18px; font-weight: 700; color: var(--text-1); letter-spacing: -0.3px; }
+    .jd-comp { font-size: 13.5px; color: var(--text-2); margin-top: 2px; }
+    .jd-action-row { display: flex; gap: 10px; margin-top: 14px; }
+    .btn {
+      padding: 10px 18px; border-radius: var(--r-pill); font-size: 13px; font-weight: 600; display: inline-flex;
+      align-items: center; gap: 6px; transition: all var(--t-fast); cursor: pointer;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .btn-secondary { border: 1px solid var(--border); color: var(--text-2); }
+    .btn-secondary:hover { border-color: var(--border-2); color: var(--text-1); background: var(--bg-hover); }
+
+    /* ─────────────────────────────────────────
+       TAB 5: INTERVIEWS COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 14px; }
+    .cal-header-cell { text-align: center; font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; padding-bottom: 6px; }
+    .cal-cell {
+      aspect-ratio: 1.2; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg-3);
+      display: flex; flex-direction: column; padding: 6px; font-size: 12px; font-weight: 600; color: var(--text-2); position: relative;
+    }
+    .cal-cell.today { border-color: var(--primary); color: var(--primary-light); }
+    .cal-cell.has-event { background: rgba(99,102,241,0.06); }
+    .cal-event-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--primary); position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); }
+
+    .mock-chat { display: flex; flex-direction: column; gap: 12px; background: var(--bg-3); border-radius: var(--r-lg); padding: 16px; height: 260px; overflow-y: auto; }
+    .mock-bubble { max-width: 80%; padding: 10px 14px; border-radius: var(--r-md); font-size: 13px; line-height: 1.5; }
+    .mock-bubble.ai { background: var(--bg-2); color: var(--text-1); align-self: flex-start; }
+    .mock-bubble.user { background: var(--primary); color: #fff; align-self: flex-end; }
+
+    /* ─────────────────────────────────────────
+       TAB 6: MESSAGES COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .msg-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; height: 520px; }
+    .msg-inbox { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; border-right: 1px solid var(--border); padding-right: 14px; }
+    .inbox-card {
+      padding: 12px; border-radius: var(--r-md); border: 1px solid transparent; cursor: pointer; transition: all var(--t-fast);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .inbox-card:hover { background: var(--bg-hover); }
+    .inbox-card.active { background: rgba(99,102,241,0.08); border-color: var(--border); }
+    .ib-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .ib-info { flex: 1; min-width: 0; }
+    .ib-name { font-size: 13px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ib-msg { font-size: 11.5px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+    .chat-panel { display: flex; flex-direction: column; background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--r-xl); overflow: hidden; }
+    .chat-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg-2); }
+    .chat-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; height: 380px; }
+    .chat-footer { padding: 14px 20px; border-top: 1px solid var(--border); background: var(--bg-2); display: flex; gap: 10px; }
+    .chat-input {
+      flex: 1; height: 38px; padding: 0 14px; background: var(--bg-3); border: 1px solid var(--border);
+      border-radius: var(--r-md); color: var(--text-1); font-family: inherit; font-size: 13.5px; outline: none;
+    }
+
+    /* ─────────────────────────────────────────
+       TAB 7: AI CAREER COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .roadmap-timeline { display: flex; flex-direction: column; position: relative; padding-left: 24px; margin-top: 10px; }
+    .roadmap-timeline::before { content: ''; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 2px; background: var(--border); }
+    .rm-item { position: relative; padding-bottom: 24px; }
+    .rm-dot { position: absolute; left: -24px; top: 4px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); display: flex; align-items: center; justify-content: center; }
+    .rm-item.completed .rm-dot { border-color: var(--success); background: var(--success); }
+    .rm-item.completed .rm-dot::after { content: '✓'; color: #fff; font-size: 9px; font-weight: 800; }
+    .rm-item.active .rm-dot { border-color: var(--primary); background: var(--primary); }
+    .rm-stage { font-size: 13.5px; font-weight: 600; color: var(--text-1); }
+    .rm-desc { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+    /* Gap bar */
+    .gap-bar-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .gap-bar-header { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-2); }
+    .gap-bar-wrap { background: var(--bg-3); border-radius: var(--r-pill); height: 6px; overflow: hidden; }
+    .gap-bar-fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--primary), var(--purple)); }
+
+    /* ─────────────────────────────────────────
+       TAB 8: ANALYTICS COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .chart-container { height: 180px; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 20px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+    .chart-bar-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
+    .chart-bar { width: 32px; border-radius: var(--r-sm) var(--r-sm) 0 0; background: linear-gradient(180deg, var(--primary-light), var(--primary)); transition: height 0.6s ease; }
+    .chart-lbl { font-size: 11px; color: var(--text-3); }
+
+    /* ─────────────────────────────────────────
+       TAB 9: SETTINGS COMPONENT STYLES
+     ───────────────────────────────────────── */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .toggle-row:last-child { border: none; }
+    .toggle-info { display: flex; flex-direction: column; gap: 3px; }
+    .toggle-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .toggle-desc { font-size: 11.5px; color: var(--text-3); }
+    
+    .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--bg-3); border: 1px solid var(--border); border-radius: 34px; transition: .3s; }
+    .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: var(--text-3); border-radius: 50%; transition: .3s; }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); background-color: #fff; }
+
+    /* Sessions log */
+    .session-log { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; padding: 8px 0; }
+    .session-device { font-weight: 600; color: var(--text-1); display: flex; align-items: center; gap: 6px; }
+
+    /* Skeleton Loading Overlay */
+    .skeleton-overlay {
+      position: fixed; inset: 0; background: var(--bg-base); z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    .skeleton-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; }
+      .menu-toggle { display: flex; }
+      .top-header { padding: 0 16px; }
+      .page-content { padding: 16px; }
+      .content-grid { grid-template-columns: 1fr; }
+      .jobs-split-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Skeleton Overlay -->
+<div class="skeleton-overlay" id="skeletonOverlay">
+  <div style="text-align:center; color: var(--text-2);">
+    <div style="font-size: 28px; font-weight:700; color:var(--primary-light); margin-bottom:10px;">TalentArc</div>
+    <div style="width: 80px; height: 3px; background:var(--border); border-radius:var(--r-pill); overflow:hidden; margin:0 auto;">
+      <div style="width: 40%; height:100%; background:var(--primary); animation: shimmer 1s infinite linear;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-text"><a href="index.html">TalentArc</a></span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Job Seeker Portal</div>
+      <div class="nav-item active" onclick="switchMainTab('overview')" id="nav-overview">
+        <i data-lucide="layout-dashboard" class="nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="switchMainTab('profile')" id="nav-profile">
+        <i data-lucide="user" class="nav-icon"></i>
+        <span class="nav-label">My Profile</span>
+      </div>
+      <div class="nav-item" onclick="switchMainTab('resume')" id="nav-resume">
+        <i data-lucide="file-text" class="nav-icon"></i>
+        <span class="nav-label">Resume Center</span>
+      </div>
+      <div class="nav-item" onclick="switchMainTab('jobs')" id="nav-jobs">
+        <i data-lucide="search" class="nav-icon"></i>
+        <span class="nav-label">Job Search</span>
+      </div>
+      <div class="nav-item" onclick="switchMainTab('interviews')" id="nav-interviews">
+        <i data-lucide="calendar" class="nav-icon"></i>
+        <span class="nav-label">Interview Center</span>
+      </div>
+      <div class="nav-item" onclick="switchMainTab('messages')" id="nav-messages">
+        <i data-lucide="message-square" class="nav-icon"></i>
+        <span class="nav-label">Messages</span>
+        <span class="nav-badge badge-number">3</span>
+      </div>
+      <div class="nav-item" onclick="switchMainTab('ai-career')" id="nav-ai-career">
+        <i data-lucide="sparkles" class="nav-icon"></i>
+        <span class="nav-label">AI Career Center</span>
+        <span class="nav-badge badge-new">NEW</span>
+      </div>
+      <div class="nav-item" onclick="switchMainTab('analytics')" id="nav-analytics">
+        <i data-lucide="bar-chart-2" class="nav-icon"></i>
+        <span class="nav-label">Analytics</span>
+      </div>
+      <div class="nav-item" onclick="switchMainTab('settings')" id="nav-settings">
+        <i data-lucide="settings" class="nav-icon"></i>
+        <span class="nav-label">Settings &amp; Security</span>
+      </div>
+    </nav>
+    <div class="sidebar-profile" id="sidebarProfile" title="Click to logout">
+      <div class="profile-avatar" id="sidebarAvatar">PS</div>
+      <div class="profile-info">
+        <div class="profile-name" id="sidebarName">Priya Sharma</div>
+        <div class="profile-role" id="sidebarRole">Software Engineer</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+        <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+      </button>
+      <div class="header-greeting">
+        <h1 id="headerTitle">Good morning, Priya</h1>
+        <p id="headerSubtitle">You have 3 active applications and 2 new messages today.</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+          <i data-lucide="sun" id="themeIcon" style="width: 18px; height: 18px;"></i>
+        </button>
+        <button class="icon-btn" aria-label="Notifications" onclick="switchMainTab('overview')">
+          <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="header-avatar" id="headerAvatar" onclick="switchMainTab('profile')">PS</div>
+      </div>
+    </header>
+
+    <!-- CONTENT PANELS -->
+
+    <!-- PANEL 1: OVERVIEW -->
+    <main class="page-content active" id="panel-overview">
+      <div class="content-grid">
+        <div class="content-left">
+          <!-- Welcome Banner -->
+          <div class="welcome-banner">
+            <div class="circle-score-wrap">
+              <span class="circle-score-val">84</span>
+              <span class="circle-score-lbl">Score</span>
+            </div>
+            <div class="welcome-content">
+              <h2 class="welcome-title">Your AI Career Copilot is active</h2>
+              <p class="welcome-subtitle">Complete your profile setup to match with jobs offering up to 25% higher salary packages.</p>
+              <div class="welcome-bar"><div class="welcome-bar-fill"></div></div>
+              <button class="btn btn-primary" onclick="switchMainTab('profile')" style="font-size:11.5px;padding:6px 14px;">Complete Profile</button>
+            </div>
+          </div>
+
+          <!-- Stats Grid -->
+          <section class="stats-grid">
+            <div class="stat-card blue">
+              <div class="stat-header">
+                <span class="stat-lbl">Applied Jobs</span>
+                <span class="stat-trend">+3 this wk</span>
+              </div>
+              <div class="stat-val">24</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-header">
+                <span class="stat-lbl">Profile Views</span>
+                <span class="stat-trend">+47%</span>
+              </div>
+              <div class="stat-val">312</div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-header">
+                <span class="stat-lbl">Interviews</span>
+                <span class="stat-trend">2 active</span>
+              </div>
+              <div class="stat-val">4</div>
+            </div>
+            <div class="stat-card purple">
+              <div class="stat-header">
+                <span class="stat-lbl">Saved Jobs</span>
+                <span class="stat-trend">Expiring soon</span>
+              </div>
+              <div class="stat-val">18</div>
+            </div>
+          </section>
+
+          <!-- Timeline Summary -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i data-lucide="file-check" style="width:16px;height:16px;color:var(--primary);"></i> Active Applications Overview</h2>
+            </div>
+            <ul class="activity-list">
+              <li class="activity-item">
+                <div class="act-icon" style="background:rgba(99,102,241,0.1); color:var(--primary-light);">S</div>
+                <div class="act-body">
+                  <div class="act-msg">Senior Software Engineer at Stripe</div>
+                  <div class="act-time">Status: <strong>Shortlisted</strong> · Technical assessment scheduled</div>
+                </div>
+              </li>
+              <li class="activity-item">
+                <div class="act-icon" style="background:#000; color:#fff;">V</div>
+                <div class="act-body">
+                  <div class="act-msg">Staff Engineer at Vercel</div>
+                  <div class="act-time">Status: <strong>Interview</strong> · Team loop scheduled for Jan 24</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right Overview Column -->
+        <div class="content-right">
+          <!-- Profile Completion Checklist -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Profile Strength: 72%</h2>
+            </div>
+            <div class="checklist-list">
+              <div class="chk-item checked">
+                <div class="chk-left"><div class="chk-bullet"></div><span class="chk-lbl">Personal Info &amp; Headline</span></div>
+              </div>
+              <div class="chk-item checked">
+                <div class="chk-left"><div class="chk-bullet"></div><span class="chk-lbl">Verify Core Skills</span></div>
+              </div>
+              <div class="chk-item checked">
+                <div class="chk-left"><div class="chk-bullet"></div><span class="chk-lbl">Upload Main Resume</span></div>
+              </div>
+              <div class="chk-item">
+                <div class="chk-left"><div class="chk-bullet"></div><span class="chk-lbl">Add Education Details</span></div>
+                <span class="btn-add-action" onclick="switchMainTab('profile')">Add</span>
+              </div>
+              <div class="chk-item">
+                <div class="chk-left"><div class="chk-bullet"></div><span class="chk-lbl">Connect GitHub Portfolio</span></div>
+                <span class="btn-add-action" onclick="switchMainTab('profile')">Connect</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Alerts Feed -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Recent Activity</h2>
+            </div>
+            <ul class="activity-list">
+              <li class="activity-item">
+                <div class="act-icon">👁️</div>
+                <div class="act-body">
+                  <div class="act-msg">Stripe viewed your profile</div>
+                  <div class="act-time">7 hours ago</div>
+                </div>
+              </li>
+              <li class="activity-item">
+                <div class="act-icon">✉️</div>
+                <div class="act-body">
+                  <div class="act-msg">Interview invitation from Linear</div>
+                  <div class="act-time">5 hours ago</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 2: MY PROFILE -->
+    <main class="page-content" id="panel-profile">
+      <div class="card">
+        <div class="profile-card">
+          <div class="profile-avatar-large" id="panelProfileAvatar">PS</div>
+          <div class="profile-info-large">
+            <h2 class="profile-name-large" id="panelProfileName">Priya Sharma</h2>
+            <div class="profile-headline-large">Software Engineer · Specialized in Distributed Systems &amp; React</div>
+            <span class="profile-status">🟢 Open to Work (Remote, Hybrid)</span>
+          </div>
+        </div>
+
+        <form id="profileForm" style="margin-top:20px;">
+          <h3 class="card-title" style="margin-bottom:12px;"><i data-lucide="user" style="width:16px;height:16px;color:var(--primary);"></i> Personal Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="input form-input" id="pfFullName" value="Priya Sharma" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" class="input form-input" id="pfLocation" value="San Francisco, CA" />
+            </div>
+            <div class="form-group form-input-full">
+              <label class="form-label">About Me</label>
+              <textarea class="input form-input textarea" id="pfAbout" style="height:80px;">Passionate frontend and systems engineer with 5+ years of experience building high-performance web products and web platforms.</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="input form-input" id="pfEmail" value="priya.sharma@gmail.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" class="input form-input" id="pfPhone" placeholder="+1 (555) 000-0000" value="" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expected Salary</label>
+              <input type="text" class="input form-input" id="pfSalary" value="$140,000 – $165,000" />
+            </div>
+            <div class="form-group form-input-full">
+              <label class="form-label">Social &amp; Portfolio Links</label>
+              <div style="display:flex;gap:10px;margin-top:4px;">
+                <input type="text" class="input form-input" id="pfGithub" value="github.com/priyasharma" placeholder="GitHub URL" />
+                <input type="text" class="input form-input" id="pfLinkedin" value="linkedin.com/in/priya" placeholder="LinkedIn URL" />
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- PANEL 3: RESUME CENTER -->
+    <main class="page-content" id="panel-resume">
+      <div class="content-grid">
+        <div class="content-left">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i data-lucide="upload" style="width:16px;height:16px;color:var(--primary);"></i> Upload New Resume</h2>
+            </div>
+            <div class="upload-zone" id="resumeUploadZone">
+              <i data-lucide="cloud-upload" class="upload-icon" style="width:36px;height:36px;"></i>
+              <span class="upload-title">Drag and drop your resume file</span>
+              <span class="upload-desc" id="resumeUploadDesc">Supports PDF, DOCX formats · Max size 5MB</span>
+            </div>
+            <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx" style="display:none;" />
+          </div>
+
+          <div class="card" id="resumeVersionsCard" style="display:none;">
+            <div class="card-header">
+              <h2 class="card-title">Saved Resume</h2>
+            </div>
+            <div class="resume-versions">
+              <div class="resume-ver-card">
+                <div class="res-ver-left">
+                  <i data-lucide="file" class="res-ver-icon"></i>
+                  <div>
+                    <div class="res-ver-name" id="resumeVerName">—</div>
+                    <div class="res-ver-date" id="resumeVerDate">—</div>
+                  </div>
+                </div>
+                <div class="res-ver-actions">
+                  <button class="btn-action" id="resumeViewBtn" title="View"><i data-lucide="eye" style="width:14px;height:14px;"></i></button>
+                  <button class="btn-action" id="resumeDownloadBtn" title="Download"><i data-lucide="download" style="width:14px;height:14px;"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-right">
+          <!-- ATS Score -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">ATS Resume Score</h2>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+              <span style="font-size:32px;font-weight:800;color:var(--success);">78%</span>
+              <div style="font-size:12px;color:var(--text-3);">ATS Match Compatibility rating based on Software Engineer roles</div>
+            </div>
+            <div class="welcome-bar" style="width:100%;margin-bottom:16px;"><div class="welcome-bar-fill" style="width:78%;"></div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;">
+              <div style="display:flex;align-items:center;gap:8px;color:var(--success);"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Layout template is highly readable</div>
+              <div style="display:flex;align-items:center;gap:8px;color:var(--warning);"><i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Add keywords: 'Kubernetes', 'Cloud'</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 4: JOB SEARCH -->
+    <main class="page-content" id="panel-jobs">
+      <!-- Search headers -->
+      <div class="job-search-bar">
+        <div class="search-input-wrap">
+          <i data-lucide="search" class="search-icon-inline"></i>
+          <input type="text" id="jobQuery" placeholder="Search roles, skills, or companies..." onkeyup="filterJobsList()" />
+        </div>
+        <button class="btn btn-primary" onclick="filterJobsList()" style="height:42px;"><i data-lucide="search" style="width:14px;height:14px;"></i> Search</button>
+      </div>
+
+      <div class="filter-chips">
+        <div class="filter-chip active" onclick="toggleFilterChip(this, 'all')">All Roles</div>
+        <div class="filter-chip" onclick="toggleFilterChip(this, 'remote')">Remote Only</div>
+        <div class="filter-chip" onclick="toggleFilterChip(this, 'hybrid')">Hybrid</div>
+        <div class="filter-chip" onclick="toggleFilterChip(this, 'over150')">$150K+</div>
+      </div>
+
+      <!-- Split Layout -->
+      <div class="jobs-split-grid">
+        <!-- List -->
+        <div class="jobs-list" id="jobsListContainer">
+          <div class="mini-job-card active" data-id="stripe" onclick="viewJobDetail('stripe')">
+            <div class="mj-header">
+              <div>
+                <h4 class="mj-title">Senior Software Engineer</h4>
+                <div class="mj-comp">Stripe · SF, CA (Hybrid)</div>
+              </div>
+              <div class="mj-logo" style="background:#635BFF;">S</div>
+            </div>
+            <div class="mj-tags">
+              <span class="mj-tag">Hybrid</span>
+              <span class="mj-tag">$180K – $240K</span>
+            </div>
+          </div>
+
+          <div class="mini-job-card" data-id="vercel" onclick="viewJobDetail('vercel')">
+            <div class="mj-header">
+              <div>
+                <h4 class="mj-title">Staff Engineer</h4>
+                <div class="mj-comp">Vercel · Remote</div>
+              </div>
+              <div class="mj-logo" style="background:#000;">V</div>
+            </div>
+            <div class="mj-tags">
+              <span class="mj-tag">Remote</span>
+              <span class="mj-tag">$200K – $260K</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail -->
+        <div class="job-detail-card" id="jobDetailCard">
+          <div class="jd-header">
+            <div class="jd-comp-wrap">
+              <div class="jd-logo" id="jdLogo" style="background:#635BFF;">S</div>
+              <div>
+                <h2 class="jd-title" id="jdTitle">Senior Software Engineer</h2>
+                <div class="jd-comp" id="jdComp">Stripe · San Francisco, CA (Hybrid)</div>
+              </div>
+            </div>
+            <div style="font-size:16px;font-weight:700;color:var(--primary-light);" id="jdSalary">$180K – $240K</div>
+          </div>
+
+          <div>
+            <h3 class="card-title" style="margin-bottom:8px;">About the Role</h3>
+            <p style="font-size:13px;color:var(--text-2);line-height:1.6;" id="jdDesc">We are looking for a Senior Software Engineer to join our infrastructure team. You will work on systems that process billions of dollars in payments globally.</p>
+          </div>
+
+          <div class="jd-action-row">
+            <button class="btn btn-primary" onclick="alert('Redirecting to application flow...'); window.location.href='./apply.html';">Apply Now</button>
+            <button class="btn btn-secondary"><i data-lucide="heart" style="width:14px;height:14px;"></i> Save Job</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 5: INTERVIEW CENTER -->
+    <main class="page-content" id="panel-interviews">
+      <div class="content-grid">
+        <div class="content-left">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i data-lucide="calendar" style="width:16px;height:16px;color:var(--primary);"></i> Interview Calendar</h2>
+            </div>
+            <!-- Month grid -->
+            <div class="calendar-grid">
+              <div class="cal-header-cell">Sun</div>
+              <div class="cal-header-cell">Mon</div>
+              <div class="cal-header-cell">Tue</div>
+              <div class="cal-header-cell">Wed</div>
+              <div class="cal-header-cell">Thu</div>
+              <div class="cal-header-cell">Fri</div>
+              <div class="cal-header-cell">Sat</div>
+
+              <div class="cal-cell">18</div>
+              <div class="cal-cell">19</div>
+              <div class="cal-cell">20</div>
+              <div class="cal-cell">21</div>
+              <div class="cal-cell has-event">22<div class="cal-event-dot"></div></div>
+              <div class="cal-cell">23</div>
+              <div class="cal-cell has-event today">24<div class="cal-event-dot"></div></div>
+            </div>
+          </div>
+
+          <!-- Coach -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i data-lucide="mic" style="width:16px;height:16px;color:var(--purple);"></i> AI Mock Interview Coach</h2>
+            </div>
+            <div class="mock-chat" id="mockChat">
+              <div class="mock-bubble ai" id="mockCoachIntro">Welcome! Select the session type to begin. Let's practice a Behavioral question. Describe a time you resolved a technical conflict in your team.</div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px;">
+              <input type="text" class="input" id="mockInput" placeholder="Type your practice response..." style="flex:1;" />
+              <button class="btn btn-primary" onclick="sendMockResponse()"><i data-lucide="send" style="width:14px;height:14px;"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-right">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Scheduled Sessions</h2>
+            </div>
+            <ul class="activity-list">
+              <li class="activity-item">
+                <div class="act-icon" style="background:#000;">V</div>
+                <div class="act-body">
+                  <div class="act-msg">Vercel Onsite Panels</div>
+                  <div class="act-time">Jan 24, 2025 at 11:00 AM</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 6: MESSAGES -->
+    <main class="page-content" id="panel-messages">
+      <div class="msg-grid card">
+        <div class="msg-inbox">
+          <div class="inbox-card active" onclick="switchActiveChat('alex')">
+            <div class="ib-avatar" style="background:#635BFF">AM</div>
+            <div class="ib-info">
+              <div class="ib-name">Alex Morrison (Stripe)</div>
+              <div class="ib-msg">Hi Priya, calendar invite sent!</div>
+            </div>
+          </div>
+          <div class="inbox-card" onclick="switchActiveChat('sarah')">
+            <div class="ib-avatar" style="background:#5E6AD2">SC</div>
+            <div class="ib-info">
+              <div class="ib-name">Sarah Chen (Linear)</div>
+              <div class="ib-msg">Thanks for applying. We are...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-panel">
+          <div class="chat-header">
+            <h3 class="card-title" id="chatHeaderName">Alex Morrison (Stripe)</h3>
+            <span style="font-size:11.5px;color:var(--success);">● Active Now</span>
+          </div>
+          <div class="chat-body" id="chatBody">
+            <div style="background:var(--bg-2);padding:10px 14px;border-radius:var(--r-md);font-size:13px;max-width:80%;align-self:flex-start;">
+              Hi Priya! I came across your profile and I'm very impressed with your background in distributed systems and React.
+            </div>
+            <div style="background:var(--primary);color:#fff;padding:10px 14px;border-radius:var(--r-md);font-size:13px;max-width:80%;align-self:flex-end;">
+              Hi Alex! Thank you for reaching out. I'm definitely interested in learning more about the opportunity at Stripe.
+            </div>
+          </div>
+          <div class="chat-footer">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage();" />
+            <button class="btn btn-primary" onclick="sendMessage()"><i data-lucide="send" style="width:14px;height:14px;"></i></button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 7: AI CAREER CENTER -->
+    <main class="page-content" id="panel-ai-career">
+      <div class="content-grid">
+        <div class="content-left">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i data-lucide="map" style="width:16px;height:16px;color:var(--primary);"></i> Recommended Career Roadmap</h2>
+            </div>
+            <div class="roadmap-timeline">
+              <div class="rm-item completed">
+                <div class="rm-dot"></div>
+                <div class="rm-stage">Frontend Software Engineer</div>
+                <div class="rm-desc">Established core technical foundations and software development lifecycle.</div>
+              </div>
+              <div class="rm-item active">
+                <div class="rm-dot"></div>
+                <div class="rm-stage">Senior Software Engineer (Current)</div>
+                <div class="rm-desc">Leading feature teams, system design architectures, and scaling processes.</div>
+              </div>
+              <div class="rm-item">
+                <div class="rm-dot"></div>
+                <div class="rm-stage">Staff Engineer / Frontend Architect</div>
+                <div class="rm-desc">Acquire skills: Distributed Systems, High Availability Systems, Kubernetes.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i data-lucide="trending-up" style="width:16px;height:16px;color:var(--purple);"></i> AI Salary Prediction</h2>
+            </div>
+            <div style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Based on your current experience and location, we predict your market value to be:</div>
+            <div style="font-size:24px;font-weight:800;color:var(--success);">$165,000 – $210,000 / year</div>
+          </div>
+        </div>
+
+        <div class="content-right">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Skill Gap Analysis</h2>
+            </div>
+            <div class="gap-bar-row">
+              <div class="gap-bar-header"><span>React / Frontend</span><span>96%</span></div>
+              <div class="gap-bar-wrap"><div class="gap-bar-fill" style="width:96%"></div></div>
+            </div>
+            <div class="gap-bar-row">
+              <div class="gap-bar-header"><span>System Design</span><span>74%</span></div>
+              <div class="gap-bar-wrap"><div class="gap-bar-fill" style="width:74%"></div></div>
+            </div>
+            <div class="gap-bar-row">
+              <div class="gap-bar-header"><span>Kubernetes</span><span>40%</span></div>
+              <div class="gap-bar-wrap"><div class="gap-bar-fill" style="width:40%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 8: ANALYTICS -->
+    <main class="page-content" id="panel-analytics">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i data-lucide="bar-chart-2" style="width:16px;height:16px;color:var(--primary);"></i> Profile View Trends (Last 6 Months)</h2>
+        </div>
+        <div class="chart-container">
+          <div class="chart-bar-col"><div class="chart-bar" style="height:40px;"></div><span class="chart-lbl">Jan</span></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:60px;"></div><span class="chart-lbl">Feb</span></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:90px;"></div><span class="chart-lbl">Mar</span></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:120px;"></div><span class="chart-lbl">Apr</span></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:150px;"></div><span class="chart-lbl">May</span></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:140px;"></div><span class="chart-lbl">Jun</span></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 9: SETTINGS -->
+    <main class="page-content" id="panel-settings">
+      <div class="content-grid">
+        <div class="content-left">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i data-lucide="settings" style="width:16px;height:16px;color:var(--primary);"></i> Preferences &amp; Account Settings</h2>
+            </div>
+            
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <span class="toggle-title">Profile Visibility</span>
+                <span class="toggle-desc">Allow recruiters to discover your resume profile in candidates search</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <span class="toggle-title">Two-Factor Authentication</span>
+                <span class="toggle-desc">Enable 2FA secure logins using verification codes</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="2faSwitch" onchange="toggle2FASettings(this)" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <span class="toggle-title">Job Alerts</span>
+                <span class="toggle-desc">Receive email alerts for matching recommended positions</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-right">
+          <!-- Active Sessions -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Security &amp; Active Sessions</h2>
+            </div>
+            <div class="session-log">
+              <span class="session-device"><i data-lucide="chrome" style="width:14px;height:14px;color:var(--primary);"></i> Chrome on Windows</span>
+              <span style="font-size:11px;color:var(--success);">Active Now</span>
+            </div>
+            <div class="session-log">
+              <span class="session-device"><i data-lucide="smartphone" style="width:14px;height:14px;color:var(--text-3);"></i> Safari on iPhone</span>
+              <span style="font-size:11px;color:var(--text-3);">2 days ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<script>
+  // ── Init Lucide icons
+  lucide.createIcons();
+
+  // ── Theme management
+  const html = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  const THEME_KEY = 'talentarc-theme';
+
+  function applyTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    if (theme === 'light') {
+      themeIcon.setAttribute('data-lucide', 'moon');
+    } else {
+      themeIcon.setAttribute('data-lucide', 'sun');
+    }
+    lucide.createIcons();
+  }
+
+  const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // ── Sidebar mobile toggle
+  const sidebar = document.getElementById('sidebar');
+  const menuToggle = document.getElementById('menuToggle');
+
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && e.target !== menuToggle && sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // ── Skeleton removal
+  const skeletonOverlay = document.getElementById('skeletonOverlay');
+  setTimeout(() => {
+    skeletonOverlay.classList.add('hide');
+    setTimeout(() => skeletonOverlay.remove(), 400);
+  }, 400);
+
+  // ══════════════════════════════════════════════
+  // ── AUTH GUARD + LOAD CURRENT USER INTO UI
+  // ══════════════════════════════════════════════
+  const currentUser = taRequireAuth('../auth/login.html');
+
+  function roleLabel(role) {
+    if (role === 'employer') return 'Employer';
+    if (role === 'recruiter') return 'Recruiter';
+    return 'Job Seeker';
+  }
+
+  function refreshUserUI(user) {
+    if (!user) return;
+    const p = user.profile || {};
+    const displayName = p.fullName || user.email;
+    const initials = taInitials(displayName);
+
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('sidebarName').textContent = displayName;
+    document.getElementById('sidebarRole').textContent = roleLabel(user.role);
+
+    document.getElementById('headerAvatar').textContent = initials;
+
+    document.getElementById('panelProfileAvatar').textContent = initials;
+    document.getElementById('panelProfileName').textContent = displayName;
+
+    // Greeting on overview
+    const firstName = (p.fullName || user.firstName || user.email).split(' ')[0];
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('headerTitle').textContent = `${greeting}, ${firstName}`;
+
+    // Profile form fields
+    document.getElementById('pfFullName').value = p.fullName || '';
+    document.getElementById('pfLocation').value = p.location || '';
+    document.getElementById('pfAbout').value = p.about || '';
+    document.getElementById('pfEmail').value = p.email || user.email;
+    document.getElementById('pfPhone').value = p.phone || '';
+    document.getElementById('pfSalary').value = p.expectedSalary || '';
+    document.getElementById('pfGithub').value = p.github || '';
+    document.getElementById('pfLinkedin').value = p.linkedin || '';
+
+    // Resume panel
+    const resumeCard = document.getElementById('resumeVersionsCard');
+    if (p.resume) {
+      resumeCard.style.display = 'block';
+      document.getElementById('resumeVerName').textContent = p.resume.name;
+      const dateStr = new Date(p.resume.uploadedAt).toLocaleDateString();
+      document.getElementById('resumeVerDate').textContent = `Saved · ${dateStr} · ${p.resume.sizeKB} KB`;
+      document.getElementById('resumeUploadDesc').textContent = `Current: ${p.resume.name} · Click to replace`;
+    } else {
+      resumeCard.style.display = 'none';
+      document.getElementById('resumeUploadDesc').textContent = 'Supports PDF, DOCX formats · Max size 5MB';
+    }
+
+    // Mock coach greets by name
+    const coachIntro = document.getElementById('mockCoachIntro');
+    if (coachIntro) {
+      coachIntro.textContent = `Welcome ${firstName}! Select the session type to begin. Let's practice a Behavioral question. Describe a time you resolved a technical conflict in your team.`;
+    }
+  }
+
+  refreshUserUI(currentUser);
+
+  // ── Save Profile (Panel 2)
+  document.getElementById('profileForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!currentUser) return;
+
+    const updated = {
+      fullName: document.getElementById('pfFullName').value.trim(),
+      location: document.getElementById('pfLocation').value.trim(),
+      about: document.getElementById('pfAbout').value.trim(),
+      email: document.getElementById('pfEmail').value.trim(),
+      phone: document.getElementById('pfPhone').value.trim(),
+      expectedSalary: document.getElementById('pfSalary').value.trim(),
+      github: document.getElementById('pfGithub').value.trim(),
+      linkedin: document.getElementById('pfLinkedin').value.trim()
+    };
+
+    taUpdateProfile(currentUser.email, updated);
+    currentUser.profile = { ...currentUser.profile, ...updated };
+    refreshUserUI(currentUser);
+    alert('Profile updated successfully!');
+  });
+
+  // ── Resume Upload (Panel 3)
+  const resumeUploadZone = document.getElementById('resumeUploadZone');
+  const resumeFileInput = document.getElementById('resumeFileInput');
+
+  resumeUploadZone.addEventListener('click', () => resumeFileInput.click());
+
+  resumeFileInput.addEventListener('change', () => {
+    const file = resumeFileInput.files[0];
+    if (!file || !currentUser) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File too large. Max size is 5MB.');
+      return;
+    }
+    const allowed = ['.pdf', '.doc', '.docx'];
+    if (!allowed.some(ext => file.name.toLowerCase().endsWith(ext))) {
+      alert('Only PDF or DOCX files are supported.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const resumeData = {
+        name: file.name,
+        dataUrl: reader.result,
+        uploadedAt: new Date().toISOString(),
+        sizeKB: Math.round(file.size / 1024)
+      };
+      taUpdateProfile(currentUser.email, { resume: resumeData });
+      currentUser.profile.resume = resumeData;
+      refreshUserUI(currentUser);
+      alert('Resume uploaded and saved!');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('resumeViewBtn')?.addEventListener('click', () => {
+    if (currentUser?.profile?.resume?.dataUrl) {
+      window.open(currentUser.profile.resume.dataUrl, '_blank');
+    }
+  });
+  document.getElementById('resumeDownloadBtn')?.addEventListener('click', () => {
+    const r = currentUser?.profile?.resume;
+    if (!r) return;
+    const a = document.createElement('a');
+    a.href = r.dataUrl;
+    a.download = r.name;
+    a.click();
+  });
+
+  // ── Logout (sidebar profile click)
+  document.getElementById('sidebarProfile').addEventListener('click', () => {
+    if (confirm('Log out of TalentArc?')) {
+      taLogout();
+      window.location.href = '../auth/login.html';
+    }
+  });
+
+  // ── SPA Tab Switching
+  function switchMainTab(tabId) {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+
+    const selectedNav = document.getElementById(`nav-${tabId}`);
+    const selectedPanel = document.getElementById(`panel-${tabId}`);
+    if (selectedNav) selectedNav.classList.add('active');
+    if (selectedPanel) selectedPanel.classList.add('active');
+
+    const headerTitle = document.getElementById('headerTitle');
+    const headerSubtitle = document.getElementById('headerSubtitle');
+    const firstName = currentUser
+      ? (currentUser.profile.fullName || currentUser.email).split(' ')[0]
+      : 'there';
+
+    if (tabId === 'overview') {
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+      headerTitle.textContent = `${greeting}, ${firstName}`;
+      headerSubtitle.textContent = "You have 3 active applications and 2 new messages today.";
+    } else {
+      headerTitle.textContent = selectedNav.querySelector('.nav-label').textContent;
+      headerSubtitle.textContent = "Manage your TalentArc account preferences and details.";
+    }
+
+    if (sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+    }
+
+    lucide.createIcons();
+  }
+
+  // ── Mock Chat Message
+  function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chatBody = document.getElementById('chatBody');
+    const bubble = document.createElement('div');
+    bubble.style.cssText = "background:var(--primary);color:#fff;padding:10px 14px;border-radius:var(--r-md);font-size:13px;max-width:80%;align-self:flex-end;";
+    bubble.textContent = text;
+    chatBody.appendChild(bubble);
+    input.value = '';
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  // ── Mock Interview Coach message
+  function sendMockResponse() {
+    const input = document.getElementById('mockInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const mockChat = document.getElementById('mockChat');
+    
+    const uBubble = document.createElement('div');
+    uBubble.className = "mock-bubble user";
+    uBubble.textContent = text;
+    mockChat.appendChild(uBubble);
+    input.value = '';
+
+    setTimeout(() => {
+      const aiBubble = document.createElement('div');
+      aiBubble.className = "mock-bubble ai";
+      aiBubble.textContent = "Great response! You clearly outlined the conflict and how you used data to resolve it. Consider adding more metrics on the outcome.";
+      mockChat.appendChild(aiBubble);
+      mockChat.scrollTop = mockChat.scrollHeight;
+    }, 1000);
+  }
+
+  // ── Toggle 2FA Setting
+  function toggle2FASettings(el) {
+    if (el.checked) {
+      alert("Two-Factor Authentication configuration panel opened. Verification codes will be required on your next login.");
+    } else {
+      alert("Two-Factor Authentication disabled.");
+    }
+  }
+
+  // ── Active Job details data
+  const jobsData = {
+    stripe: {
+      title: "Senior Software Engineer",
+      comp: "Stripe · San Francisco, CA (Hybrid)",
+      salary: "$180K – $240K",
+      bg: "#635BFF",
+      logo: "S",
+      desc: "We are looking for a Senior Software Engineer to join our infrastructure team. You will work on systems that process billions of dollars in payments globally."
+    },
+    vercel: {
+      title: "Staff Engineer",
+      comp: "Vercel · Remote",
+      salary: "$200K – $260K",
+      bg: "#000",
+      logo: "V",
+      desc: "We are seeking a Staff Engineer to join our core development team to help optimize build pipelines, cache sharing mechanisms, and deploy frameworks."
+    }
+  };
+
+  function viewJobDetail(id) {
+    document.querySelectorAll('.mini-job-card').forEach(c => c.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    const data = jobsData[id];
+    if (!data) return;
+
+    document.getElementById('jdTitle').textContent = data.title;
+    document.getElementById('jdComp').textContent = data.comp;
+    document.getElementById('jdSalary').textContent = data.salary;
+    document.getElementById('jdDesc').textContent = data.desc;
+    
+    const logo = document.getElementById('jdLogo');
+    logo.textContent = data.logo;
+    logo.style.background = data.bg;
+  }
+
+  function toggleFilterChip(el, filter) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    
+    const stripeCard = document.querySelector('.mini-job-card[data-id="stripe"]');
+    const vercelCard = document.querySelector('.mini-job-card[data-id="vercel"]');
+
+    if (filter === 'remote') {
+      stripeCard.style.display = 'none';
+      vercelCard.style.display = 'flex';
+    } else if (filter === 'hybrid') {
+      stripeCard.style.display = 'flex';
+      vercelCard.style.display = 'none';
+    } else {
+      stripeCard.style.display = 'flex';
+      vercelCard.style.display = 'flex';
+    }
+  }
+
+  function filterJobsList() {
+    const q = document.getElementById('jobQuery').value.toLowerCase();
+    const stripeCard = document.querySelector('.mini-job-card[data-id="stripe"]');
+    const vercelCard = document.querySelector('.mini-job-card[data-id="vercel"]');
+
+    if (q.includes('str') || q.includes('soft') || q.includes('hybrid')) {
+      stripeCard.style.display = 'flex';
+      vercelCard.style.display = 'none';
+    } else if (q.includes('ver') || q.includes('staff') || q.includes('rem')) {
+      stripeCard.style.display = 'none';
+      vercelCard.style.display = 'flex';
+    } else {
+      stripeCard.style.display = 'flex';
+      vercelCard.style.display = 'flex';
+    }
+  }
+</script>
+</body>
+</html>

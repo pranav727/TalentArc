@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentArc · Employer Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    /* ─── CSS VARIABLES ─────────────────────────────────────────── */
+    :root {
+      --primary: #6366F1;
+      --primary-light: #818CF8;
+      --primary-glow: rgba(99,102,241,0.18);
+      --accent: #F59E0B;
+      --accent-warm: #F97316;
+      --accent-light: rgba(245,158,11,0.15);
+      --success: #10B981;
+      --success-light: rgba(16,185,129,0.15);
+      --warning: #F59E0B;
+      --warning-light: rgba(245,158,11,0.15);
+      --error: #EF4444;
+      --error-light: rgba(239,68,68,0.15);
+      --cyan: #06B6D4;
+      --cyan-light: rgba(6,182,212,0.15);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-pill: 999px;
+      --transition: 0.2s ease;
+      --transition-md: 0.3s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg-base:    #0A0A0F;
+      --bg-surface: #0F0F17;
+      --bg-card:    #13131E;
+      --bg-card2:   #1A1A28;
+      --bg-hover:   #1E1E2E;
+      --bg-input:   #1A1A28;
+      --border:     rgba(255,255,255,0.06);
+      --border-md:  rgba(255,255,255,0.10);
+      --text-primary:   #E2E8F0;
+      --text-secondary: #94A3B8;
+      --text-muted:     #64748B;
+      --sidebar-bg:     #0C0C16;
+      --header-bg:      rgba(13,13,23,0.85);
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
+      --shadow-md:  0 4px 16px rgba(0,0,0,0.5);
+      --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
+      --shadow-glow: 0 0 24px rgba(99,102,241,0.25);
+    }
+
+    [data-theme="light"] {
+      --bg-base:    #F0F0F8;
+      --bg-surface: #FAFAFA;
+      --bg-card:    #FFFFFF;
+      --bg-card2:   #F5F5FF;
+      --bg-hover:   #EDEDF9;
+      --bg-input:   #F5F5FF;
+      --border:     rgba(0,0,0,0.08);
+      --border-md:  rgba(0,0,0,0.12);
+      --text-primary:   #0F172A;
+      --text-secondary: #475569;
+      --text-muted:     #94A3B8;
+      --sidebar-bg:     #FFFFFF;
+      --header-bg:      rgba(255,255,255,0.85);
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md:  0 4px 16px rgba(0,0,0,0.10);
+      --shadow-lg:  0 8px 32px rgba(0,0,0,0.12);
+      --shadow-glow: 0 0 24px rgba(99,102,241,0.15);
+    }
+
+    /* ─── RESET ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background var(--transition-md), color var(--transition-md);
+    }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: 'Inter', sans-serif; border: none; outline: none; }
+    ul { list-style: none; }
+
+    /* ─── SCROLLBAR ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 99px; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────────── */
+    .app-layout { display: flex; width: 100%; min-height: 100vh; }
+
+    /* ─── SIDEBAR ────────────────────────────────────────────────── */
+    .sidebar {
+      width: 252px;
+      min-width: 252px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform var(--transition-md), background var(--transition-md);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 22px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+      flex-shrink: 0;
+    }
+    .logo-text { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-text span {
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 18px 20px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 16px;
+      margin: 1px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all var(--transition);
+      position: relative;
+      user-select: none;
+    }
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      transform: translateX(2px);
+    }
+    .nav-item.active {
+      background: var(--primary-glow);
+      color: var(--primary-light);
+      font-weight: 600;
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 3px; height: 20px;
+      background: linear-gradient(180deg, #6366F1, #F59E0B);
+      border-radius: 0 4px 4px 0;
+    }
+    .nav-item .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-item .nav-label { flex: 1; }
+    .nav-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      color: #fff;
+      min-width: 20px;
+      text-align: center;
+    }
+    .nav-badge.warn { background: linear-gradient(135deg, #F59E0B, #F97316); }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      transition: background var(--transition);
+      cursor: pointer;
+    }
+    .sidebar-user:hover { background: var(--bg-hover); }
+    .user-avatar-sm {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .user-info-sm { flex: 1; min-width: 0; }
+    .user-name-sm { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role-sm { font-size: 11px; color: var(--accent); font-weight: 500; }
+    .sidebar-settings-btn {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .sidebar-settings-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+    /* ─── MAIN AREA ───────────────────────────────────────────────── */
+    .main-area {
+      margin-left: 252px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* ─── HEADER ─────────────────────────────────────────────────── */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      background: var(--header-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: background var(--transition-md);
+    }
+    .header-left { flex: 1; min-width: 0; }
+    .header-greeting {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-subtitle {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    .btn-post-job {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-pill);
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+      white-space: nowrap;
+    }
+    .btn-post-job:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99,102,241,0.5);
+    }
+    .btn-post-job:active { transform: translateY(0); }
+
+    .icon-btn {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+    }
+    .icon-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-md); }
+    .icon-btn .notif-dot {
+      position: absolute;
+      top: 7px; right: 7px;
+      width: 7px; height: 7px;
+      background: #EF4444;
+      border-radius: 50%;
+      border: 2px solid var(--bg-surface);
+    }
+
+    .theme-toggle {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .theme-toggle:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+    .header-avatar {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all var(--transition);
+    }
+    .header-avatar:hover { border-color: var(--primary); box-shadow: var(--shadow-glow); }
+
+    /* ─── PAGE CONTENT ───────────────────────────────────────────── */
+    .page-content {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr 304px;
+      gap: 24px;
+      align-items: start;
+    }
+    .left-col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+    .right-col { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 96px; }
+
+    /* ─── SECTION HEADERS ────────────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+    .section-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ─── CARDS ──────────────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      transition: all var(--transition-md);
+    }
+    .card:hover { border-color: var(--border-md); box-shadow: var(--shadow-md); }
+
+    /* ─── QUICK STATS ────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-md);
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    .stat-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .stat-card:nth-child(1)::before { background: linear-gradient(90deg, #6366F1, #818CF8); }
+    .stat-card:nth-child(2)::before { background: linear-gradient(90deg, #F59E0B, #F97316); }
+    .stat-card:nth-child(3)::before { background: linear-gradient(90deg, #10B981, #06B6D4); }
+    .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #EF4444, #F59E0B); }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--border-md); }
+    .stat-icon-wrap {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .stat-icon-wrap.indigo  { background: var(--primary-glow); }
+    .stat-icon-wrap.amber   { background: var(--accent-light); }
+    .stat-icon-wrap.green   { background: var(--success-light); }
+    .stat-icon-wrap.red     { background: var(--error-light); }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .stat-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    .stat-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 6px;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+    }
+    .stat-change.up   { background: var(--success-light); color: var(--success); }
+    .stat-change.warn { background: var(--accent-light);  color: var(--accent); }
+
+    /* ─── JOB POSTINGS ───────────────────────────────────────────── */
+    .job-table-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      padding: 9px 14px;
+      background: var(--bg-card2);
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
+    }
+    .job-table-header span {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .job-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      margin-bottom: 8px;
+      transition: all var(--transition);
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    .job-row.visible { opacity: 1; transform: translateX(0); }
+    .job-row:hover { background: var(--bg-hover); border-color: var(--border-md); transform: translateY(-1px); }
+    .job-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .job-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-card2);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .tag.remote { color: var(--cyan); border-color: var(--cyan-light); background: var(--cyan-light); }
+    .tag.location { color: var(--accent); border-color: var(--accent-light); background: var(--accent-light); }
+    .date-text { font-size: 12px; color: var(--text-muted); }
+    .applicant-count {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .applicant-count span { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+    }
+    .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .status-badge.active { background: var(--success-light); color: var(--success); }
+    .status-badge.paused { background: var(--accent-light); color: var(--accent); }
+    .job-actions { display: flex; align-items: center; gap: 7px; }
+    .btn-view-apps {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--primary-glow);
+      color: var(--primary-light);
+      border: 1px solid rgba(99,102,241,0.2);
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .btn-view-apps:hover { background: var(--primary); color: #fff; }
+    .btn-more {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-more:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+    /* ─── RECENT APPLICANTS ──────────────────────────────────────── */
+    .applicant-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      margin-bottom: 8px;
+      transition: all var(--transition);
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .applicant-row.visible { opacity: 1; transform: translateY(0); }
+    .applicant-row:hover { background: var(--bg-hover); border-color: var(--border-md); }
+    .applicant-avatar {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .applicant-info { flex: 1; min-width: 0; }
+    .applicant-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .applicant-role { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .match-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(245,158,11,0.15));
+      color: var(--primary-light);
+      border: 1px solid rgba(99,102,241,0.2);
+      white-space: nowrap;
+    }
+    .applicant-status { white-space: nowrap; }
+    .app-status {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+    }
+    .app-status.new        { background: var(--primary-glow); color: var(--primary-light); }
+    .app-status.shortlisted { background: var(--success-light); color: var(--success); }
+    .app-status.interviewing{ background: var(--accent-light); color: var(--accent); }
+    .app-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .quick-actions-row {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .qa-btn {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .qa-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-md); transform: scale(1.1); }
+    .qa-btn.heart:hover  { color: #EF4444; border-color: var(--error-light); background: var(--error-light); }
+    .qa-btn.msg:hover    { color: var(--primary-light); border-color: var(--primary-glow); background: var(--primary-glow); }
+    .qa-btn.cal:hover    { color: var(--success); border-color: var(--success-light); background: var(--success-light); }
+
+    /* ─── HIRING FUNNEL ─────────────────────────────────────────── */
+    .funnel-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .funnel-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .funnel-label-wrap { width: 100px; flex-shrink: 0; }
+    .funnel-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+    .funnel-count { font-size: 11px; color: var(--text-muted); }
+    .funnel-bar-track {
+      flex: 1;
+      height: 28px;
+      background: var(--bg-card2);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+    .funnel-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      width: 0;
+      transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .funnel-pct { font-size: 11px; font-weight: 600; width: 42px; text-align: right; color: var(--text-muted); flex-shrink: 0; }
+
+    /* ─── RIGHT SIDEBAR CARDS ────────────────────────────────────── */
+    .sub-plan-card {
+      background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(245,158,11,0.08));
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .plan-title {
+      font-size: 14px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 3px;
+    }
+    .plan-valid { font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px; }
+    .plan-features { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+    .plan-feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .plan-feature .check { color: var(--success); font-size: 13px; }
+    .plan-slots { margin-bottom: 16px; }
+    .slots-label { font-size: 11.5px; color: var(--text-muted); margin-bottom: 7px; display: flex; justify-content: space-between; }
+    .slots-bar {
+      height: 6px;
+      background: var(--bg-card2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .slots-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6366F1, #F59E0B);
+      border-radius: 99px;
+      width: 0;
+      transition: width 1s ease 0.5s;
+    }
+    .btn-upgrade {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-upgrade:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .qa-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      padding: 14px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: center;
+    }
+    .qa-action:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-md);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    .qa-action-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .qa-action-label { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); line-height: 1.3; }
+
+    /* Calendar */
+    .cal-card { display: flex; flex-direction: column; gap: 10px; }
+    .cal-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 13px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition);
+    }
+    .cal-item:hover { background: var(--bg-hover); border-color: var(--border-md); }
+    .cal-time {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--bg-card2);
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      line-height: 1.2;
+      text-align: center;
+    }
+    .cal-time .hour { font-size: 13px; color: var(--text-primary); }
+    .cal-info { flex: 1; min-width: 0; }
+    .cal-name { font-size: 12.5px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-role { font-size: 11px; color: var(--text-muted); }
+    .cal-type {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: var(--primary-glow);
+      color: var(--primary-light);
+      white-space: nowrap;
+    }
+
+    /* ─── SECTION BADGE ──────────────────────────────────────────── */
+    .section-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--primary-glow);
+      color: var(--primary-light);
+    }
+
+    /* ─── LINK BUTTON ────────────────────────────────────────────── */
+    .btn-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary-light);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-text:hover { background: var(--primary-glow); }
+
+    .btn-sm-outline {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      border: 1px solid var(--border-md);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .btn-sm-outline:hover { border-color: var(--primary); color: var(--primary-light); background: var(--primary-glow); }
+
+    /* ─── TOAST ──────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 18px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      max-width: 320px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-icon { font-size: 16px; }
+
+    /* ─── MOBILE MENU TOGGLE ─────────────────────────────────────── */
+    .mobile-menu-btn {
+      display: none;
+      width: 38px; height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 99;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ─── GRADIENT TEXT ──────────────────────────────────────────── */
+    .gradient-text {
+      background: linear-gradient(135deg, #6366F1, #F59E0B);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ─── SKELETON LOADER ────────────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card2) 25%, var(--bg-hover) 50%, var(--bg-card2) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shine 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes skeleton-shine {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 1200px) {
+      .page-content { grid-template-columns: 1fr; }
+      .right-col { position: static; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .quick-actions-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .main-area { margin-left: 0; }
+      .mobile-menu-btn { display: flex; }
+      .job-table-header { display: none; }
+      .job-row { grid-template-columns: 1fr auto; grid-template-rows: auto auto auto; }
+      .job-row > *:nth-child(3),
+      .job-row > *:nth-child(4) { grid-column: 1; }
+      .job-actions { grid-column: 1 / -1; }
+    }
+    @media (max-width: 600px) {
+      .page-content { padding: 14px; }
+      .header { padding: 0 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .applicant-row { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ─── SIDEBAR ─────────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <div class="logo-text"><span>TalentArc</span></div>
+    </div>
+
+    <!-- Main Nav -->
+    <div class="sidebar-section-label">Employer Portal</div>
+    <ul>
+      <li>
+        <a class="nav-item active" href="#" aria-current="page">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">🏢</span>
+          <span class="nav-label">Company Profile</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="./post-job.html">
+          <span class="nav-icon">➕</span>
+          <span class="nav-label">Post a Job</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">💼</span>
+          <span class="nav-label">Manage Jobs</span>
+          <span class="nav-badge">12</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="./applicants.html">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Applicants</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Candidate Search</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Interviews</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Messages</span>
+          <span class="nav-badge warn">5</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-section-label">Reports & Admin</div>
+    <ul>
+      <li>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Analytics</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">💳</span>
+          <span class="nav-label">Subscription</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Sidebar Bottom User -->
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="user-avatar-sm">S</div>
+        <div class="user-info-sm">
+          <div class="user-name-sm">Stripe</div>
+          <div class="user-role-sm">✦ Premium Employer</div>
+        </div>
+        <button class="sidebar-settings-btn" aria-label="Settings" onclick="showToast('⚙️', 'Opening Settings...')">
+          <i data-lucide="settings" style="width:14px;height:14px;"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN AREA ────────────────────────────────────────────────── -->
+  <div class="main-area">
+    <!-- HEADER -->
+    <header class="header" role="banner">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu" onclick="openSidebar()">
+        <i data-lucide="menu" style="width:18px;height:18px;"></i>
+      </button>
+      <div class="header-left">
+        <div class="header-greeting">Welcome back, Stripe 👋</div>
+        <div class="header-subtitle">You have 47 new applications and 3 interviews scheduled today.</div>
+      </div>
+      <div class="header-right">
+        <a href="./post-job.html">
+          <button class="btn-post-job">
+            <i data-lucide="plus" style="width:14px;height:14px;"></i>
+            Post a Job
+          </button>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" onclick="toggleTheme()">
+          <i data-lucide="sun" id="themeIcon" style="width:16px;height:16px;"></i>
+        </button>
+        <button class="icon-btn" aria-label="Notifications" onclick="showToast('🔔', 'You have 12 unread notifications')">
+          <i data-lucide="bell" style="width:16px;height:16px;"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="header-avatar" role="button" tabindex="0" aria-label="User menu" onclick="showToast('👤', 'Opening profile menu...')">S</div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content" role="main">
+      <!-- ─── LEFT COLUMN ───────────────────────────────────────── -->
+      <div class="left-col">
+
+        <!-- 1. QUICK STATS -->
+        <section aria-label="Quick stats">
+          <div class="stats-grid">
+            <!-- Active Jobs -->
+            <div class="stat-card" id="stat1">
+              <div class="stat-icon-wrap indigo">📋</div>
+              <div class="stat-value gradient-text">12</div>
+              <div class="stat-label">Active Jobs</div>
+              <div class="stat-change warn">🟡 3 expiring soon</div>
+            </div>
+            <!-- Total Applicants -->
+            <div class="stat-card" id="stat2">
+              <div class="stat-icon-wrap amber">👥</div>
+              <div class="stat-value" style="color:var(--accent)">247</div>
+              <div class="stat-label">Total Applicants</div>
+              <div class="stat-change up">↑ +47 today</div>
+            </div>
+            <!-- Interviews This Week -->
+            <div class="stat-card" id="stat3">
+              <div class="stat-icon-wrap green">📅</div>
+              <div class="stat-value" style="color:var(--success)">8</div>
+              <div class="stat-label">Interviews This Week</div>
+              <div class="stat-change up">↑ +2 from last week</div>
+            </div>
+            <!-- Offers Extended -->
+            <div class="stat-card" id="stat4">
+              <div class="stat-icon-wrap red">⭐</div>
+              <div class="stat-value" style="color:var(--error)">3</div>
+              <div class="stat-label">Offers Extended</div>
+              <div class="stat-change warn">⏳ 2 pending reply</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. ACTIVE JOB POSTINGS -->
+        <section class="card" aria-label="Active job postings">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Active Job Postings</div>
+              <div class="section-subtitle">12 jobs live · last updated just now</div>
+            </div>
+            <a href="./post-job.html">
+              <button class="btn-sm-outline">
+                <i data-lucide="plus" style="width:12px;height:12px;"></i>
+                Post New Job
+              </button>
+            </a>
+          </div>
+
+          <!-- Table Header -->
+          <div class="job-table-header">
+            <span>Job Title</span>
+            <span>Posted</span>
+            <span>Applicants</span>
+            <span>Status</span>
+            <span>Actions</span>
+          </div>
+
+          <!-- Job Row 1 -->
+          <div class="job-row" id="job1">
+            <div>
+              <div class="job-title">Senior Software Engineer</div>
+              <div class="job-tags">
+                <span class="tag remote">Remote</span>
+                <span class="tag">Full-time</span>
+                <span class="tag">Engineering</span>
+              </div>
+            </div>
+            <div class="date-text">Jan 10, 2025</div>
+            <div class="applicant-count">
+              <i data-lucide="users" style="width:13px;height:13px;color:var(--text-muted);"></i>
+              89 <span>applicants</span>
+            </div>
+            <div><span class="status-badge active">Active</span></div>
+            <div class="job-actions">
+              <a href="./applicants.html"><button class="btn-view-apps">View Applicants</button></a>
+              <button class="btn-more" onclick="showToast('⚙️', 'Job options coming soon')" aria-label="More options">⋮</button>
+            </div>
+          </div>
+
+          <!-- Job Row 2 -->
+          <div class="job-row" id="job2">
+            <div>
+              <div class="job-title">Staff Engineer</div>
+              <div class="job-tags">
+                <span class="tag remote">Remote</span>
+                <span class="tag">Full-time</span>
+                <span class="tag">Leadership</span>
+              </div>
+            </div>
+            <div class="date-text">Jan 8, 2025</div>
+            <div class="applicant-count">
+              <i data-lucide="users" style="width:13px;height:13px;color:var(--text-muted);"></i>
+              134 <span>applicants</span>
+            </div>
+            <div><span class="status-badge active">Active</span></div>
+            <div class="job-actions">
+              <a href="./applicants.html"><button class="btn-view-apps">View Applicants</button></a>
+              <button class="btn-more" onclick="showToast('⚙️', 'Job options coming soon')" aria-label="More options">⋮</button>
+            </div>
+          </div>
+
+          <!-- Job Row 3 -->
+          <div class="job-row" id="job3">
+            <div>
+              <div class="job-title">Product Designer</div>
+              <div class="job-tags">
+                <span class="tag location">SF, CA</span>
+                <span class="tag">Full-time</span>
+                <span class="tag">Design</span>
+              </div>
+            </div>
+            <div class="date-text">Jan 5, 2025</div>
+            <div class="applicant-count">
+              <i data-lucide="users" style="width:13px;height:13px;color:var(--text-muted);"></i>
+              24 <span>applicants</span>
+            </div>
+            <div><span class="status-badge active">Active</span></div>
+            <div class="job-actions">
+              <a href="./applicants.html"><button class="btn-view-apps">View Applicants</button></a>
+              <button class="btn-more" onclick="showToast('⚙️', 'Job options coming soon')" aria-label="More options">⋮</button>
+            </div>
+          </div>
+
+          <div style="text-align:center;margin-top:8px;">
+            <button class="btn-text" onclick="showToast('💼', 'Loading all job postings...')">
+              View all 12 jobs <i data-lucide="chevron-right" style="width:12px;height:12px;"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- 3. RECENT APPLICANTS -->
+        <section class="card" aria-label="Recent applicants">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Recent Applicants</div>
+              <div class="section-subtitle">47 new today · AI-matched candidates</div>
+            </div>
+            <a href="./applicants.html">
+              <button class="btn-text">
+                View All <i data-lucide="chevron-right" style="width:12px;height:12px;"></i>
+              </button>
+            </a>
+          </div>
+
+          <!-- Applicant 1 -->
+          <div class="applicant-row" id="app1">
+            <div class="applicant-avatar" style="background:linear-gradient(135deg,#6366F1,#818CF8)">AK</div>
+            <div class="applicant-info">
+              <div class="applicant-name">Arjun Kumar</div>
+              <div class="applicant-role">Senior Software Engineer</div>
+            </div>
+            <span class="match-badge">✦ 96% Match</span>
+            <div class="applicant-status"><span class="app-status new">New</span></div>
+            <div class="app-time">2m ago</div>
+            <div class="quick-actions-row">
+              <button class="qa-btn heart" title="Shortlist" onclick="showToast('❤️', 'Arjun Kumar shortlisted!')">♥</button>
+              <button class="qa-btn msg" title="Message" onclick="showToast('💬', 'Opening message to Arjun...')"><i data-lucide="message-circle" style="width:13px;height:13px;"></i></button>
+              <button class="qa-btn cal" title="Schedule Interview" onclick="showToast('📅', 'Scheduling interview with Arjun...')"><i data-lucide="calendar" style="width:13px;height:13px;"></i></button>
+            </div>
+          </div>
+
+          <!-- Applicant 2 -->
+          <div class="applicant-row" id="app2">
+            <div class="applicant-avatar" style="background:linear-gradient(135deg,#F59E0B,#F97316)">SM</div>
+            <div class="applicant-info">
+              <div class="applicant-name">Sofia Martinez</div>
+              <div class="applicant-role">Staff Engineer</div>
+            </div>
+            <span class="match-badge">✦ 91% Match</span>
+            <div class="applicant-status"><span class="app-status shortlisted">Shortlisted</span></div>
+            <div class="app-time">15m ago</div>
+            <div class="quick-actions-row">
+              <button class="qa-btn heart" title="Shortlist" onclick="showToast('❤️', 'Sofia Martinez shortlisted!')">♥</button>
+              <button class="qa-btn msg" title="Message" onclick="showToast('💬', 'Opening message to Sofia...')"><i data-lucide="message-circle" style="width:13px;height:13px;"></i></button>
+              <button class="qa-btn cal" title="Schedule Interview" onclick="showToast('📅', 'Scheduling interview with Sofia...')"><i data-lucide="calendar" style="width:13px;height:13px;"></i></button>
+            </div>
+          </div>
+
+          <!-- Applicant 3 -->
+          <div class="applicant-row" id="app3">
+            <div class="applicant-avatar" style="background:linear-gradient(135deg,#10B981,#06B6D4)">JL</div>
+            <div class="applicant-info">
+              <div class="applicant-name">James Liu</div>
+              <div class="applicant-role">Product Designer</div>
+            </div>
+            <span class="match-badge">✦ 88% Match</span>
+            <div class="applicant-status"><span class="app-status interviewing">Interviewing</span></div>
+            <div class="app-time">1h ago</div>
+            <div class="quick-actions-row">
+              <button class="qa-btn heart" title="Shortlist" onclick="showToast('❤️', 'James Liu shortlisted!')">♥</button>
+              <button class="qa-btn msg" title="Message" onclick="showToast('💬', 'Opening message to James...')"><i data-lucide="message-circle" style="width:13px;height:13px;"></i></button>
+              <button class="qa-btn cal" title="Schedule Interview" onclick="showToast('📅', 'Scheduling interview with James...')"><i data-lucide="calendar" style="width:13px;height:13px;"></i></button>
+            </div>
+          </div>
+
+          <!-- Applicant 4 -->
+          <div class="applicant-row" id="app4">
+            <div class="applicant-avatar" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">PR</div>
+            <div class="applicant-info">
+              <div class="applicant-name">Priya Rao</div>
+              <div class="applicant-role">Senior Software Engineer</div>
+            </div>
+            <span class="match-badge">✦ 84% Match</span>
+            <div class="applicant-status"><span class="app-status new">New</span></div>
+            <div class="app-time">3h ago</div>
+            <div class="quick-actions-row">
+              <button class="qa-btn heart" title="Shortlist" onclick="showToast('❤️', 'Priya Rao shortlisted!')">♥</button>
+              <button class="qa-btn msg" title="Message" onclick="showToast('💬', 'Opening message to Priya...')"><i data-lucide="message-circle" style="width:13px;height:13px;"></i></button>
+              <button class="qa-btn cal" title="Schedule Interview" onclick="showToast('📅', 'Scheduling interview with Priya...')"><i data-lucide="calendar" style="width:13px;height:13px;"></i></button>
+            </div>
+          </div>
+
+          <!-- Applicant 5 -->
+          <div class="applicant-row" id="app5">
+            <div class="applicant-avatar" style="background:linear-gradient(135deg,#EF4444,#F59E0B)">TC</div>
+            <div class="applicant-info">
+              <div class="applicant-name">Tom Chen</div>
+              <div class="applicant-role">Staff Engineer</div>
+            </div>
+            <span class="match-badge">✦ 79% Match</span>
+            <div class="applicant-status"><span class="app-status shortlisted">Shortlisted</span></div>
+            <div class="app-time">5h ago</div>
+            <div class="quick-actions-row">
+              <button class="qa-btn heart" title="Shortlist" onclick="showToast('❤️', 'Tom Chen shortlisted!')">♥</button>
+              <button class="qa-btn msg" title="Message" onclick="showToast('💬', 'Opening message to Tom...')"><i data-lucide="message-circle" style="width:13px;height:13px;"></i></button>
+              <button class="qa-btn cal" title="Schedule Interview" onclick="showToast('📅', 'Scheduling interview with Tom...')"><i data-lucide="calendar" style="width:13px;height:13px;"></i></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. HIRING FUNNEL -->
+        <section class="card" aria-label="Hiring funnel">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Hiring Funnel</div>
+              <div class="section-subtitle">Across all active positions</div>
+            </div>
+            <span class="section-badge">Live</span>
+          </div>
+          <div class="funnel-wrap" id="funnelWrap">
+            <div class="funnel-row">
+              <div class="funnel-label-wrap">
+                <div class="funnel-label">Applied</div>
+                <div class="funnel-count">247 candidates</div>
+              </div>
+              <div class="funnel-bar-track">
+                <div class="funnel-bar-fill" data-width="100" style="background:linear-gradient(90deg,#6366F1,#818CF8);">247</div>
+              </div>
+              <div class="funnel-pct">100%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label-wrap">
+                <div class="funnel-label">Reviewed</div>
+                <div class="funnel-count">189 candidates</div>
+              </div>
+              <div class="funnel-bar-track">
+                <div class="funnel-bar-fill" data-width="76.5" style="background:linear-gradient(90deg,#F59E0B,#F97316);">189</div>
+              </div>
+              <div class="funnel-pct">77%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label-wrap">
+                <div class="funnel-label">Shortlisted</div>
+                <div class="funnel-count">42 candidates</div>
+              </div>
+              <div class="funnel-bar-track">
+                <div class="funnel-bar-fill" data-width="17" style="background:linear-gradient(90deg,#10B981,#06B6D4);">42</div>
+              </div>
+              <div class="funnel-pct">17%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label-wrap">
+                <div class="funnel-label">Interview</div>
+                <div class="funnel-count">12 candidates</div>
+              </div>
+              <div class="funnel-bar-track">
+                <div class="funnel-bar-fill" data-width="4.9" style="background:linear-gradient(90deg,#8B5CF6,#EC4899);">12</div>
+              </div>
+              <div class="funnel-pct">5%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label-wrap">
+                <div class="funnel-label">Offered</div>
+                <div class="funnel-count">3 candidates</div>
+              </div>
+              <div class="funnel-bar-track">
+                <div class="funnel-bar-fill" data-width="1.2" style="background:linear-gradient(90deg,#F59E0B,#EF4444);">3</div>
+              </div>
+              <div class="funnel-pct">1%</div>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- end left-col -->
+
+      <!-- ─── RIGHT COLUMN ──────────────────────────────────────── -->
+      <div class="right-col">
+
+        <!-- 5. SUBSCRIPTION PLAN -->
+        <section class="sub-plan-card" aria-label="Subscription plan">
+          <div class="plan-title">✦ Premium Employer Plan</div>
+          <div class="plan-valid">Valid until: Mar 31, 2025</div>
+          <div class="plan-features">
+            <div class="plan-feature"><span class="check">✓</span> 15 Active Job Slots</div>
+            <div class="plan-feature"><span class="check">✓</span> Unlimited Applicant Access</div>
+            <div class="plan-feature"><span class="check">✓</span> AI Candidate Matching</div>
+            <div class="plan-feature"><span class="check">✓</span> Advanced Analytics</div>
+            <div class="plan-feature"><span class="check">✓</span> Priority Support</div>
+            <div class="plan-feature"><span class="check">✓</span> ATS Integration</div>
+          </div>
+          <div class="plan-slots">
+            <div class="slots-label">
+              <span>Job Slots Used</span>
+              <span style="color:var(--text-primary);font-weight:700;">12 / 15</span>
+            </div>
+            <div class="slots-bar">
+              <div class="slots-fill" data-width="80" id="slotsFill"></div>
+            </div>
+          </div>
+          <button class="btn-upgrade" onclick="showToast('💳', 'Opening plan upgrade options...')">
+            Upgrade Plan →
+          </button>
+        </section>
+
+        <!-- 6. QUICK ACTIONS -->
+        <section class="card" aria-label="Quick actions">
+          <div class="section-header" style="margin-bottom:12px;">
+            <div class="section-title">Quick Actions</div>
+          </div>
+          <div class="quick-actions-grid">
+            <a href="./post-job.html" style="display:contents;">
+              <div class="qa-action">
+                <div class="qa-action-icon" style="background:var(--primary-glow);">➕</div>
+                <div class="qa-action-label">Post a Job</div>
+              </div>
+            </a>
+            <div class="qa-action" onclick="showToast('🔍', 'Opening candidate search...')">
+              <div class="qa-action-icon" style="background:var(--accent-light);">🔍</div>
+              <div class="qa-action-label">Search Candidates</div>
+            </div>
+            <div class="qa-action" onclick="showToast('📅', 'Opening interview scheduler...')">
+              <div class="qa-action-icon" style="background:var(--success-light);">📅</div>
+              <div class="qa-action-label">Schedule Interview</div>
+            </div>
+            <div class="qa-action" onclick="showToast('📊', 'Generating reports...')">
+              <div class="qa-action-icon" style="background:var(--cyan-light);">📊</div>
+              <div class="qa-action-label">Download Reports</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. UPCOMING INTERVIEWS -->
+        <section class="card" aria-label="Upcoming interviews">
+          <div class="section-header" style="margin-bottom:12px;">
+            <div>
+              <div class="section-title">Upcoming Interviews</div>
+              <div class="section-subtitle">Today · 3 scheduled</div>
+            </div>
+            <button class="btn-text" onclick="showToast('📅', 'Opening full calendar...')">
+              <i data-lucide="calendar" style="width:12px;height:12px;"></i>
+            </button>
+          </div>
+          <div class="cal-card">
+            <!-- Interview 1 -->
+            <div class="cal-item">
+              <div class="cal-time">
+                <div class="hour">10:00</div>
+                <div>AM</div>
+              </div>
+              <div class="cal-info">
+                <div class="cal-name">Arjun Kumar</div>
+                <div class="cal-role">Sr. Software Engineer · Technical</div>
+              </div>
+              <span class="cal-type">Video</span>
+            </div>
+            <!-- Interview 2 -->
+            <div class="cal-item">
+              <div class="cal-time">
+                <div class="hour">2:30</div>
+                <div>PM</div>
+              </div>
+              <div class="cal-info">
+                <div class="cal-name">Sofia Martinez</div>
+                <div class="cal-role">Staff Engineer · System Design</div>
+              </div>
+              <span class="cal-type">Zoom</span>
+            </div>
+            <!-- Interview 3 -->
+            <div class="cal-item">
+              <div class="cal-time">
+                <div class="hour">4:00</div>
+                <div>PM</div>
+              </div>
+              <div class="cal-info">
+                <div class="cal-name">James Liu</div>
+                <div class="cal-role">Product Designer · Portfolio</div>
+              </div>
+              <span class="cal-type">In-person</span>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- end right-col -->
+    </main>
+  </div><!-- end main-area -->
+
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span class="toast-icon" id="toastIcon"></span>
+    <span id="toastMsg"></span>
+  </div>
+
+  <!-- ─── SCRIPTS ───────────────────────────────────────────────────── -->
+  <script>
+    // ─── Lucide Init ───────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initTheme();
+      initAnimations();
+    });
+
+    // ─── Theme ─────────────────────────────────────────────────────
+    function initTheme() {
+      const saved = localStorage.getItem('tarc-employer-theme') || 'dark';
+      setTheme(saved);
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+        lucide.createIcons();
+      }
+      localStorage.setItem('tarc-employer-theme', theme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    // ─── Mobile Sidebar ─────────────────────────────────────────────
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('sidebarOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ─── Toast ──────────────────────────────────────────────────────
+    let toastTimer;
+    function showToast(icon, msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ─── Intersection Observer Animations ───────────────────────────
+    function initAnimations() {
+      // Stat cards
+      const statCards = document.querySelectorAll('.stat-card');
+      const statObs = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+              entry.target.style.transition = `opacity 0.4s ease ${i * 0.08}s, transform 0.4s ease ${i * 0.08}s`;
+            }, i * 80);
+            statObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+      statCards.forEach(c => statObs.observe(c));
+
+      // Job rows
+      const jobRows = document.querySelectorAll('.job-row');
+      const jobObs = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+              entry.target.style.transition = `opacity 0.35s ease ${i * 0.1}s, transform 0.35s ease ${i * 0.1}s`;
+            }, i * 100);
+            jobObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      jobRows.forEach(r => jobObs.observe(r));
+
+      // Applicant rows
+      const appRows = document.querySelectorAll('.applicant-row');
+      const appObs = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+              entry.target.style.transition = `opacity 0.35s ease ${i * 0.08}s, transform 0.35s ease ${i * 0.08}s`;
+            }, i * 80);
+            appObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      appRows.forEach(r => appObs.observe(r));
+
+      // Funnel bars
+      const funnelObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateFunnel();
+            funnelObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      const funnel = document.getElementById('funnelWrap');
+      if (funnel) funnelObs.observe(funnel);
+
+      // Slots bar
+      const slotsObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const fill = document.getElementById('slotsFill');
+            if (fill) fill.style.width = '80%';
+            slotsObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      const slotsFill = document.getElementById('slotsFill');
+      if (slotsFill) slotsObs.observe(slotsFill);
+    }
+
+    function animateFunnel() {
+      const bars = document.querySelectorAll('.funnel-bar-fill');
+      bars.forEach((bar, i) => {
+        const targetWidth = parseFloat(bar.getAttribute('data-width'));
+        setTimeout(() => {
+          bar.style.width = targetWidth + '%';
+        }, i * 120);
+      });
+    }
+
+    // ─── Counter Animation ──────────────────────────────────────────
+    function animateCounter(el, target, duration = 1200) {
+      let start = 0;
+      const step = target / (duration / 16);
+      const timer = setInterval(() => {
+        start = Math.min(start + step, target);
+        el.textContent = Math.floor(start);
+        if (start >= target) clearInterval(timer);
+      }, 16);
+    }
+
+    // Trigger stat card counters on visibility
+    const statValues = document.querySelectorAll('.stat-value');
+    const counterTargets = [12, 247, 8, 3];
+    const counterObs = new IntersectionObserver((entries) => {
+      entries.forEach((entry, idx) => {
+        if (entry.isIntersecting) {
+          const allVals = document.querySelectorAll('.stat-value');
+          allVals.forEach((el, i) => {
+            animateCounter(el, counterTargets[i], 1000 + i * 100);
+          });
+          counterObs.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    if (statValues[0]) counterObs.observe(statValues[0]);
+  </script>
+</body>
+</html>

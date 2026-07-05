@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentArc Admin — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    /* ─── RESET & BASE ────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.35s ease, color 0.35s ease;
+    }
+
+    /* ─── THEME TOKENS ────────────────────────────────────────────── */
+    :root[data-theme="dark"] {
+      --bg-base:       #07070E;
+      --bg-surface:    #0D0D18;
+      --bg-card:       #111120;
+      --bg-card2:      #16162A;
+      --bg-hover:      #1C1C30;
+      --bg-sidebar:    #08080F;
+      --border:        rgba(255,255,255,0.06);
+      --border-strong: rgba(255,255,255,0.10);
+      --text-primary:  #E2E8F0;
+      --text-secondary:#94A3B8;
+      --text-muted:    #64748B;
+      --indigo:        #6366F1;
+      --indigo-light:  #818CF8;
+      --indigo-dim:    rgba(99,102,241,0.15);
+      --cyan:          #06B6D4;
+      --green:         #10B981;
+      --amber:         #F59E0B;
+      --red:           #EF4444;
+      --red-dim:       rgba(239,68,68,0.15);
+      --green-dim:     rgba(16,185,129,0.12);
+      --amber-dim:     rgba(245,158,11,0.12);
+      --shadow-sm:     0 2px 8px rgba(0,0,0,0.4);
+      --shadow-md:     0 4px 20px rgba(0,0,0,0.5);
+      --shadow-lg:     0 8px 40px rgba(0,0,0,0.6);
+      --sidebar-width: 240px;
+    }
+    :root[data-theme="light"] {
+      --bg-base:       #F0F0F8;
+      --bg-surface:    #FAFAFA;
+      --bg-card:       #FFFFFF;
+      --bg-card2:      #F6F6FC;
+      --bg-hover:      #F0F0FC;
+      --bg-sidebar:    #0F0F1E;
+      --border:        rgba(0,0,0,0.07);
+      --border-strong: rgba(0,0,0,0.12);
+      --text-primary:  #0F172A;
+      --text-secondary:#475569;
+      --text-muted:    #94A3B8;
+      --indigo:        #6366F1;
+      --indigo-light:  #818CF8;
+      --indigo-dim:    rgba(99,102,241,0.10);
+      --cyan:          #0891B2;
+      --green:         #059669;
+      --amber:         #D97706;
+      --red:           #DC2626;
+      --red-dim:       rgba(220,38,38,0.10);
+      --green-dim:     rgba(5,150,105,0.10);
+      --amber-dim:     rgba(217,119,6,0.10);
+      --shadow-sm:     0 2px 8px rgba(0,0,0,0.08);
+      --shadow-md:     0 4px 20px rgba(0,0,0,0.10);
+      --shadow-lg:     0 8px 40px rgba(0,0,0,0.12);
+      --sidebar-width: 240px;
+    }
+
+    /* ─── LAYOUT ──────────────────────────────────────────────────── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ─── SIDEBAR ─────────────────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-height: 100vh;
+      background: var(--bg-sidebar);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #6366F1, #818CF8);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 0 14px rgba(99,102,241,0.4);
+      flex-shrink: 0;
+    }
+    .logo-text { font-size: 13px; font-weight: 700; color: #E2E8F0; letter-spacing: -0.3px; }
+    .logo-badge {
+      font-size: 9px; font-weight: 600;
+      background: linear-gradient(135deg, #EF4444, #F87171);
+      color: #fff; padding: 2px 6px; border-radius: 999px; margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+    .logo-block { display: flex; flex-direction: column; }
+
+    .sidebar-section-label {
+      font-size: 9px; font-weight: 600; letter-spacing: 1px;
+      color: #3E3E5A; text-transform: uppercase;
+      padding: 16px 20px 6px;
+    }
+
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 8px 0; }
+    .sidebar-nav::-webkit-scrollbar { width: 0; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px;
+      border-radius: 8px;
+      margin: 1px 8px;
+      color: #5A5A7A;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px; font-weight: 500;
+      position: relative;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: rgba(99,102,241,0.10); color: #C4C4E0; }
+    .nav-item.active {
+      background: rgba(99,102,241,0.18);
+      color: #A5B4FC;
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      width: 3px; height: 60%; background: #6366F1;
+      border-radius: 0 3px 3px 0;
+    }
+    .nav-item .nav-icon { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
+    .nav-item.active .nav-icon { opacity: 1; }
+    .nav-emoji { font-size: 14px; flex-shrink: 0; }
+
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 999px;
+      min-width: 20px; text-align: center;
+    }
+    .nav-badge.red { background: rgba(239,68,68,0.2); color: #F87171; }
+    .nav-badge.amber { background: rgba(245,158,11,0.2); color: #FCD34D; }
+    .nav-badge.indigo { background: rgba(99,102,241,0.2); color: #A5B4FC; }
+
+    .sidebar-user {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border-radius: 0;
+    }
+    .sidebar-user:hover { background: rgba(255,255,255,0.03); }
+    .user-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #6366F1, #818CF8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 12px; font-weight: 600; color: #C4C4E0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role { font-size: 10px; color: #4E4E72; font-weight: 500; }
+    .user-role span { color: #6366F1; }
+
+    /* ─── MAIN AREA ───────────────────────────────────────────────── */
+    .main-area {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ──────────────────────────────────────────────────── */
+    .header {
+      background: rgba(var(--bg-card), 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 62px;
+      display: flex; align-items: center; gap: 16px;
+      position: sticky; top: 0; z-index: 50;
+      background: var(--bg-card);
+    }
+    .header-title {
+      font-size: 17px; font-weight: 700;
+      color: var(--text-primary); letter-spacing: -0.4px;
+      flex: 1;
+    }
+    .header-title span { font-size: 18px; }
+
+    .date-picker {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 7px 14px;
+      font-size: 12px; font-weight: 500; color: var(--text-secondary);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .date-picker:hover { border-color: var(--indigo); color: var(--text-primary); }
+
+    .btn-export {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--indigo);
+      color: #fff; border: none; border-radius: 10px;
+      padding: 8px 16px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-export:hover { background: var(--indigo-light); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(99,102,241,0.4); }
+
+    .status-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--green-dim);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 11px; font-weight: 600; color: var(--green);
+    }
+    .pulse-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+      50% { box-shadow: 0 0 0 5px rgba(16,185,129,0); }
+    }
+
+    .theme-toggle {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--bg-card2); border: 1px solid var(--border-strong);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; color: var(--text-secondary);
+    }
+    .theme-toggle:hover { border-color: var(--indigo); color: var(--indigo); }
+
+    /* ─── CONTENT ─────────────────────────────────────────────────── */
+    .content { padding: 24px 28px; flex: 1; }
+
+    /* ─── SECTION TITLE ───────────────────────────────────────────── */
+    .section-title {
+      font-size: 13px; font-weight: 700; color: var(--text-secondary);
+      letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 14px;
+    }
+
+    /* ─── METRIC CARDS ────────────────────────────────────────────── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    @media (max-width:1400px) { .metrics-grid { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width:900px)  { .metrics-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width:600px)  { .metrics-grid { grid-template-columns: 1fr; } }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+      transition: all 0.25s ease;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent-gradient, linear-gradient(90deg, #6366F1, #818CF8));
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .metric-card:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .metric-card:hover::before { opacity: 1; }
+
+    .metric-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; margin-bottom: 12px;
+    }
+    .metric-label { font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+    .metric-value {
+      font-size: 22px; font-weight: 800; color: var(--text-primary);
+      letter-spacing: -0.8px; line-height: 1;
+      margin-bottom: 8px;
+    }
+    .metric-change {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px;
+    }
+    .metric-change.up { background: var(--green-dim); color: var(--green); }
+    .metric-change.down { background: var(--red-dim); color: var(--red); }
+    .metric-sub { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ─── CHARTS ROW ──────────────────────────────────────────────── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 60% 40%;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width:1100px) { .charts-row { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { border-color: var(--border-strong); }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+    .card-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* LINE CHART */
+    .chart-container { position: relative; }
+    .chart-legend {
+      display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 500; color: var(--text-secondary);
+    }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .svg-chart { width: 100%; overflow: visible; }
+    .chart-line {
+      fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: drawLine 1.8s ease forwards;
+    }
+    .chart-line.line1 { stroke: #6366F1; animation-delay: 0.2s; }
+    .chart-line.line2 { stroke: #F59E0B; animation-delay: 0.5s; }
+    .chart-line.line3 { stroke: #10B981; animation-delay: 0.8s; }
+    @keyframes drawLine {
+      to { stroke-dashoffset: 0; }
+    }
+    .chart-area {
+      opacity: 0;
+      animation: fadeIn 1s ease 1.5s forwards;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    .chart-dot {
+      r: 4; stroke-width: 2; stroke: var(--bg-card);
+      transition: r 0.2s;
+      cursor: pointer;
+    }
+    .chart-dot:hover { r: 6; }
+
+    .chart-x-labels { display: flex; justify-content: space-between; margin-top: 8px; }
+    .chart-x-label { font-size: 10px; color: var(--text-muted); }
+
+    .chart-y-line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 4 4; }
+    .chart-y-label { font-size: 9px; fill: var(--text-muted); }
+
+    /* DONUT CHART */
+    .donut-wrap {
+      display: flex; align-items: center; gap: 28px;
+      justify-content: center;
+    }
+    .donut-svg { width: 160px; height: 160px; flex-shrink: 0; }
+    .donut-ring {
+      fill: none;
+      stroke-width: 22;
+      stroke-linecap: butt;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .donut-ring:hover { stroke-width: 26; filter: brightness(1.2); }
+    .donut-center { font-family: 'Inter', sans-serif; }
+
+    .donut-legends { display: flex; flex-direction: column; gap: 12px; }
+    .donut-legend-item {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .donut-legend-item:hover { opacity: 0.8; }
+    .donut-legend-color { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .donut-legend-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+    .donut-legend-val { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .donut-legend-pct { font-size: 10px; color: var(--text-muted); }
+
+    /* ─── ROW 3 ───────────────────────────────────────────────────── */
+    .row3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width:1000px) { .row3 { grid-template-columns: 1fr; } }
+
+    /* ACTIVITY FEED */
+    .activity-feed { display: flex; flex-direction: column; gap: 0; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+      border-radius: 8px;
+      padding-left: 8px; padding-right: 8px;
+      cursor: pointer;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item:hover { background: var(--bg-hover); }
+
+    .activity-icon-wrap {
+      width: 32px; height: 32px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0; margin-top: 1px;
+    }
+    .activity-body { flex: 1; min-width: 0; }
+    .activity-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .activity-desc { font-size: 11px; color: var(--text-secondary); }
+    .activity-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+    .activity-badge {
+      font-size: 10px; font-weight: 600; padding: 2px 8px;
+      border-radius: 999px; align-self: flex-start; margin-top: 4px; flex-shrink: 0;
+    }
+    .badge-green { background: var(--green-dim); color: var(--green); }
+    .badge-red { background: var(--red-dim); color: var(--red); }
+    .badge-amber { background: var(--amber-dim); color: var(--amber); }
+    .badge-indigo { background: var(--indigo-dim); color: var(--indigo-light); }
+    .badge-blue { background: rgba(6,182,212,0.12); color: var(--cyan); }
+
+    .view-all {
+      display: flex; align-items: center; gap: 4px;
+      color: var(--indigo-light); font-size: 11px; font-weight: 600;
+      cursor: pointer; padding: 10px 8px 2px;
+      transition: opacity 0.2s;
+    }
+    .view-all:hover { opacity: 0.7; }
+
+    /* QUICK ACTIONS + SYSTEM HEALTH */
+    .panel-col { display: flex; flex-direction: column; gap: 16px; }
+
+    .qa-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .qa-item:hover { border-color: var(--indigo); transform: translateX(2px); }
+    .qa-icon { font-size: 18px; }
+    .qa-info { flex: 1; }
+    .qa-label { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .qa-count { font-size: 11px; color: var(--text-muted); }
+    .qa-count span { font-weight: 700; }
+    .btn-review {
+      font-size: 11px; font-weight: 600; color: var(--indigo-light);
+      background: var(--indigo-dim); border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 8px; padding: 5px 12px; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .btn-review:hover { background: rgba(99,102,241,0.25); }
+    .btn-review.red { color: var(--red); background: var(--red-dim); border-color: rgba(239,68,68,0.2); }
+    .btn-review.red:hover { background: rgba(239,68,68,0.22); }
+    .btn-review.amber { color: var(--amber); background: var(--amber-dim); border-color: rgba(245,158,11,0.2); }
+    .btn-review.amber:hover { background: rgba(245,158,11,0.22); }
+
+    /* SYSTEM HEALTH */
+    .health-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+    .health-item {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .health-label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+    .health-value { font-size: 16px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
+    .health-value.green { color: var(--green); }
+    .health-status { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+    .progress-bar-wrap { margin-top: 8px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+    .progress-track {
+      height: 5px; border-radius: 999px;
+      background: var(--border-strong);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, #10B981, #34D399);
+      width: 0;
+      transition: width 1.2s ease;
+    }
+    .progress-fill.amber { background: linear-gradient(90deg, #F59E0B, #FCD34D); }
+    .progress-fill.red { background: linear-gradient(90deg, #EF4444, #F87171); }
+
+    /* ─── ROW 4 TABLES ────────────────────────────────────────────── */
+    .row4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width:1000px) { .row4 { grid-template-columns: 1fr; } }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      font-size: 10px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      padding: 8px 10px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 11px 10px; font-size: 12px; color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg-hover); }
+    td.bold { font-weight: 600; color: var(--text-primary); }
+    td.rank { font-weight: 800; color: var(--text-muted); font-size: 13px; }
+
+    .company-cell { display: flex; align-items: center; gap: 8px; }
+    .company-logo {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    /* FRAUD TABLE */
+    .fraud-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .fraud-item:last-child { border-bottom: none; }
+    .fraud-body { flex: 1; min-width: 0; }
+    .fraud-title {
+      font-size: 12px; font-weight: 600; color: var(--text-primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 200px;
+    }
+    .fraud-meta { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .risk-badge {
+      font-size: 11px; font-weight: 800;
+      padding: 3px 8px; border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .risk-critical { background: var(--red-dim); color: var(--red); }
+    .risk-high { background: rgba(245,158,11,0.15); color: var(--amber); }
+    .risk-medium { background: rgba(6,182,212,0.12); color: var(--cyan); }
+
+    .fraud-actions { display: flex; gap: 5px; flex-shrink: 0; }
+    .btn-sm {
+      font-size: 10px; font-weight: 600; padding: 4px 9px;
+      border-radius: 6px; cursor: pointer; font-family: inherit;
+      border: 1px solid transparent; transition: all 0.2s;
+    }
+    .btn-sm.remove { background: var(--red-dim); color: var(--red); border-color: rgba(239,68,68,0.2); }
+    .btn-sm.remove:hover { background: rgba(239,68,68,0.25); }
+    .btn-sm.review { background: var(--indigo-dim); color: var(--indigo-light); border-color: rgba(99,102,241,0.2); }
+    .btn-sm.review:hover { background: rgba(99,102,241,0.25); }
+    .btn-sm.approve { background: var(--green-dim); color: var(--green); border-color: rgba(16,185,129,0.2); }
+    .btn-sm.approve:hover { background: rgba(16,185,129,0.25); }
+
+    /* ─── TOOLTIP ─────────────────────────────────────────────────── */
+    .tooltip {
+      position: absolute;
+      background: var(--bg-card2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px; color: var(--text-primary);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 200;
+      white-space: nowrap;
+      box-shadow: var(--shadow-md);
+    }
+    .tooltip.visible { opacity: 1; }
+
+    /* ─── SKELETON ────────────────────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card2) 25%, var(--bg-hover) 50%, var(--bg-card2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ─── SCROLLBAR ───────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
+    /* ─── ANIMATIONS ──────────────────────────────────────────────── */
+    .fade-in { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* Mobile nav toggle */
+    .mobile-toggle {
+      display: none; position: fixed; bottom: 20px; right: 20px; z-index: 200;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--indigo);
+      border: none; cursor: pointer; color: #fff;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.5);
+      align-items: center; justify-content: center;
+    }
+    @media (max-width:768px) {
+      .mobile-toggle { display: flex; }
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; }
+    }
+
+    /* ─── COUNTER ANIMATION ───────────────────────────────────────── */
+    .counter { display: inline-block; }
+
+    /* sub-section titles */
+    .subsection-title {
+      font-size: 12px; font-weight: 700; color: var(--text-secondary);
+      margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Admin navigation">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <div class="logo-block">
+        <span class="logo-text">TalentArc Admin</span>
+        <span class="logo-badge">SUPER ADMIN</span>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="sidebar-section-label">Overview</div>
+      <a class="nav-item active" href="#" aria-current="page">
+        <span class="nav-emoji">📊</span> Analytics
+      </a>
+
+      <div class="sidebar-section-label">Management</div>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">👥</span> Users
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">🏢</span> Employers
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">🔍</span> Recruiters
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">💼</span> Jobs
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">💰</span> Payments
+      </a>
+
+      <div class="sidebar-section-label">Trust & Safety</div>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">🎫</span> Support Tickets
+        <span class="nav-badge amber">23</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">🛡️</span> Fraud Detection
+        <span class="nav-badge red">5</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">✅</span> Verification Queue
+        <span class="nav-badge indigo">12</span>
+      </a>
+
+      <div class="sidebar-section-label">System</div>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">📝</span> Audit Logs
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">🖼️</span> CMS
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">⚙️</span> System Settings
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-emoji">📄</span> Role Management
+      </a>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">A</div>
+      <div class="user-info">
+        <div class="user-name">Admin User</div>
+        <div class="user-role"><span>Super Admin</span> · Online</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN AREA ══════════════════════════════════════════════════ -->
+  <div class="main-area">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-title">Platform Analytics <span>📊</span></div>
+
+      <div class="date-picker" role="button" aria-label="Date range picker">
+        📅 Last 30 days <span style="color:var(--text-muted)">▾</span>
+      </div>
+
+      <button class="btn-export" aria-label="Export report">
+        ↑ Export Report
+      </button>
+
+      <div class="status-badge" role="status" aria-live="polite">
+        <div class="pulse-dot"></div>
+        System Status: All Operational
+      </div>
+
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">
+        🌙
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content" role="main">
+
+      <!-- ══ ROW 1: METRIC CARDS ══════════════════════════════════ -->
+      <div class="section-title">Key Metrics — July 2026</div>
+      <div class="metrics-grid">
+
+        <div class="metric-card fade-in" style="--accent-gradient:linear-gradient(90deg,#6366F1,#818CF8)">
+          <div class="metric-icon" style="background:rgba(99,102,241,0.15)">👥</div>
+          <div class="metric-label">Total Users</div>
+          <div class="metric-value"><span class="counter" data-target="2400000" data-prefix="" data-suffix="M" data-divisor="1000000" data-decimals="1">0</span></div>
+          <span class="metric-change up">↑ +12% this month</span>
+          <div class="metric-sub">All registered accounts</div>
+        </div>
+
+        <div class="metric-card fade-in" style="--accent-gradient:linear-gradient(90deg,#06B6D4,#38BDF8)">
+          <div class="metric-icon" style="background:rgba(6,182,212,0.12)">💼</div>
+          <div class="metric-label">Active Jobs</div>
+          <div class="metric-value"><span class="counter" data-target="124000" data-suffix="K" data-divisor="1000" data-decimals="0">0</span></div>
+          <span class="metric-change up">↑ +8% this month</span>
+          <div class="metric-sub">Live job postings</div>
+        </div>
+
+        <div class="metric-card fade-in" style="--accent-gradient:linear-gradient(90deg,#F59E0B,#FCD34D)">
+          <div class="metric-icon" style="background:rgba(245,158,11,0.12)">🏢</div>
+          <div class="metric-label">Companies</div>
+          <div class="metric-value"><span class="counter" data-target="18000" data-suffix="K" data-divisor="1000" data-decimals="0">0</span></div>
+          <span class="metric-change up">↑ +15% this month</span>
+          <div class="metric-sub">Registered employers</div>
+        </div>
+
+        <div class="metric-card fade-in" style="--accent-gradient:linear-gradient(90deg,#10B981,#34D399)">
+          <div class="metric-icon" style="background:rgba(16,185,129,0.12)">💰</div>
+          <div class="metric-label">Revenue (MRR)</div>
+          <div class="metric-value">$<span class="counter" data-target="2100000" data-suffix="M" data-divisor="1000000" data-decimals="1">0</span></div>
+          <span class="metric-change up">↑ +22% this month</span>
+          <div class="metric-sub">Monthly recurring revenue</div>
+        </div>
+
+        <div class="metric-card fade-in" style="--accent-gradient:linear-gradient(90deg,#8B5CF6,#A78BFA)">
+          <div class="metric-icon" style="background:rgba(139,92,246,0.12)">📥</div>
+          <div class="metric-label">Applications Today</div>
+          <div class="metric-value"><span class="counter" data-target="47200" data-suffix="K" data-divisor="1000" data-decimals="1">0</span></div>
+          <span class="metric-change up">↑ +31% vs yesterday</span>
+          <div class="metric-sub">Submitted applications</div>
+        </div>
+
+        <div class="metric-card fade-in" style="--accent-gradient:linear-gradient(90deg,#EF4444,#F87171)">
+          <div class="metric-icon" style="background:rgba(239,68,68,0.12)">🎯</div>
+          <div class="metric-label">Placement Rate</div>
+          <div class="metric-value"><span class="counter" data-target="94" data-suffix="%" data-divisor="1" data-decimals="0">0</span></div>
+          <span class="metric-change up">↑ +2% this month</span>
+          <div class="metric-sub">Successful hire rate</div>
+        </div>
+
+      </div>
+
+      <!-- ══ ROW 2: CHARTS ════════════════════════════════════════ -->
+      <div class="charts-row">
+
+        <!-- LINE CHART -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div>
+              <div class="card-title">User Growth</div>
+              <div class="card-subtitle">Jan – Jul 2026 · All user segments</div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#6366F1"></div>Job Seekers</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>Employers</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>Recruiters</div>
+            </div>
+          </div>
+          <div class="chart-container" style="position:relative">
+            <div id="tooltip" class="tooltip"></div>
+            <svg class="svg-chart" viewBox="0 0 560 180" id="lineChart">
+              <!-- Grid lines -->
+              <line class="chart-y-line" x1="0" y1="20"  x2="560" y2="20"/>
+              <line class="chart-y-line" x1="0" y1="60"  x2="560" y2="60"/>
+              <line class="chart-y-line" x1="0" y1="100" x2="560" y2="100"/>
+              <line class="chart-y-line" x1="0" y1="140" x2="560" y2="140"/>
+              <line class="chart-y-line" x1="0" y1="170" x2="560" y2="170"/>
+              <!-- Y labels -->
+              <text class="chart-y-label" x="0" y="18">2.4M</text>
+              <text class="chart-y-label" x="0" y="58">1.8M</text>
+              <text class="chart-y-label" x="0" y="98">1.2M</text>
+              <text class="chart-y-label" x="0" y="138">600K</text>
+
+              <!-- Area fills -->
+              <defs>
+                <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6366F1" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.15"/>
+                  <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="grad3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity="0.15"/>
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Job Seekers area -->
+              <path class="chart-area" d="M 32 145 L 112 130 L 192 115 L 272 95 L 352 72 L 432 50 L 512 28 L 512 170 L 32 170 Z" fill="url(#grad1)"/>
+              <!-- Employers area -->
+              <path class="chart-area" d="M 32 162 L 112 158 L 192 153 L 272 147 L 352 140 L 432 132 L 512 120 L 512 170 L 32 170 Z" fill="url(#grad2)"/>
+              <!-- Recruiters area -->
+              <path class="chart-area" d="M 32 165 L 112 162 L 192 160 L 272 157 L 352 154 L 432 150 L 512 143 L 512 170 L 32 170 Z" fill="url(#grad3)"/>
+
+              <!-- Lines -->
+              <polyline class="chart-line line1"
+                points="32,145 112,130 192,115 272,95 352,72 432,50 512,28"/>
+              <polyline class="chart-line line2"
+                points="32,162 112,158 192,153 272,147 352,140 432,132 512,120"/>
+              <polyline class="chart-line line3"
+                points="32,165 112,162 192,160 272,157 352,154 432,150 512,143"/>
+
+              <!-- Dots — Job Seekers -->
+              <circle class="chart-dot" cx="32"  cy="145" fill="#6366F1" data-label="Jan · Seekers: 1.1M"/>
+              <circle class="chart-dot" cx="112" cy="130" fill="#6366F1" data-label="Feb · Seekers: 1.35M"/>
+              <circle class="chart-dot" cx="192" cy="115" fill="#6366F1" data-label="Mar · Seekers: 1.55M"/>
+              <circle class="chart-dot" cx="272" cy="95"  fill="#6366F1" data-label="Apr · Seekers: 1.82M"/>
+              <circle class="chart-dot" cx="352" cy="72"  fill="#6366F1" data-label="May · Seekers: 2.05M"/>
+              <circle class="chart-dot" cx="432" cy="50"  fill="#6366F1" data-label="Jun · Seekers: 2.26M"/>
+              <circle class="chart-dot" cx="512" cy="28"  fill="#6366F1" data-label="Jul · Seekers: 2.4M"/>
+
+              <!-- Dots — Employers -->
+              <circle class="chart-dot" cx="32"  cy="162" fill="#F59E0B" data-label="Jan · Employers: 10K"/>
+              <circle class="chart-dot" cx="112" cy="158" fill="#F59E0B" data-label="Feb · Employers: 12K"/>
+              <circle class="chart-dot" cx="192" cy="153" fill="#F59E0B" data-label="Mar · Employers: 14K"/>
+              <circle class="chart-dot" cx="272" cy="147" fill="#F59E0B" data-label="Apr · Employers: 15.5K"/>
+              <circle class="chart-dot" cx="352" cy="140" fill="#F59E0B" data-label="May · Employers: 16.5K"/>
+              <circle class="chart-dot" cx="432" cy="132" fill="#F59E0B" data-label="Jun · Employers: 17.2K"/>
+              <circle class="chart-dot" cx="512" cy="120" fill="#F59E0B" data-label="Jul · Employers: 18K"/>
+
+              <!-- Dots — Recruiters -->
+              <circle class="chart-dot" cx="32"  cy="165" fill="#10B981" data-label="Jan · Recruiters: 3.2K"/>
+              <circle class="chart-dot" cx="112" cy="162" fill="#10B981" data-label="Feb · Recruiters: 3.8K"/>
+              <circle class="chart-dot" cx="192" cy="160" fill="#10B981" data-label="Mar · Recruiters: 4.3K"/>
+              <circle class="chart-dot" cx="272" cy="157" fill="#10B981" data-label="Apr · Recruiters: 4.9K"/>
+              <circle class="chart-dot" cx="352" cy="154" fill="#10B981" data-label="May · Recruiters: 5.5K"/>
+              <circle class="chart-dot" cx="432" cy="150" fill="#10B981" data-label="Jun · Recruiters: 6.1K"/>
+              <circle class="chart-dot" cx="512" cy="143" fill="#10B981" data-label="Jul · Recruiters: 6.9K"/>
+            </svg>
+            <div class="chart-x-labels" style="padding:0 6px">
+              <span class="chart-x-label">Jan</span>
+              <span class="chart-x-label">Feb</span>
+              <span class="chart-x-label">Mar</span>
+              <span class="chart-x-label">Apr</span>
+              <span class="chart-x-label">May</span>
+              <span class="chart-x-label">Jun</span>
+              <span class="chart-x-label">Jul</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- DONUT CHART -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Revenue Breakdown</div>
+              <div class="card-subtitle">MRR by segment · July 2026</div>
+            </div>
+          </div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 160 160" id="donutChart">
+              <circle class="donut-ring" cx="80" cy="80" r="58"
+                stroke="#6366F1"
+                stroke-dasharray="247.9 116.6"
+                stroke-dashoffset="0"
+                fill="none"
+                data-label="Employer Subscriptions: $1.43M (68%)"
+                style="transform-origin:80px 80px; transform:rotate(-90deg)"/>
+              <circle class="donut-ring" cx="80" cy="80" r="58"
+                stroke="#F59E0B"
+                stroke-dasharray="80.4 284.1"
+                stroke-dashoffset="-247.9"
+                fill="none"
+                data-label="Premium Job Seekers: $462K (22%)"
+                style="transform-origin:80px 80px; transform:rotate(-90deg)"/>
+              <circle class="donut-ring" cx="80" cy="80" r="58"
+                stroke="#10B981"
+                stroke-dasharray="36.4 327.1"
+                stroke-dashoffset="-328.3"
+                fill="none"
+                data-label="Featured Listings: $210K (10%)"
+                style="transform-origin:80px 80px; transform:rotate(-90deg)"/>
+              <text x="80" y="75" text-anchor="middle" font-size="18" font-weight="800" fill="#E2E8F0" class="donut-center" id="donutCenterVal">$2.1M</text>
+              <text x="80" y="90" text-anchor="middle" font-size="9" fill="#64748B" class="donut-center">Total MRR</text>
+            </svg>
+            <div class="donut-legends">
+              <div class="donut-legend-item" data-segment="0">
+                <div class="donut-legend-color" style="background:#6366F1"></div>
+                <div>
+                  <div class="donut-legend-label">Employer Subs</div>
+                  <div class="donut-legend-val">$1.43M</div>
+                  <div class="donut-legend-pct">68% of MRR</div>
+                </div>
+              </div>
+              <div class="donut-legend-item" data-segment="1">
+                <div class="donut-legend-color" style="background:#F59E0B"></div>
+                <div>
+                  <div class="donut-legend-label">Premium Seekers</div>
+                  <div class="donut-legend-val">$462K</div>
+                  <div class="donut-legend-pct">22% of MRR</div>
+                </div>
+              </div>
+              <div class="donut-legend-item" data-segment="2">
+                <div class="donut-legend-color" style="background:#10B981"></div>
+                <div>
+                  <div class="donut-legend-label">Featured Listings</div>
+                  <div class="donut-legend-val">$210K</div>
+                  <div class="donut-legend-pct">10% of MRR</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ROW 3 ════════════════════════════════════════════════ -->
+      <div class="row3">
+
+        <!-- ACTIVITY FEED -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Live Activity Feed</div>
+              <div class="card-subtitle">Real-time platform events</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div class="pulse-dot" style="background:var(--indigo)"></div>
+              <span style="font-size:10px;color:var(--text-muted)">Live</span>
+            </div>
+          </div>
+          <div class="activity-feed" role="feed" aria-label="Platform activity">
+
+            <div class="activity-item" tabindex="0">
+              <div class="activity-icon-wrap" style="background:rgba(16,185,129,0.12)">🏢</div>
+              <div class="activity-body">
+                <div class="activity-title">New employer registered</div>
+                <div class="activity-desc">Stripe Inc. completed verification onboarding</div>
+                <div class="activity-time">2 minutes ago</div>
+              </div>
+              <span class="activity-badge badge-green">New</span>
+            </div>
+
+            <div class="activity-item" tabindex="0">
+              <div class="activity-icon-wrap" style="background:rgba(239,68,68,0.12)">🚩</div>
+              <div class="activity-body">
+                <div class="activity-title">Job flagged for review</div>
+                <div class="activity-desc">"Work from home earn $5K/day" — auto-flagged</div>
+                <div class="activity-time">7 minutes ago</div>
+              </div>
+              <span class="activity-badge badge-red">Flagged</span>
+            </div>
+
+            <div class="activity-item" tabindex="0">
+              <div class="activity-icon-wrap" style="background:rgba(99,102,241,0.12)">✅</div>
+              <div class="activity-body">
+                <div class="activity-title">Verification requested</div>
+                <div class="activity-desc">OpenAI Inc. submitted business documents</div>
+                <div class="activity-time">18 minutes ago</div>
+              </div>
+              <span class="activity-badge badge-indigo">Pending</span>
+            </div>
+
+            <div class="activity-item" tabindex="0">
+              <div class="activity-icon-wrap" style="background:rgba(239,68,68,0.15)">🛡️</div>
+              <div class="activity-body">
+                <div class="activity-title">Fraud alert triggered</div>
+                <div class="activity-desc">Suspicious job posting detected · Risk score: 94%</div>
+                <div class="activity-time">31 minutes ago</div>
+              </div>
+              <span class="activity-badge badge-red">Alert</span>
+            </div>
+
+            <div class="activity-item" tabindex="0">
+              <div class="activity-icon-wrap" style="background:rgba(245,158,11,0.12)">🎫</div>
+              <div class="activity-body">
+                <div class="activity-title">New support ticket #1234</div>
+                <div class="activity-desc">Payment issue — subscription charge failed</div>
+                <div class="activity-time">44 minutes ago</div>
+              </div>
+              <span class="activity-badge badge-amber">Open</span>
+            </div>
+
+            <div class="activity-item" tabindex="0">
+              <div class="activity-icon-wrap" style="background:rgba(239,68,68,0.12)">⚠️</div>
+              <div class="activity-body">
+                <div class="activity-title">User reported content</div>
+                <div class="activity-desc">User ID #88412 reported fake job listing · 3 reports</div>
+                <div class="activity-time">1 hour ago</div>
+              </div>
+              <span class="activity-badge badge-red">Report</span>
+            </div>
+
+          </div>
+          <div class="view-all" role="button" tabindex="0">View all activity →</div>
+        </div>
+
+        <!-- QUICK ACTIONS + HEALTH -->
+        <div class="panel-col">
+
+          <!-- Quick Actions -->
+          <div class="card fade-in" style="flex:0">
+            <div class="card-header" style="margin-bottom:12px">
+              <div class="card-title">Quick Actions</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="qa-item">
+                <div class="qa-icon">✅</div>
+                <div class="qa-info">
+                  <div class="qa-label">Pending Verifications</div>
+                  <div class="qa-count"><span style="color:var(--amber)">12</span> companies awaiting review</div>
+                </div>
+                <button class="btn-review amber">Review</button>
+              </div>
+
+              <div class="qa-item">
+                <div class="qa-icon">🛡️</div>
+                <div class="qa-info">
+                  <div class="qa-label">Fraud Alerts</div>
+                  <div class="qa-count"><span style="color:var(--red)">5</span> high-risk items flagged</div>
+                </div>
+                <button class="btn-review red">Review</button>
+              </div>
+
+              <div class="qa-item">
+                <div class="qa-icon">🎫</div>
+                <div class="qa-info">
+                  <div class="qa-label">Support Tickets</div>
+                  <div class="qa-count"><span style="color:var(--indigo-light)">23</span> open tickets</div>
+                </div>
+                <button class="btn-review">View</button>
+              </div>
+
+              <div class="qa-item">
+                <div class="qa-icon">💼</div>
+                <div class="qa-info">
+                  <div class="qa-label">Jobs Pending Review</div>
+                  <div class="qa-count"><span style="color:var(--amber)">8</span> listings need approval</div>
+                </div>
+                <button class="btn-review amber">Review</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Health -->
+          <div class="card fade-in" style="flex:1">
+            <div class="card-header" style="margin-bottom:14px">
+              <div class="card-title">System Health</div>
+              <div class="status-badge" style="font-size:10px;padding:4px 10px">
+                <div class="pulse-dot"></div> All Systems Go
+              </div>
+            </div>
+
+            <div class="health-grid">
+              <div class="health-item">
+                <div class="health-label">API Response</div>
+                <div class="health-value green">45ms</div>
+                <div class="health-status">↓ Excellent latency</div>
+              </div>
+              <div class="health-item">
+                <div class="health-label">Uptime</div>
+                <div class="health-value green">99.99%</div>
+                <div class="health-status">30-day average</div>
+              </div>
+              <div class="health-item">
+                <div class="health-label">Active Sessions</div>
+                <div class="health-value">12,847</div>
+                <div class="health-status">Right now</div>
+              </div>
+              <div class="health-item">
+                <div class="health-label">Error Rate</div>
+                <div class="health-value green">0.02%</div>
+                <div class="health-status">Last 1 hour</div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px">
+              <div class="progress-bar-wrap">
+                <div class="progress-label"><span>Server Load</span><span style="color:var(--green)">23%</span></div>
+                <div class="progress-track"><div class="progress-fill" data-width="23"></div></div>
+              </div>
+              <div class="progress-bar-wrap" style="margin-top:8px">
+                <div class="progress-label"><span>Database CPU</span><span style="color:var(--green)">41%</span></div>
+                <div class="progress-track"><div class="progress-fill" data-width="41"></div></div>
+              </div>
+              <div class="progress-bar-wrap" style="margin-top:8px">
+                <div class="progress-label"><span>Storage Used</span><span style="color:var(--amber)">67%</span></div>
+                <div class="progress-track"><div class="progress-fill amber" data-width="67"></div></div>
+              </div>
+              <div class="progress-bar-wrap" style="margin-top:8px">
+                <div class="progress-label"><span>Memory</span><span style="color:var(--green)">58%</span></div>
+                <div class="progress-track"><div class="progress-fill" data-width="58"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ ROW 4: TABLES ════════════════════════════════════════ -->
+      <div class="row4">
+
+        <!-- TOP EMPLOYERS -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Top Employers</div>
+              <div class="card-subtitle">By revenue contribution · July 2026</div>
+            </div>
+            <div class="view-all" style="padding:0" role="button" tabindex="0">View all →</div>
+          </div>
+          <table role="table" aria-label="Top employers">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Company</th>
+                <th>Jobs</th>
+                <th>Applicants</th>
+                <th>Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="rank">1</td>
+                <td>
+                  <div class="company-cell">
+                    <div class="company-logo" style="background:#635BFF;color:#fff">S</div>
+                    <span class="bold">Stripe</span>
+                  </div>
+                </td>
+                <td>847</td>
+                <td>24,312</td>
+                <td class="bold" style="color:var(--green)">$42,000</td>
+              </tr>
+              <tr>
+                <td class="rank">2</td>
+                <td>
+                  <div class="company-cell">
+                    <div class="company-logo" style="background:#4285F4;color:#fff">G</div>
+                    <span class="bold">Google</span>
+                  </div>
+                </td>
+                <td>1,204</td>
+                <td>89,741</td>
+                <td class="bold" style="color:var(--green)">$38,500</td>
+              </tr>
+              <tr>
+                <td class="rank">3</td>
+                <td>
+                  <div class="company-cell">
+                    <div class="company-logo" style="background:#1877F2;color:#fff">M</div>
+                    <span class="bold">Meta</span>
+                  </div>
+                </td>
+                <td>692</td>
+                <td>51,290</td>
+                <td class="bold" style="color:var(--green)">$31,200</td>
+              </tr>
+              <tr>
+                <td class="rank">4</td>
+                <td>
+                  <div class="company-cell">
+                    <div class="company-logo" style="background:#FF5A5F;color:#fff">A</div>
+                    <span class="bold">Airbnb</span>
+                  </div>
+                </td>
+                <td>318</td>
+                <td>18,440</td>
+                <td class="bold" style="color:var(--green)">$22,800</td>
+              </tr>
+              <tr>
+                <td class="rank">5</td>
+                <td>
+                  <div class="company-cell">
+                    <div class="company-logo" style="background:#000;color:#fff;border:1px solid var(--border-strong)">N</div>
+                    <span class="bold">Notion</span>
+                  </div>
+                </td>
+                <td>214</td>
+                <td>9,882</td>
+                <td class="bold" style="color:var(--green)">$17,400</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- FRAUD DETECTION -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div>
+              <div class="card-title" style="color:var(--red)">🛡️ Fraud Detection</div>
+              <div class="card-subtitle">AI-flagged suspicious listings · Requires review</div>
+            </div>
+            <span class="activity-badge badge-red" style="font-size:11px;padding:4px 10px">5 Active</span>
+          </div>
+
+          <div id="fraudList">
+
+            <div class="fraud-item" data-id="1">
+              <div style="flex:1;min-width:0">
+                <div class="fraud-title">Work from home earn $5000/day easily!!</div>
+                <div class="fraud-meta">Posted by: anonymous@mail.ru · 2h ago · 0 applicants</div>
+              </div>
+              <span class="risk-badge risk-critical">94%</span>
+              <div class="fraud-actions">
+                <button class="btn-sm remove" onclick="removeFraud(this)">Remove</button>
+                <button class="btn-sm review" onclick="reviewFraud(this)">Review</button>
+              </div>
+            </div>
+
+            <div class="fraud-item" data-id="2">
+              <div style="flex:1;min-width:0">
+                <div class="fraud-title">Make $10K weekly doing NOTHING at home</div>
+                <div class="fraud-meta">Posted by: quickmoney@yandex.com · 4h ago · 0 applicants</div>
+              </div>
+              <span class="risk-badge risk-critical">91%</span>
+              <div class="fraud-actions">
+                <button class="btn-sm remove" onclick="removeFraud(this)">Remove</button>
+                <button class="btn-sm review" onclick="reviewFraud(this)">Review</button>
+              </div>
+            </div>
+
+            <div class="fraud-item" data-id="3">
+              <div style="flex:1;min-width:0">
+                <div class="fraud-title">Crypto trader wanted — $500 upfront deposit req.</div>
+                <div class="fraud-meta">Posted by: cryptojobs44@gmail.com · 6h ago · 3 applicants</div>
+              </div>
+              <span class="risk-badge risk-high">78%</span>
+              <div class="fraud-actions">
+                <button class="btn-sm remove" onclick="removeFraud(this)">Remove</button>
+                <button class="btn-sm review" onclick="reviewFraud(this)">Review</button>
+              </div>
+            </div>
+
+            <div class="fraud-item" data-id="4">
+              <div style="flex:1;min-width:0">
+                <div class="fraud-title">Senior Engineer — Remote — Requires SSN verification</div>
+                <div class="fraud-meta">Posted by: techstaff2026@outlook.com · 9h ago · 7 applicants</div>
+              </div>
+              <span class="risk-badge risk-high">65%</span>
+              <div class="fraud-actions">
+                <button class="btn-sm approve" onclick="approveFraud(this)">Approve</button>
+                <button class="btn-sm review" onclick="reviewFraud(this)">Review</button>
+              </div>
+            </div>
+
+            <div class="fraud-item" data-id="5">
+              <div style="flex:1;min-width:0">
+                <div class="fraud-title">Data Entry Clerk — Pay upfront for training materials</div>
+                <div class="fraud-meta">Posted by: hirenow.biz@proton.me · 12h ago · 2 applicants</div>
+              </div>
+              <span class="risk-badge risk-medium">54%</span>
+              <div class="fraud-actions">
+                <button class="btn-sm approve" onclick="approveFraud(this)">Approve</button>
+                <button class="btn-sm review" onclick="reviewFraud(this)">Review</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Mobile toggle -->
+<button class="mobile-toggle" id="mobileToggle" aria-label="Open navigation">☰</button>
+
+<script>
+// ─── THEME ──────────────────────────────────────────────────────────
+const html = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('talentarc-admin-theme') || 'dark';
+html.setAttribute('data-theme', savedTheme);
+themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+themeToggle.addEventListener('click', () => {
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('talentarc-admin-theme', next);
+  // Update donut center text color
+  updateDonutColors();
+});
+
+// ─── NAV ITEMS ──────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+// ─── MOBILE SIDEBAR ─────────────────────────────────────────────────
+const sidebar = document.getElementById('sidebar');
+const mobileToggle = document.getElementById('mobileToggle');
+mobileToggle.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+});
+
+// ─── INTERSECTION OBSERVER (fade-in) ────────────────────────────────
+const fadeEls = document.querySelectorAll('.fade-in');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+fadeEls.forEach(el => observer.observe(el));
+
+// ─── ANIMATED COUNTERS ───────────────────────────────────────────────
+function animateCounter(el) {
+  const target = parseFloat(el.dataset.target);
+  const divisor = parseFloat(el.dataset.divisor || 1);
+  const decimals = parseInt(el.dataset.decimals || 0);
+  const suffix = el.dataset.suffix || '';
+  const duration = 1800;
+  const start = performance.now();
+
+  function update(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 4);
+    const val = (target / divisor) * eased;
+    el.textContent = val.toFixed(decimals) + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+// Trigger counters when cards are visible
+const counterEls = document.querySelectorAll('.counter');
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateCounter(entry.target);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+counterEls.forEach(el => counterObserver.observe(el));
+
+// ─── PROGRESS BARS ───────────────────────────────────────────────────
+const bars = document.querySelectorAll('.progress-fill[data-width]');
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const w = entry.target.dataset.width;
+      setTimeout(() => { entry.target.style.width = w + '%'; }, 300);
+      barObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+bars.forEach(b => barObserver.observe(b));
+
+// ─── CHART TOOLTIPS ─────────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+const chartContainer = document.querySelector('.chart-container');
+document.querySelectorAll('.chart-dot').forEach(dot => {
+  dot.addEventListener('mouseenter', (e) => {
+    const rect = chartContainer.getBoundingClientRect();
+    const dotRect = dot.getBoundingClientRect();
+    tooltip.textContent = dot.dataset.label;
+    tooltip.classList.add('visible');
+    tooltip.style.left = (dotRect.left - rect.left + 10) + 'px';
+    tooltip.style.top = (dotRect.top - rect.top - 36) + 'px';
+  });
+  dot.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible');
+  });
+});
+
+// ─── DONUT TOOLTIP ──────────────────────────────────────────────────
+document.querySelectorAll('.donut-ring').forEach(ring => {
+  const centerVal = document.getElementById('donutCenterVal');
+  const labels = ['$1.43M', '$462K', '$210K'];
+  const legends = ['68%', '22%', '10%'];
+  const rings = document.querySelectorAll('.donut-ring');
+
+  ring.addEventListener('mouseenter', function() {
+    const idx = [...rings].indexOf(this);
+    centerVal.textContent = labels[idx];
+    centerVal.nextElementSibling.textContent = legends[idx];
+  });
+  ring.addEventListener('mouseleave', function() {
+    centerVal.textContent = '$2.1M';
+    centerVal.nextElementSibling.textContent = 'Total MRR';
+  });
+});
+
+// ─── UPDATE DONUT COLORS FOR THEME ──────────────────────────────────
+function updateDonutColors() {
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const centerVal = document.getElementById('donutCenterVal');
+  if (centerVal) {
+    centerVal.setAttribute('fill', isDark ? '#E2E8F0' : '#0F172A');
+  }
+}
+
+// ─── FRAUD ACTIONS ───────────────────────────────────────────────────
+function removeFraud(btn) {
+  const item = btn.closest('.fraud-item');
+  item.style.transition = 'all 0.35s ease';
+  item.style.opacity = '0';
+  item.style.transform = 'translateX(20px)';
+  item.style.maxHeight = item.offsetHeight + 'px';
+  setTimeout(() => {
+    item.style.maxHeight = '0';
+    item.style.padding = '0';
+    item.style.overflow = 'hidden';
+  }, 200);
+  setTimeout(() => item.remove(), 550);
+  showToast('🗑️ Fraudulent listing removed', 'red');
+}
+
+function reviewFraud(btn) {
+  const item = btn.closest('.fraud-item');
+  const riskBadge = item.querySelector('.risk-badge');
+  riskBadge.textContent = '⏳ Under Review';
+  riskBadge.className = 'risk-badge risk-medium';
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  showToast('🔍 Listing sent to review queue', 'indigo');
+}
+
+function approveFraud(btn) {
+  const item = btn.closest('.fraud-item');
+  item.style.transition = 'all 0.35s ease';
+  item.style.opacity = '0';
+  item.style.transform = 'translateX(-20px)';
+  setTimeout(() => item.remove(), 400);
+  showToast('✅ Listing approved and published', 'green');
+}
+
+// ─── TOAST NOTIFICATIONS ─────────────────────────────────────────────
+function showToast(message, type = 'indigo') {
+  const colors = {
+    red: { bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.3)', text: '#F87171' },
+    green: { bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.3)', text: '#34D399' },
+    indigo: { bg: 'rgba(99,102,241,0.15)', border: 'rgba(99,102,241,0.3)', text: '#A5B4FC' },
+  };
+  const c = colors[type] || colors.indigo;
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:${c.bg}; border:1px solid ${c.border}; color:${c.text};
+    padding:10px 20px; border-radius:12px; font-size:12px; font-weight:600;
+    backdrop-filter:blur(16px); z-index:9999;
+    transition:all 0.3s ease; opacity:0; font-family:Inter,sans-serif;
+    box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(10px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ─── DATE PICKER MOCK ────────────────────────────────────────────────
+document.querySelector('.date-picker').addEventListener('click', () => {
+  const options = ['Last 7 days', 'Last 30 days', 'Last 90 days', 'This year', 'All time'];
+  const current = document.querySelector('.date-picker').textContent.trim().replace('▾','').replace('📅','').trim();
+  const idx = options.indexOf(current);
+  const next = options[(idx + 1) % options.length];
+  document.querySelector('.date-picker').innerHTML = `📅 ${next} <span style="color:var(--text-muted)">▾</span>`;
+});
+
+// ─── EXPORT BUTTON ────────────────────────────────────────────────────
+document.querySelector('.btn-export').addEventListener('click', () => {
+  showToast('📄 Report export started — check your email', 'indigo');
+});
+
+// ─── LIVE FEED SIMULATION ─────────────────────────────────────────────
+const liveEvents = [
+  { icon: '💼', title: 'Job posted', desc: 'New senior role at Figma Inc.', time: 'Just now', badge: 'New', badgeClass: 'badge-green' },
+  { icon: '👤', title: 'User registered', desc: 'New job seeker signed up via LinkedIn', time: 'Just now', badge: 'New', badgeClass: 'badge-indigo' },
+  { icon: '🚩', title: 'Content flagged', desc: '"Get rich quick scheme" auto-flagged by AI', time: 'Just now', badge: 'Flagged', badgeClass: 'badge-red' },
+  { icon: '💰', title: 'Payment received', desc: 'Employer subscription renewed · $299/mo', time: 'Just now', badge: 'Paid', badgeClass: 'badge-green' },
+  { icon: '🔍', title: 'Recruiter joined', desc: 'TechRecruit Ltd. onboarded as premium recruiter', time: 'Just now', badge: 'New', badgeClass: 'badge-blue' },
+];
+let liveIdx = 0;
+
+setInterval(() => {
+  const feed = document.querySelector('.activity-feed');
+  const event = liveEvents[liveIdx % liveEvents.length];
+  liveIdx++;
+
+  const el = document.createElement('div');
+  el.className = 'activity-item';
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(-8px)';
+  el.tabIndex = 0;
+  el.innerHTML = `
+    <div class="activity-icon-wrap" style="background:rgba(99,102,241,0.12)">${event.icon}</div>
+    <div class="activity-body">
+      <div class="activity-title">${event.title}</div>
+      <div class="activity-desc">${event.desc}</div>
+      <div class="activity-time">${event.time}</div>
+    </div>
+    <span class="activity-badge ${event.badgeClass}">${event.badge}</span>
+  `;
+  feed.insertBefore(el, feed.firstChild);
+  requestAnimationFrame(() => {
+    el.style.transition = 'all 0.4s ease';
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  });
+
+  // Remove oldest if too many
+  const items = feed.querySelectorAll('.activity-item');
+  if (items.length > 7) {
+    const last = items[items.length - 1];
+    last.style.transition = 'opacity 0.3s';
+    last.style.opacity = '0';
+    setTimeout(() => last.remove(), 300);
+  }
+}, 8000);
+
+// ─── LUCIDE ICONS ────────────────────────────────────────────────────
+if (typeof lucide !== 'undefined') {
+  lucide.createIcons();
+}
+</script>
+</body>
+</html>

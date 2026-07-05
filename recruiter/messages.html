@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentArc · Recruiter Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    
+:root {
+  --primary: #6366F1;
+  --primary-light: #818CF8;
+  --primary-dark: #4F46E5;
+  --accent: #06B6D4;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --purple: #A855F7;
+  --font: 'Inter', sans-serif;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --sidebar-w: 240px;
+}
+
+[data-theme="dark"] {
+  --bg-base: #0A0A0F;
+  --bg-1: #0F0F17;
+  --bg-2: #13131E;
+  --bg-3: #1A1A28;
+  --bg-4: #1E1E2E;
+  --bg-card: #15151F;
+  --bg-hover: #252535;
+  --text-1: #E2E8F0;
+  --text-2: #94A3B8;
+  --text-3: #64748B;
+  --border: rgba(255,255,255,0.06);
+  --border-2: rgba(255,255,255,0.10);
+  --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  --glow: 0 0 20px rgba(99,102,241,0.15);
+}
+
+[data-theme="light"] {
+  --bg-base: #F0F0F8;
+  --bg-1: #FAFAFA;
+  --bg-2: #FFFFFF;
+  --bg-3: #F5F5FF;
+  --bg-4: #EDEDFA;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F0F0FF;
+  --text-1: #0F172A;
+  --text-2: #475569;
+  --text-3: #94A3B8;
+  --border: rgba(0,0,0,0.08);
+  --border-2: rgba(0,0,0,0.12);
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --glow: 0 0 20px rgba(99,102,241,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg-base);
+  color: var(--text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+ul { list-style: none; }
+
+.app-shell { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0;
+  display: flex; flex-direction: column; background: var(--bg-2); border-right: 1px solid var(--border);
+  z-index: 100; transition: transform var(--transition), background var(--transition); overflow: hidden;
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px; padding: 22px 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-icon {
+  width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), var(--purple));
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.4); flex-shrink: 0;
+}
+.logo-text {
+  font-size: 15px; font-weight: 700; letter-spacing: -0.3px;
+  background: linear-gradient(135deg, var(--primary-light), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.nav-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
+  padding: 12px 10px 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-sm);
+  color: var(--text-2); font-size: 13.5px; font-weight: 500; cursor: pointer;
+  transition: all var(--transition); position: relative; margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--bg-hover); color: var(--text-1); }
+.nav-item.active { background: rgba(99,102,241,0.15); color: var(--primary-light); font-weight: 600; }
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px;
+  background: linear-gradient(180deg, var(--primary), var(--purple)); border-radius: 0 3px 3px 0;
+}
+.nav-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+.nav-label { flex: 1; }
+.nav-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill); line-height: 1.4; }
+.badge-number { background: var(--error); color: #fff; }
+.badge-new { background: linear-gradient(135deg, var(--primary), var(--purple)); color: #fff; font-size: 9px; }
+
+.sidebar-profile {
+  padding: 14px 14px 18px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background var(--transition);
+}
+.sidebar-profile:hover { background: var(--bg-hover); }
+.profile-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--purple));
+  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff;
+  flex-shrink: 0; border: 2px solid rgba(99,102,241,0.4);
+}
+.profile-info { flex: 1; min-width: 0; }
+.profile-name { font-size: 12.5px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-role { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.main-area { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; }
+.top-header {
+  position: sticky; top: 0; z-index: 90; background: rgba(10,10,15,0.75); backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 28px;
+  height: 66px; display: flex; align-items: center; gap: 20px; transition: background var(--transition);
+}
+[data-theme="light"] .top-header { background: rgba(250,250,250,0.85); }
+.header-greeting { flex: 1; }
+.header-greeting h1 { font-size: 16px; font-weight: 700; color: var(--text-1); letter-spacing: -0.2px; }
+.header-greeting p { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center;
+  color: var(--text-2); background: var(--bg-3); border: 1px solid var(--border); cursor: pointer; transition: all var(--transition);
+  position: relative;
+}
+.icon-btn:hover { background: var(--bg-4); color: var(--text-1); border-color: var(--border-2); }
+.notif-dot {
+  position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--error);
+  border-radius: 50%; border: 1.5px solid var(--bg-2);
+}
+
+.page-content { padding: 24px 28px; flex: 1; display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.25s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+.card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px;
+  transition: box-shadow var(--transition), border-color var(--transition), transform var(--transition);
+}
+.card:hover { box-shadow: var(--glow), var(--shadow); border-color: var(--border-2); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-title { font-size: 14.5px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 8px; }
+
+.btn {
+  padding: 10px 18px; border-radius: var(--r-pill); font-size: 13px; font-weight: 600; display: inline-flex;
+  align-items: center; gap: 6px; transition: all var(--transition); cursor: pointer;
+}
+.btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+.btn-secondary { border: 1px solid var(--border); color: var(--text-2); background: var(--bg-3); }
+.btn-secondary:hover { border-color: var(--border-2); color: var(--text-1); background: var(--bg-hover); }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+.form-input {
+  width: 100%; padding: 10px 14px; background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: var(--r-md); color: var(--text-1); font-family: inherit; font-size: 13.5px; outline: none;
+  transition: all var(--transition);
+}
+.form-input:focus { border-color: var(--primary); background: var(--bg-4); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+.form-input-full { grid-column: span 2; }
+
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--r-pill); font-size: 11px; font-weight: 600; }
+.badge-success { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+.badge-warning { background: rgba(245,158,11,0.12); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
+.badge-error { background: rgba(239,68,68,0.12); color: var(--error); border: 1px solid rgba(239,68,68,0.2); }
+
+.skeleton-overlay {
+  position: fixed; inset: 0; background: var(--bg-base); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+.skeleton-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .main-area { margin-left: 0; }
+  .top-header { padding: 0 16px; }
+  .page-content { padding: 16px; }
+  .content-grid { grid-template-columns: 1fr; }
+}
+
+    
+  </style>
+</head>
+<body>
+<div class="skeleton-overlay" id="skeletonOverlay">
+  <div style="text-align:center; color: var(--text-2);">
+    <div style="font-size: 28px; font-weight:700; color:var(--primary-light); margin-bottom:10px;">✦ TalentArc</div>
+    <div style="width: 80px; height: 3px; background:var(--border); border-radius:var(--r-pill); overflow:hidden; margin:0 auto; position:relative;">
+      <div style="width: 40%; height:100%; background:var(--primary); position:absolute; left:0; top:0; animation: shimmer 1.5s infinite linear;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-text">TalentArc</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Recruiter Portal</div>
+      
+          <a href="dashboard.html" class="nav-item" id="nav-dashboard">
+            <i data-lucide="layout-dashboard" class="nav-icon"></i>
+            <span class="nav-label">Dashboard</span>
+            
+          </a>
+    
+          <a href="candidates.html" class="nav-item" id="nav-candidates">
+            <i data-lucide="users" class="nav-icon"></i>
+            <span class="nav-label">Candidates</span>
+            
+          </a>
+    
+          <a href="pipeline.html" class="nav-item" id="nav-pipeline">
+            <i data-lucide="activity" class="nav-icon"></i>
+            <span class="nav-label">Pipeline Analytics</span>
+            
+          </a>
+    
+          <a href="messages.html" class="nav-item active" id="nav-messages">
+            <i data-lucide="message-square" class="nav-icon"></i>
+            <span class="nav-label">Messages</span>
+            
+          </a>
+    
+          <a href="dashboard.html" class="nav-item" id="nav-settings">
+            <i data-lucide="settings" class="nav-icon"></i>
+            <span class="nav-label">Settings</span>
+            
+          </a>
+    
+    </nav>
+    <div class="sidebar-profile">
+      <div class="profile-avatar">AM</div>
+      <div class="profile-info">
+        <div class="profile-name">Alex Morrison</div>
+        <div class="profile-role">Senior Recruiter</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <header class="top-header">
+      <div class="header-greeting">
+        <h1>Recruiter Chat</h1>
+        <p>Premium platform workspace · Role: Recruiter</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle Theme">
+          <i data-lucide="sun" id="themeIcon" style="width: 18px; height: 18px;"></i>
+        </button>
+        <button class="icon-btn" aria-label="Notifications">
+          <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="header-avatar">AM</div>
+      </div>
+    </header>
+
+    <main class="page-content">
+      
+<div style="display:grid; grid-template-columns: 280px 1fr; gap:20px; height:500px;">
+  <div class="card" style="padding:12px;">
+    <h3>Direct Messages</h3>
+    <div style="background:var(--bg-3); padding:10px; border-radius:var(--r-md); margin-top:10px; cursor:pointer;">
+      <strong>James Liu</strong>
+      <p style="font-size:12px; color:var(--text-3);">Interview scheduled confirm...</p>
+    </div>
+  </div>
+  <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+    <div><strong>James Liu</strong> · Staff SWE candidate</div>
+    <div style="display:flex; gap:10px;"><input type="text" class="form-input" placeholder="Type reply..." /><button class="btn btn-primary">Send</button></div>
+  </div>
+</div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+  window.addEventListener('load', () => {
+    setTimeout(() => { document.getElementById('skeletonOverlay').classList.add('hide'); }, 300);
+  });
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  const htmlEl = document.documentElement;
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  htmlEl.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = htmlEl.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    htmlEl.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+  });
+  function updateThemeIcon(theme) {
+    if (theme === 'dark') { themeIcon.setAttribute('data-lucide', 'sun'); }
+    else { themeIcon.setAttribute('data-lucide', 'moon'); }
+    lucide.createIcons();
+  }
+  
+</script>
+</body>
+</html>

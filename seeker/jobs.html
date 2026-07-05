@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentArc – Job Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    /* ─── CSS Custom Properties ────────────────────────────────── */
+    :root {
+      --primary: #6366F1;
+      --primary-light: #818CF8;
+      --primary-dark: #4F46E5;
+      --primary-glow: rgba(99,102,241,0.18);
+      --accent: #06B6D4;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+
+      --font: 'Inter', sans-serif;
+      --radius-sm: 6px;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --radius-full: 999px;
+
+      --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+      --transition-fast: 0.14s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    [data-theme="dark"] {
+      --bg-base:    #0A0A0F;
+      --bg-2:       #0F0F17;
+      --bg-3:       #13131E;
+      --bg-4:       #1A1A28;
+      --bg-5:       #1E1E2E;
+      --bg-hover:   #222236;
+      --bg-card:    #14141F;
+      --bg-elevated:#1C1C2E;
+      --border:     rgba(255,255,255,0.06);
+      --border-md:  rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.16);
+      --text-1:     #E2E8F0;
+      --text-2:     #94A3B8;
+      --text-3:     #64748B;
+      --text-inv:   #0F172A;
+      --shadow:     0 4px 24px rgba(0,0,0,0.5);
+      --shadow-lg:  0 8px 40px rgba(0,0,0,0.6);
+      --glass:      rgba(15,15,23,0.8);
+      --scrollbar-thumb: rgba(255,255,255,0.12);
+    }
+    [data-theme="light"] {
+      --bg-base:    #F0F0F8;
+      --bg-2:       #F7F7FC;
+      --bg-3:       #FFFFFF;
+      --bg-4:       #FAFAFA;
+      --bg-5:       #FFFFFF;
+      --bg-hover:   #F0F0F8;
+      --bg-card:    #FFFFFF;
+      --bg-elevated:#FFFFFF;
+      --border:     rgba(0,0,0,0.07);
+      --border-md:  rgba(0,0,0,0.10);
+      --border-strong: rgba(0,0,0,0.16);
+      --text-1:     #0F172A;
+      --text-2:     #475569;
+      --text-3:     #94A3B8;
+      --text-inv:   #E2E8F0;
+      --shadow:     0 4px 24px rgba(0,0,0,0.09);
+      --shadow-lg:  0 8px 40px rgba(0,0,0,0.13);
+      --glass:      rgba(255,255,255,0.88);
+      --scrollbar-thumb: rgba(0,0,0,0.12);
+    }
+
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: var(--font);
+      background: var(--bg-base);
+      color: var(--text-1);
+      font-size: 14px;
+      line-height: 1.5;
+      transition: background var(--transition), color var(--transition);
+    }
+    button { cursor: pointer; border: none; background: none; font-family: var(--font); }
+    input, select { font-family: var(--font); }
+    a { text-decoration: none; color: inherit; }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+    /* ─── App Shell ─────────────────────────────────────────────── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ─── TOP NAV / SEARCH BAR ──────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      flex-shrink: 0;
+      min-height: 62px;
+    }
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      margin-right: 4px;
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 12px rgba(99,102,241,0.4);
+    }
+    .logo-name {
+      font-size: 16px; font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-light), #A5B4FC);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+    }
+    .hamburger-btn {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--text-2);
+      transition: background var(--transition-fast), color var(--transition-fast);
+      flex-shrink: 0;
+    }
+    .hamburger-btn:hover { background: var(--bg-hover); color: var(--text-1); }
+
+    .search-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+    .search-input-wrap .si-icon {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      display: flex; align-items: center;
+    }
+    .search-input-wrap input {
+      width: 100%;
+      height: 38px;
+      background: var(--bg-4);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      padding: 0 12px 0 34px;
+      color: var(--text-1);
+      font-size: 13.5px;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+      outline: none;
+    }
+    .search-input-wrap input::placeholder { color: var(--text-3); }
+    .search-input-wrap input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+      background: var(--bg-3);
+    }
+    .divider-v {
+      width: 1px; height: 22px;
+      background: var(--border-md);
+      flex-shrink: 0;
+    }
+    .search-btn {
+      height: 38px;
+      padding: 0 20px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      border-radius: var(--radius);
+      font-size: 13.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+      box-shadow: 0 2px 12px rgba(99,102,241,0.35);
+    }
+    .search-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 18px rgba(99,102,241,0.45); }
+    .search-btn:active { transform: translateY(0); }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .sort-select {
+      height: 36px;
+      background: var(--bg-4);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      padding: 0 10px;
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+      transition: border-color var(--transition-fast);
+    }
+    .sort-select:focus { border-color: var(--primary); }
+    .view-toggle {
+      display: flex;
+      align-items: center;
+      background: var(--bg-4);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      overflow: hidden;
+      height: 36px;
+    }
+    .view-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-3);
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .view-btn.active { background: var(--primary); color: #fff; }
+    .view-btn:hover:not(.active) { background: var(--bg-hover); color: var(--text-1); }
+
+    .theme-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-4);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      color: var(--text-2);
+      transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    }
+    .theme-btn:hover { background: var(--bg-hover); color: var(--text-1); transform: rotate(20deg); }
+
+    .avatar-btn {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #7C3AED, #6366F1);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .avatar-btn:hover { transform: scale(1.06); box-shadow: 0 2px 12px rgba(99,102,241,0.4); }
+
+    /* ─── 3-PANEL LAYOUT ──────────────────────────────────────── */
+    .panels {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* ─── PANEL 1 – FILTERS ───────────────────────────────────── */
+    .panel-filters {
+      width: 248px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-2);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .panel-filters-inner {
+      padding: 18px 16px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .filters-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .filters-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.01em;
+    }
+    .clear-all-btn {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--primary-light);
+      transition: opacity var(--transition-fast);
+    }
+    .clear-all-btn:hover { opacity: 0.75; }
+
+    .filter-section {
+      border-top: 1px solid var(--border);
+      padding: 14px 0;
+    }
+    .filter-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .filter-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-3);
+    }
+    .filter-chevron {
+      color: var(--text-3);
+      transition: transform var(--transition-fast);
+    }
+    .filter-section.collapsed .filter-chevron { transform: rotate(-90deg); }
+    .filter-section.collapsed .filter-options { display: none; }
+
+    .filter-options {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 5px 6px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .filter-option:hover { background: var(--bg-hover); }
+    .filter-option input[type="checkbox"] {
+      width: 15px; height: 15px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+      border-radius: 4px;
+    }
+    .filter-option-label {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-2);
+      font-weight: 400;
+      transition: color var(--transition-fast);
+    }
+    .filter-option:has(input:checked) .filter-option-label {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+    .filter-count {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    /* Salary Slider */
+    .salary-section { padding-bottom: 4px; }
+    .salary-display {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .salary-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-light);
+      background: var(--primary-glow);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(99,102,241,0.2);
+    }
+    .salary-slider-wrap {
+      position: relative;
+      height: 20px;
+      display: flex;
+      align-items: center;
+    }
+    .salary-track {
+      position: absolute;
+      left: 0; right: 0;
+      height: 4px;
+      background: var(--border-strong);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .salary-fill {
+      position: absolute;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 99px;
+    }
+    .salary-range {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      height: 20px;
+      position: absolute;
+      pointer-events: none;
+      outline: none;
+    }
+    .salary-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 17px; height: 17px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2.5px solid var(--bg-3);
+      cursor: pointer;
+      pointer-events: all;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.4);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .salary-range::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 3px 14px rgba(99,102,241,0.5);
+    }
+    .salary-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    .salary-labels span {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* Quick Filters */
+    .quick-filter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      cursor: pointer;
+    }
+    .quick-filter-label {
+      font-size: 13px;
+      color: var(--text-2);
+      font-weight: 400;
+    }
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border-strong);
+      border-radius: 99px;
+      transition: background var(--transition);
+      cursor: pointer;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      left: 3px; top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform var(--transition);
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+    .apply-filters-btn {
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      border-radius: var(--radius);
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-top: 18px;
+      transition: opacity var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+      box-shadow: 0 2px 12px rgba(99,102,241,0.3);
+    }
+    .apply-filters-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 18px rgba(99,102,241,0.45); }
+    .apply-filters-btn:active { transform: scale(0.98); }
+
+    /* ─── PANEL 2 – JOB LIST ──────────────────────────────────── */
+    .panel-list {
+      width: 390px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-3);
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .panel-list-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .list-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .results-count {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+    .ai-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(16,185,129,0.12);
+      color: var(--success);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: var(--radius-full);
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .filter-chip {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--primary-glow);
+      color: var(--primary-light);
+      border: 1px solid rgba(99,102,241,0.22);
+      border-radius: var(--radius-full);
+      padding: 3px 9px;
+      font-size: 11.5px;
+      font-weight: 500;
+      transition: background var(--transition-fast), transform var(--transition-fast);
+      cursor: pointer;
+    }
+    .filter-chip:hover { background: rgba(99,102,241,0.22); transform: scale(0.97); }
+    .filter-chip .chip-x {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      background: rgba(99,102,241,0.2);
+      color: var(--primary-light);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .panel-list-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 10px;
+    }
+
+    /* Job Card */
+    .job-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 14px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition), background var(--transition);
+      border-left: 3px solid transparent;
+    }
+    .job-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+    .job-card.selected {
+      border-left: 3px solid var(--primary);
+      background: rgba(99,102,241,0.06);
+      border-color: rgba(99,102,241,0.22);
+      box-shadow: 0 0 0 1px rgba(99,102,241,0.1), var(--shadow);
+    }
+    .job-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      margin-bottom: 10px;
+    }
+    .company-logo {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      letter-spacing: -0.03em;
+    }
+    .job-card-info { flex: 1; min-width: 0; }
+    .job-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+      line-height: 1.3;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .company-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .company-name {
+      font-size: 12.5px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(6,182,212,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(6,182,212,0.2);
+      border-radius: var(--radius-full);
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .job-location {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 2px;
+      display: flex; align-items: center; gap: 3px;
+    }
+    .bookmark-btn {
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--text-3);
+      flex-shrink: 0;
+      transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    }
+    .bookmark-btn:hover { background: var(--bg-hover); color: var(--primary-light); transform: scale(1.1); }
+    .bookmark-btn.bookmarked { color: var(--primary-light); }
+
+    .job-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 9px;
+    }
+    .tag {
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      border-radius: var(--radius-full);
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .tag:hover { background: var(--primary-glow); color: var(--primary-light); border-color: rgba(99,102,241,0.2); }
+    .tag.mode-tag {
+      background: rgba(16,185,129,0.08);
+      color: var(--success);
+      border-color: rgba(16,185,129,0.18);
+    }
+    .tag.type-tag {
+      background: rgba(245,158,11,0.08);
+      color: var(--warning);
+      border-color: rgba(245,158,11,0.18);
+    }
+    .tag.easy-tag {
+      background: rgba(99,102,241,0.1);
+      color: var(--primary-light);
+      border-color: rgba(99,102,241,0.2);
+    }
+
+    .job-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .salary-range-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+    .time-ago {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* ─── PANEL 3 – JOB DETAIL ───────────────────────────────── */
+    .panel-detail {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-base);
+      overflow: hidden;
+    }
+    .panel-detail-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px 60px;
+    }
+
+    /* Detail Header */
+    .detail-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .detail-company-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .detail-logo {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .detail-company-info {}
+    .detail-company-name-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 2px;
+    }
+    .detail-company-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+    .detail-location {
+      font-size: 13px;
+      color: var(--text-3);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .detail-actions-top {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-4);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      color: var(--text-2);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    }
+    .icon-btn:hover { background: var(--bg-hover); color: var(--text-1); transform: scale(1.06); }
+
+    .detail-job-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-1);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--text-1) 60%, var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .detail-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    /* Salary + Match + Apply row */
+    .detail-action-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .detail-salary-block {}
+    .detail-salary-amount {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-1);
+      letter-spacing: -0.03em;
+    }
+    .detail-salary-sub {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+    .match-score-circle {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: conic-gradient(var(--success) 0% 96%, var(--border-strong) 96% 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .match-score-inner {
+      width: 44px; height: 44px;
+      background: var(--bg-base);
+      border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .match-score-num {
+      font-size: 14px; font-weight: 800;
+      color: var(--success);
+      line-height: 1;
+    }
+    .match-score-label {
+      font-size: 8px;
+      color: var(--text-3);
+      font-weight: 500;
+      line-height: 1;
+    }
+    .match-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .match-block > span {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+    .apply-btn-lg {
+      height: 44px;
+      padding: 0 28px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      border-radius: var(--radius);
+      font-size: 14.5px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      transition: opacity var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+      box-shadow: 0 3px 16px rgba(99,102,241,0.4);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .apply-btn-lg:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 6px 22px rgba(99,102,241,0.5); }
+    .apply-btn-lg:active { transform: scale(0.98); }
+
+    /* Recruiter Card */
+    .recruiter-card {
+      background: var(--bg-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .recruiter-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7C3AED, #6366F1);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .recruiter-info { flex: 1; }
+    .recruiter-name { font-size: 13.5px; font-weight: 600; color: var(--text-1); }
+    .recruiter-role { font-size: 12px; color: var(--text-3); }
+    .message-btn {
+      height: 32px;
+      padding: 0 14px;
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      background: var(--bg-3);
+      color: var(--text-2);
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+      font-family: var(--font);
+    }
+    .message-btn:hover { background: var(--primary-glow); color: var(--primary-light); border-color: rgba(99,102,241,0.3); }
+
+    /* Tabs */
+    .detail-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 22px;
+      gap: 0;
+    }
+    .detail-tab {
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-3);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+    .detail-tab.active {
+      color: var(--primary-light);
+      border-bottom-color: var(--primary);
+      font-weight: 600;
+    }
+    .detail-tab:hover:not(.active) { color: var(--text-2); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Section */
+    .detail-section { margin-bottom: 24px; }
+    .detail-section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .detail-paragraph {
+      font-size: 13.5px;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+    .detail-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .detail-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13.5px;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
+    .detail-list li .li-icon {
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+    .detail-list li .li-icon.check { color: var(--success); }
+    .detail-list li .li-icon.bullet { color: var(--primary-light); }
+
+    /* Benefits pills */
+    .benefits-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .benefit-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 5px 12px;
+      font-size: 12.5px;
+      color: var(--text-2);
+      font-weight: 500;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .benefit-pill:hover { background: var(--primary-glow); color: var(--primary-light); border-color: rgba(99,102,241,0.2); }
+
+    /* Company info card */
+    .company-card {
+      background: var(--bg-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .company-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .company-card-logo {
+      width: 44px; height: 44px;
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .company-card-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+    .company-card-meta {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+    .company-card-desc {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+    .company-ratings {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .rating-box {
+      flex: 1;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      text-align: center;
+    }
+    .rating-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-1);
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+    .rating-num .rating-max {
+      font-size: 12px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+    .rating-label {
+      font-size: 10.5px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    /* Similar Jobs */
+    .similar-jobs { margin-top: 8px; }
+    .mini-job-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 13px;
+      background: var(--bg-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 7px;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    }
+    .mini-job-card:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-md);
+      transform: translateX(3px);
+    }
+    .mini-logo {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .mini-info { flex: 1; min-width: 0; }
+    .mini-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-1);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .mini-company {
+      font-size: 11.5px;
+      color: var(--text-3);
+    }
+    .mini-salary {
+      font-size: 12px; font-weight: 700;
+      color: var(--text-2);
+      white-space: nowrap;
+    }
+
+    /* ─── MODAL ──────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      width: 480px;
+      max-width: 95vw;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(16px) scale(0.97);
+      transition: transform var(--transition);
+    }
+    .modal-overlay.open .modal {
+      transform: translateY(0) scale(1);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; color: var(--text-1); letter-spacing: -0.02em; }
+    .modal-close {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--text-3);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .modal-close:hover { background: var(--bg-hover); color: var(--text-1); }
+    .modal-company {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+    .modal-form { display: flex; flex-direction: column; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+    .form-input {
+      height: 40px;
+      background: var(--bg-4);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      padding: 0 13px;
+      color: var(--text-1);
+      font-size: 13.5px;
+      font-family: var(--font);
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .form-textarea {
+      min-height: 90px;
+      resize: vertical;
+      padding: 10px 13px;
+      font-family: var(--font);
+      font-size: 13.5px;
+    }
+    .upload-area {
+      border: 2px dashed var(--border-md);
+      border-radius: var(--radius);
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+    .upload-area:hover { border-color: var(--primary); background: var(--primary-glow); }
+    .upload-area p { font-size: 13px; color: var(--text-3); margin-top: 6px; }
+    .upload-area strong { color: var(--primary-light); }
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: flex-end;
+    }
+    .btn-ghost {
+      height: 40px;
+      padding: 0 18px;
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      background: var(--bg-4);
+      color: var(--text-2);
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .btn-ghost:hover { background: var(--bg-hover); color: var(--text-1); }
+    .btn-primary {
+      height: 40px;
+      padding: 0 22px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      border-radius: var(--radius);
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      border: none;
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+      box-shadow: 0 2px 12px rgba(99,102,241,0.3);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-lg);
+      z-index: 2000;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform var(--transition), opacity var(--transition);
+      max-width: 340px;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast-icon { color: var(--success); flex-shrink: 0; }
+    .toast-msg { font-size: 13.5px; color: var(--text-1); font-weight: 500; }
+
+    /* Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-4) 25%, var(--bg-hover) 50%, var(--bg-4) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Responsive hint */
+    @media (max-width: 768px) {
+      .panel-filters { display: none; }
+      .panel-list { width: 100%; }
+      .panel-detail { display: none; }
+    }
+
+    /* Scrollbar utility */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Utility */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .mt-1 { margin-top: 4px; }
+    .text-muted { color: var(--text-3); }
+    .fw-600 { font-weight: 600; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════════ TOP SEARCH BAR ══════════════ -->
+  <header class="topbar" role="banner">
+    <!-- Logo -->
+    <div class="topbar-logo">
+      <div class="logo-icon" aria-hidden="true">✦</div>
+      <span class="logo-name">TalentArc</span>
+    </div>
+    <button class="hamburger-btn" aria-label="Open menu">
+      <i data-lucide="menu" width="18" height="18"></i>
+    </button>
+
+    <!-- Search Inputs -->
+    <div class="search-group" role="search">
+      <div class="search-input-wrap">
+        <span class="si-icon"><i data-lucide="search" width="15" height="15"></i></span>
+        <input type="text" value="Software Engineer" placeholder="Job title, keywords..." aria-label="Search keywords" id="search-keyword" />
+      </div>
+      <div class="divider-v" aria-hidden="true"></div>
+      <div class="search-input-wrap" style="max-width:200px;">
+        <span class="si-icon"><i data-lucide="map-pin" width="15" height="15"></i></span>
+        <input type="text" value="Remote" placeholder="Location" aria-label="Location" id="search-location" />
+      </div>
+      <button class="search-btn" aria-label="Search jobs">
+        <i data-lucide="search" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:5px;"></i>
+        Search
+      </button>
+    </div>
+
+    <!-- Controls -->
+    <div class="topbar-controls">
+      <select class="sort-select" aria-label="Sort order" id="sort-select">
+        <option>Sort: Relevance</option>
+        <option>Sort: Date</option>
+        <option>Sort: Salary</option>
+        <option>Sort: Match Score</option>
+      </select>
+      <div class="view-toggle" role="group" aria-label="View mode">
+        <button class="view-btn active" id="list-view-btn" aria-label="List view" aria-pressed="true">
+          <i data-lucide="list" width="15" height="15"></i>
+        </button>
+        <button class="view-btn" id="grid-view-btn" aria-label="Grid view" aria-pressed="false">
+          <i data-lucide="layout-grid" width="15" height="15"></i>
+        </button>
+      </div>
+      <button class="theme-btn" id="theme-toggle" aria-label="Toggle theme">
+        <i data-lucide="sun" width="16" height="16" id="theme-icon"></i>
+      </button>
+      <div class="avatar-btn" role="button" aria-label="User profile" tabindex="0">PR</div>
+    </div>
+  </header>
+
+  <!-- ══════════════ PANELS ══════════════ -->
+  <main class="panels" role="main">
+
+    <!-- ──────── PANEL 1 – FILTERS ──────── -->
+    <aside class="panel-filters" aria-label="Job filters">
+      <div class="panel-filters-inner">
+        <div class="filters-header">
+          <span class="filters-title">Filters</span>
+          <button class="clear-all-btn" id="clear-filters-btn" aria-label="Clear all filters">Clear all</button>
+        </div>
+
+        <!-- Job Type -->
+        <div class="filter-section" id="section-jobtype">
+          <div class="filter-section-header" onclick="toggleSection('section-jobtype')">
+            <span class="filter-section-title">Job Type</span>
+            <span class="filter-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+          </div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" checked data-filter="jobtype" value="full-time" onchange="updateCounts()" />
+              <span class="filter-option-label">Full-time</span>
+              <span class="filter-count">12.4K</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="jobtype" value="part-time" onchange="updateCounts()" />
+              <span class="filter-option-label">Part-time</span>
+              <span class="filter-count">3.2K</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="jobtype" value="contract" onchange="updateCounts()" />
+              <span class="filter-option-label">Contract</span>
+              <span class="filter-count">9.8K</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="jobtype" value="internship" onchange="updateCounts()" />
+              <span class="filter-option-label">Internship</span>
+              <span class="filter-count">1.9K</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="jobtype" value="freelance" onchange="updateCounts()" />
+              <span class="filter-option-label">Freelance</span>
+              <span class="filter-count">4.1K</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Work Mode -->
+        <div class="filter-section" id="section-workmode">
+          <div class="filter-section-header" onclick="toggleSection('section-workmode')">
+            <span class="filter-section-title">Work Mode</span>
+            <span class="filter-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+          </div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" checked data-filter="workmode" value="remote" onchange="updateCounts()" />
+              <span class="filter-option-label">Remote</span>
+              <span class="filter-count">47K</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" checked data-filter="workmode" value="hybrid" onchange="updateCounts()" />
+              <span class="filter-option-label">Hybrid</span>
+              <span class="filter-count">25K</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="workmode" value="onsite" onchange="updateCounts()" />
+              <span class="filter-option-label">On-site</span>
+              <span class="filter-count">19K</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Experience Level -->
+        <div class="filter-section" id="section-exp">
+          <div class="filter-section-header" onclick="toggleSection('section-exp')">
+            <span class="filter-section-title">Experience Level</span>
+            <span class="filter-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+          </div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" data-filter="exp" value="entry" onchange="updateCounts()" />
+              <span class="filter-option-label">Entry Level</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="exp" value="mid" onchange="updateCounts()" />
+              <span class="filter-option-label">Mid Level</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" checked data-filter="exp" value="senior" onchange="updateCounts()" />
+              <span class="filter-option-label">Senior</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="exp" value="lead" onchange="updateCounts()" />
+              <span class="filter-option-label">Lead / Staff</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="exp" value="exec" onchange="updateCounts()" />
+              <span class="filter-option-label">Executive</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Salary Range -->
+        <div class="filter-section salary-section" id="section-salary">
+          <div class="filter-section-header" onclick="toggleSection('section-salary')">
+            <span class="filter-section-title">Salary Range</span>
+            <span class="filter-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+          </div>
+          <div class="salary-display">
+            <span class="salary-val" id="salary-min-label">$120K</span>
+            <span class="salary-val" id="salary-max-label">$220K</span>
+          </div>
+          <div class="salary-slider-wrap">
+            <div class="salary-track">
+              <div class="salary-fill" id="salary-fill"></div>
+            </div>
+            <input type="range" class="salary-range" id="salary-min" min="40" max="400" value="120" oninput="updateSalarySlider()" aria-label="Minimum salary" />
+            <input type="range" class="salary-range" id="salary-max" min="40" max="400" value="220" oninput="updateSalarySlider()" aria-label="Maximum salary" />
+          </div>
+          <div class="salary-labels">
+            <span>$40K</span>
+            <span>$400K+</span>
+          </div>
+        </div>
+
+        <!-- Industry -->
+        <div class="filter-section" id="section-industry">
+          <div class="filter-section-header" onclick="toggleSection('section-industry')">
+            <span class="filter-section-title">Industry</span>
+            <span class="filter-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+          </div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" checked data-filter="industry" value="tech" onchange="updateCounts()" />
+              <span class="filter-option-label">Technology</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="industry" value="finance" onchange="updateCounts()" />
+              <span class="filter-option-label">Finance</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="industry" value="healthcare" onchange="updateCounts()" />
+              <span class="filter-option-label">Healthcare</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="industry" value="design" onchange="updateCounts()" />
+              <span class="filter-option-label">Design</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="industry" value="marketing" onchange="updateCounts()" />
+              <span class="filter-option-label">Marketing</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-filter="industry" value="education" onchange="updateCounts()" />
+              <span class="filter-option-label">Education</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Quick Filters -->
+        <div class="filter-section" id="section-quick">
+          <div class="filter-section-header" onclick="toggleSection('section-quick')">
+            <span class="filter-section-title">Quick Filters</span>
+            <span class="filter-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+          </div>
+          <div style="padding-bottom:4px;">
+            <div class="quick-filter">
+              <span class="quick-filter-label">Easy Apply</span>
+              <label class="toggle-switch" aria-label="Easy Apply only">
+                <input type="checkbox" checked id="toggle-easy" onchange="updateCounts()" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="quick-filter">
+              <span class="quick-filter-label">Verified Companies Only</span>
+              <label class="toggle-switch" aria-label="Verified companies only">
+                <input type="checkbox" id="toggle-verified" onchange="updateCounts()" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="quick-filter">
+              <span class="quick-filter-label">Visa Sponsorship</span>
+              <label class="toggle-switch" aria-label="Visa sponsorship available">
+                <input type="checkbox" id="toggle-visa" onchange="updateCounts()" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button class="apply-filters-btn" onclick="applyFilters()">
+          Apply Filters
+        </button>
+      </div>
+    </aside>
+
+    <!-- ──────── PANEL 2 – JOB LIST ──────── -->
+    <section class="panel-list" aria-label="Job listings">
+      <div class="panel-list-header">
+        <div class="list-meta">
+          <span class="results-count" id="results-count">12,483 results</span>
+          <span class="ai-badge">
+            <i data-lucide="sparkles" width="11" height="11"></i>
+            AI Sorted
+          </span>
+        </div>
+        <div class="chip-row" id="chip-row">
+          <button class="filter-chip" onclick="removeChip(this, 'full-time')">Full-time <span class="chip-x">×</span></button>
+          <button class="filter-chip" onclick="removeChip(this, 'remote')">Remote <span class="chip-x">×</span></button>
+          <button class="filter-chip" onclick="removeChip(this, 'hybrid')">Hybrid <span class="chip-x">×</span></button>
+          <button class="filter-chip" onclick="removeChip(this, 'salary')">$120K–$220K <span class="chip-x">×</span></button>
+          <button class="filter-chip" onclick="removeChip(this, 'senior')">Senior <span class="chip-x">×</span></button>
+        </div>
+      </div>
+      <div class="panel-list-scroll" id="job-list" role="listbox" aria-label="Job cards">
+        <!-- Cards injected by JS -->
+      </div>
+    </section>
+
+    <!-- ──────── PANEL 3 – JOB DETAIL ──────── -->
+    <section class="panel-detail" aria-label="Job details" id="job-detail-panel">
+      <div class="panel-detail-scroll" id="detail-scroll">
+        <!-- Content injected by JS -->
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ══════════════ APPLY MODAL ══════════════ -->
+<div class="modal-overlay" id="apply-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">Easy Apply</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close modal">
+        <i data-lucide="x" width="18" height="18"></i>
+      </button>
+    </div>
+    <div class="modal-company">
+      <div class="company-logo" style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#635bff,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;">ST</div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--text-1);">Senior Software Engineer</div>
+        <div style="font-size:12px;color:var(--text-3);">Stripe · San Francisco, CA · $180K – $240K</div>
+      </div>
+    </div>
+    <form class="modal-form" onsubmit="submitApplication(event)">
+      <div class="form-group">
+        <label class="form-label" for="full-name">Full Name</label>
+        <input class="form-input" type="text" id="full-name" placeholder="Prana Reddy" value="Prana Reddy" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" placeholder="prana@email.com" value="prana@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone</label>
+        <input class="form-input" type="tel" id="phone" placeholder="+1 (555) 000-0000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Resume</label>
+        <div class="upload-area" onclick="document.getElementById('resume-input').click()" role="button" tabindex="0" aria-label="Upload resume">
+          <i data-lucide="upload-cloud" width="28" height="28" style="color:var(--text-3);margin:0 auto;display:block;"></i>
+          <p><strong>Click to upload</strong> or drag and drop</p>
+          <p style="font-size:11px;margin-top:2px;">PDF, DOC up to 10MB</p>
+          <input type="file" id="resume-input" style="display:none;" accept=".pdf,.doc,.docx" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cover-letter">Cover Letter <span style="color:var(--text-3);font-weight:400;">(optional)</span></label>
+        <textarea class="form-input form-textarea" id="cover-letter" placeholder="Briefly describe why you're excited about this role..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-primary">Submit Application →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast" role="alert" aria-live="polite">
+  <span class="toast-icon"><i data-lucide="check-circle" width="20" height="20"></i></span>
+  <span class="toast-msg" id="toast-msg">Application submitted!</span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════
+const JOBS = [
+  {
+    id: 1,
+    title: 'Senior Software Engineer',
+    company: 'Stripe',
+    verified: true,
+    location: 'San Francisco, CA',
+    type: 'Full-time',
+    mode: 'Remote',
+    easyApply: true,
+    salary: '$180K – $240K',
+    salaryNum: '180–240',
+    tags: ['React', 'TypeScript', 'Node.js'],
+    time: '2d ago',
+    logoColor: 'linear-gradient(135deg,#635bff,#a78bfa)',
+    logoText: 'ST',
+    matchScore: 96,
+    recruiterName: 'Alex Morrison',
+    recruiterTitle: 'Senior Recruiter at Stripe',
+    recruiterInitials: 'AM',
+    about: `Stripe is building the infrastructure for the global internet economy. As a Senior Software Engineer on our Platform team, you'll architect and build mission-critical systems that process hundreds of billions of dollars in payments annually. You'll work alongside world-class engineers to solve complex distributed systems challenges at massive scale.`,
+    responsibilities: [
+      'Design and build highly-available distributed services handling millions of requests per second',
+      'Lead technical design reviews and contribute to architectural decisions across the platform',
+      'Mentor junior engineers and establish engineering best practices',
+      'Drive the technical roadmap for our core payment infrastructure',
+      'Collaborate with product, design, and data science to deliver exceptional developer experiences',
+    ],
+    requirements: [
+      '6+ years of professional software engineering experience',
+      'Strong expertise in React, TypeScript, and modern Node.js',
+      'Experience with distributed systems and high-availability architectures',
+      'Track record of leading complex projects from inception to production',
+      'Exceptional communication skills and collaborative mindset',
+    ],
+    benefits: ['Health / Dental / Vision', 'Unlimited PTO', '$10K Learning Budget', 'Equity Package', 'Remote Flexible', '401K Match', 'Home Office Stipend'],
+    companyDesc: 'Stripe is the world\'s leading online payment processing platform, powering businesses of all sizes—from startups to Fortune 500s—with seamless, secure payment infrastructure.',
+    companyMeta: 'FinTech · 5,000–10,000 employees · San Francisco',
+    cultureRating: '4.5',
+    wlbRating: '4.8',
+    openRoles: 48,
+  },
+  {
+    id: 2,
+    title: 'Staff Engineer',
+    company: 'Vercel',
+    verified: false,
+    location: 'Remote',
+    type: 'Full-time',
+    mode: 'Remote',
+    easyApply: false,
+    salary: '$200K – $260K',
+    salaryNum: '200–260',
+    tags: ['Rust', 'Go', 'Kubernetes'],
+    time: '1d ago',
+    logoColor: 'linear-gradient(135deg,#1a1a2e,#4a4a6a)',
+    logoText: 'VC',
+    matchScore: 91,
+    recruiterName: 'Sarah Chen',
+    recruiterTitle: 'Head of Talent at Vercel',
+    recruiterInitials: 'SC',
+    about: `Vercel is the platform for frontend developers, providing the speed and reliability innovators need to create at the moment of inspiration. As a Staff Engineer, you'll be at the forefront of our edge computing infrastructure, building systems that serve millions of deployments globally.`,
+    responsibilities: [
+      'Architect edge computing infrastructure deployed across 100+ global regions',
+      'Lead cross-functional initiatives to improve platform reliability and performance',
+      'Drive technical strategy for Vercel\'s next-generation deployment pipeline',
+      'Collaborate with OSS communities and contribute to open-source projects',
+      'Define and implement observability and reliability standards',
+    ],
+    requirements: [
+      '8+ years of software engineering with 2+ years at Staff level',
+      'Deep expertise in Rust, Go, and Kubernetes',
+      'Experience building and operating large-scale distributed systems',
+      'Strong understanding of networking, CDN, and edge computing',
+      'Passion for developer experience and open-source software',
+    ],
+    benefits: ['Comprehensive Health Coverage', 'Unlimited PTO', 'Remote-First', 'Stock Options', 'Learning Stipend', '401K', 'Home Office Setup'],
+    companyDesc: 'Vercel enables teams to ship better software faster. Their platform provides developer-first infrastructure powering millions of websites and applications worldwide.',
+    companyMeta: 'Infrastructure · 500–1,000 employees · Remote',
+    cultureRating: '4.7',
+    wlbRating: '4.9',
+    openRoles: 23,
+  },
+  {
+    id: 3,
+    title: 'Principal Engineer',
+    company: 'Linear',
+    verified: false,
+    location: 'Remote',
+    type: 'Full-time',
+    mode: 'Remote',
+    easyApply: false,
+    salary: '$190K – $250K',
+    salaryNum: '190–250',
+    tags: ['TypeScript', 'PostgreSQL', 'GraphQL'],
+    time: '3d ago',
+    logoColor: 'linear-gradient(135deg,#5e6ad2,#8b97f4)',
+    logoText: 'LN',
+    matchScore: 89,
+    recruiterName: 'Mikael Lind',
+    recruiterTitle: 'Engineering Lead at Linear',
+    recruiterInitials: 'ML',
+    about: `Linear is building the tools that high-performance software teams use to build software. As a Principal Engineer, you'll shape the technical direction of a product loved by thousands of engineering teams at companies like Loom, Raycast, and Vercel.`,
+    responsibilities: [
+      'Define and own the technical roadmap for core product features',
+      'Architect solutions for real-time collaboration at scale',
+      'Partner with design to craft exceptional user experiences',
+      'Champion engineering standards and code quality across the team',
+      'Contribute to product strategy and company direction',
+    ],
+    requirements: [
+      '10+ years of engineering experience with product focus',
+      'Expert in TypeScript, PostgreSQL, and GraphQL APIs',
+      'Experience with real-time systems and collaborative editing',
+      'Strong product intuition and design sensibility',
+      'Remote work experience and strong async communication skills',
+    ],
+    benefits: ['Full Health Benefits', 'Flexible PTO', 'Remote Work', 'Equity', 'Hardware Budget', '$5K Annual Learning', '401K'],
+    companyDesc: 'Linear is the project management tool built for speed. Used by the world\'s best product teams to plan, build, and ship products with uncompromising craftsmanship.',
+    companyMeta: 'Productivity · 50–100 employees · Remote',
+    cultureRating: '4.9',
+    wlbRating: '4.8',
+    openRoles: 7,
+  },
+  {
+    id: 4,
+    title: 'Backend Engineer III',
+    company: 'Anthropic',
+    verified: true,
+    location: 'San Francisco, CA',
+    type: 'Full-time',
+    mode: 'On-site',
+    easyApply: false,
+    salary: '$185K – $235K',
+    salaryNum: '185–235',
+    tags: ['Python', 'AWS', 'Distributed Systems'],
+    time: '6d ago',
+    logoColor: 'linear-gradient(135deg,#cc5200,#ff8c42)',
+    logoText: 'AN',
+    matchScore: 84,
+    recruiterName: 'Jordan Park',
+    recruiterTitle: 'Technical Recruiter at Anthropic',
+    recruiterInitials: 'JP',
+    about: `Anthropic is an AI safety company working to build reliable, interpretable, and steerable AI systems. As a Backend Engineer III, you'll build the infrastructure that powers Claude and future AI systems, contributing to some of the most important engineering challenges of our era.`,
+    responsibilities: [
+      'Build and scale distributed infrastructure supporting AI model training and inference',
+      'Design APIs and services enabling researchers to run large-scale experiments',
+      'Optimize system performance and reliability for mission-critical AI workloads',
+      'Collaborate with ML researchers to translate cutting-edge research into production',
+      'Contribute to Anthropic\'s commitment to AI safety through robust engineering',
+    ],
+    requirements: [
+      '5+ years of backend engineering experience',
+      'Expert Python skills with ML/AI infrastructure experience',
+      'Deep knowledge of AWS services and cloud architecture',
+      'Experience building and scaling distributed systems',
+      'Passion for AI safety and responsible AI development',
+    ],
+    benefits: ['Premium Health Benefits', 'Flexible PTO', 'AI Research Access', 'Significant Equity', '$15K Learning Stipend', '401K Match', 'Commuter Benefits'],
+    companyDesc: 'Anthropic is an AI safety company dedicated to building AI that is safe, beneficial, and understandable. Makers of Claude, one of the world\'s most capable AI assistants.',
+    companyMeta: 'AI Safety · 500–1,000 employees · San Francisco',
+    cultureRating: '4.6',
+    wlbRating: '4.4',
+    openRoles: 61,
+  },
+  {
+    id: 5,
+    title: 'Senior Full-Stack Engineer',
+    company: 'Supabase',
+    verified: false,
+    location: 'Remote',
+    type: 'Full-time',
+    mode: 'Remote',
+    easyApply: true,
+    salary: '$180K – $200K',
+    salaryNum: '180–200',
+    tags: ['PostgreSQL', 'Deno', 'React'],
+    time: '1w ago',
+    logoColor: 'linear-gradient(135deg,#3ecf8e,#1a9e6b)',
+    logoText: 'SB',
+    matchScore: 82,
+    recruiterName: 'Kim Nakamura',
+    recruiterTitle: 'People Ops at Supabase',
+    recruiterInitials: 'KN',
+    about: `Supabase is the open source Firebase alternative. As a Senior Full-Stack Engineer, you'll build the tools and APIs that hundreds of thousands of developers rely on every day to build their products faster.`,
+    responsibilities: [
+      'Build and maintain core Supabase platform features used by 500K+ developers',
+      'Contribute to open-source repositories and engage with the developer community',
+      'Design performant PostgreSQL extensions and real-time subscriptions',
+      'Ship delightful developer experience improvements across the platform',
+      'Work async-first in a distributed, globally-distributed team',
+    ],
+    requirements: [
+      '5+ years of full-stack engineering experience',
+      'Strong PostgreSQL knowledge and database optimization skills',
+      'Experience with React and modern frontend ecosystems',
+      'Comfort with Deno and TypeScript runtime environments',
+      'Open-source mindset and passion for developer tools',
+    ],
+    benefits: ['Health Insurance', 'Flexible PTO', 'Remote-First', 'Stock Options', 'Open Source Friday', 'Learning Budget', 'Home Office'],
+    companyDesc: 'Supabase is the open source alternative to Firebase, providing an instant backend with Postgres database, authentication, real-time subscriptions, storage, and edge functions.',
+    companyMeta: 'Developer Tools · 100–200 employees · Remote',
+    cultureRating: '4.8',
+    wlbRating: '4.9',
+    openRoles: 14,
+  },
+  {
+    id: 6,
+    title: 'Engineering Manager',
+    company: 'Figma',
+    verified: true,
+    location: 'Remote',
+    type: 'Full-time',
+    mode: 'Remote',
+    easyApply: false,
+    salary: '$220K – $280K',
+    salaryNum: '220–280',
+    tags: ['Leadership', 'React', 'Product'],
+    time: '2w ago',
+    logoColor: 'linear-gradient(135deg,#f24e1e,#ff7262)',
+    logoText: 'FG',
+    matchScore: 78,
+    recruiterName: 'Morgan Ellis',
+    recruiterTitle: 'Engineering Recruiter at Figma',
+    recruiterInitials: 'ME',
+    about: `Figma is the leading collaborative design platform used by over 4 million people. As an Engineering Manager, you'll lead a team of world-class engineers building the future of design and creative collaboration at massive scale.`,
+    responsibilities: [
+      'Lead and grow a team of 6–10 senior engineers across multiple time zones',
+      'Drive technical excellence while maintaining velocity and product quality',
+      'Partner with Product and Design to define and execute on roadmap',
+      'Hire, mentor, and develop the next generation of engineering leaders',
+      'Shape engineering culture and organizational strategy',
+    ],
+    requirements: [
+      '8+ years engineering experience with 3+ years in management',
+      'Track record of building high-performing engineering teams',
+      'Technical depth in React and modern web platform engineering',
+      'Strong cross-functional collaboration with Product and Design',
+      'Experience scaling teams through rapid company growth',
+    ],
+    benefits: ['Premium Health Coverage', 'Unlimited PTO', 'Remote-First', 'Generous RSUs', '$3K Annual Learning', '401K', 'Monthly Wellness Stipend'],
+    companyDesc: 'Figma is a collaborative interface design tool where teams design, prototype, and develop products together in real time. Over 4 million designers and developers trust Figma.',
+    companyMeta: 'Design Tools · 1,000–5,000 employees · San Francisco',
+    cultureRating: '4.5',
+    wlbRating: '4.6',
+    openRoles: 36,
+  },
+];
+
+const SIMILAR_JOBS = [
+  { title: 'Senior React Engineer', company: 'Notion', salary: '$175K–$220K', logoColor: 'linear-gradient(135deg,#2d2d2d,#555)', logoText: 'NT' },
+  { title: 'Full-Stack Engineer', company: 'Linear', salary: '$160K–$200K', logoColor: 'linear-gradient(135deg,#5e6ad2,#8b97f4)', logoText: 'LN' },
+  { title: 'Senior Engineer', company: 'Loom', salary: '$170K–$215K', logoColor: 'linear-gradient(135deg,#7c5cfc,#9b7fff)', logoText: 'LM' },
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let selectedJobId = 1;
+let bookmarks = new Set();
+let activeTab = 'about';
+
+// ══════════════════════════════════════════════
+// THEME
+// ══════════════════════════════════════════════
+function initTheme() {
+  const saved = localStorage.getItem('ta-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeIcon(saved);
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ta-theme', next);
+  updateThemeIcon(next);
+}
+function updateThemeIcon(theme) {
+  const icon = document.getElementById('theme-icon');
+  if (!icon) return;
+  icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+  lucide.createIcons();
+}
+
+// ══════════════════════════════════════════════
+// JOB LIST RENDERING
+// ══════════════════════════════════════════════
+function renderJobList() {
+  const container = document.getElementById('job-list');
+  container.innerHTML = '';
+  JOBS.forEach(job => {
+    const card = document.createElement('div');
+    card.className = 'job-card' + (job.id === selectedJobId ? ' selected' : '');
+    card.setAttribute('role', 'option');
+    card.setAttribute('aria-selected', job.id === selectedJobId ? 'true' : 'false');
+    card.setAttribute('tabindex', '0');
+    card.dataset.jobId = job.id;
+    card.innerHTML = buildCardHTML(job);
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('.bookmark-btn')) {
+        selectJob(job.id);
+      }
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') selectJob(job.id);
+    });
+    container.appendChild(card);
+  });
+}
+
+function buildCardHTML(job) {
+  const bmClass = bookmarks.has(job.id) ? 'bookmarked' : '';
+  return `
+    <div class="job-card-top">
+      <div class="company-logo" style="background:${job.logoColor};" aria-hidden="true">${job.logoText}</div>
+      <div class="job-card-info">
+        <div class="job-title">${job.title}</div>
+        <div class="company-row">
+          <span class="company-name">${job.company}</span>
+          ${job.verified ? '<span class="verified-badge"><i data-lucide="badge-check" width="10" height="10"></i> Verified</span>' : ''}
+        </div>
+        <div class="job-location">
+          <i data-lucide="map-pin" width="11" height="11"></i>
+          ${job.location}
+        </div>
+      </div>
+      <button class="bookmark-btn ${bmClass}" onclick="toggleBookmark(${job.id}, event)" aria-label="${bookmarks.has(job.id) ? 'Remove bookmark' : 'Bookmark'} ${job.title}">
+        <i data-lucide="${bookmarks.has(job.id) ? 'bookmark-check' : 'bookmark'}" width="15" height="15"></i>
+      </button>
+    </div>
+    <div class="job-tags">
+      <span class="tag type-tag">${job.type}</span>
+      <span class="tag mode-tag">${job.mode}</span>
+      ${job.easyApply ? '<span class="tag easy-tag">⚡ Easy Apply</span>' : ''}
+      ${job.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+    </div>
+    <div class="job-card-footer">
+      <span class="salary-range-text">${job.salary}</span>
+      <span class="time-ago">${job.time}</span>
+    </div>
+  `;
+}
+
+function selectJob(id) {
+  selectedJobId = id;
+  document.querySelectorAll('.job-card').forEach(c => {
+    const isSelected = parseInt(c.dataset.jobId) === id;
+    c.classList.toggle('selected', isSelected);
+    c.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+  });
+  renderJobDetail(JOBS.find(j => j.id === id));
+  activeTab = 'about';
+  lucide.createIcons();
+}
+
+function toggleBookmark(id, e) {
+  e.stopPropagation();
+  if (bookmarks.has(id)) bookmarks.delete(id);
+  else bookmarks.add(id);
+  renderJobList();
+  lucide.createIcons();
+  showToast(bookmarks.has(id) ? 'Job saved to bookmarks' : 'Bookmark removed');
+}
+
+// ══════════════════════════════════════════════
+// JOB DETAIL RENDERING
+// ══════════════════════════════════════════════
+function renderJobDetail(job) {
+  const container = document.getElementById('detail-scroll');
+  container.innerHTML = buildDetailHTML(job);
+  // Scroll to top
+  container.scrollTop = 0;
+  // Re-init lucide icons
+  lucide.createIcons();
+}
+
+function buildDetailHTML(job) {
+  return `
+    <!-- Header -->
+    <div class="detail-header">
+      <div class="detail-company-row">
+        <div class="detail-logo" style="background:${job.logoColor};" aria-hidden="true">${job.logoText}</div>
+        <div class="detail-company-info">
+          <div class="detail-company-name-row">
+            <span class="detail-company-name">${job.company}</span>
+            ${job.verified ? '<span class="verified-badge"><i data-lucide="badge-check" width="11" height="11"></i> Verified</span>' : ''}
+          </div>
+          <div class="detail-location">
+            <i data-lucide="map-pin" width="12" height="12"></i>
+            ${job.location}
+          </div>
+        </div>
+      </div>
+      <div class="detail-actions-top">
+        <button class="icon-btn" onclick="toggleBookmark(${job.id}, event)" aria-label="Bookmark job">
+          <i data-lucide="${bookmarks.has(job.id) ? 'bookmark-check' : 'bookmark'}" width="16" height="16"></i>
+        </button>
+        <button class="icon-btn" onclick="shareJob()" aria-label="Share job">
+          <i data-lucide="share-2" width="16" height="16"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Job Title -->
+    <h1 class="detail-job-title">${job.title}</h1>
+
+    <!-- Tags Row -->
+    <div class="detail-tags-row">
+      <span class="tag type-tag">${job.type}</span>
+      <span class="tag mode-tag">${job.mode}</span>
+      ${job.easyApply ? '<span class="tag easy-tag">⚡ Easy Apply</span>' : ''}
+      <span class="tag"><i data-lucide="clock" width="11" height="11" style="display:inline-block;vertical-align:middle;margin-right:3px;"></i>Posted ${job.time}</span>
+    </div>
+
+    <!-- Salary + Match + Apply -->
+    <div class="detail-action-row">
+      <div class="detail-salary-block">
+        <div class="detail-salary-amount">${job.salary}</div>
+        <div class="detail-salary-sub">Base salary · Equity · Full Benefits</div>
+      </div>
+      <div class="match-block">
+        <div class="match-score-circle" aria-label="${job.matchScore}% match score">
+          <div class="match-score-inner">
+            <span class="match-score-num">${job.matchScore}</span>
+            <span class="match-score-label">match</span>
+          </div>
+        </div>
+        <span>Match score</span>
+      </div>
+      <button class="apply-btn-lg" onclick="${job.easyApply ? 'openModal()' : "window.location.href='./apply.html'"}">
+        <i data-lucide="${job.easyApply ? 'zap' : 'external-link'}" width="16" height="16"></i>
+        ${job.easyApply ? 'Easy Apply' : 'Apply Now'}
+      </button>
+    </div>
+
+    <!-- Recruiter Card -->
+    <div class="recruiter-card">
+      <div class="recruiter-avatar" aria-hidden="true">${job.recruiterInitials}</div>
+      <div class="recruiter-info">
+        <div class="recruiter-name">${job.recruiterName}</div>
+        <div class="recruiter-role">${job.recruiterTitle}</div>
+      </div>
+      <button class="message-btn" onclick="showToast('Message request sent to ${job.recruiterName}')">
+        <i data-lucide="message-circle" width="14" height="14"></i>
+        Message
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="detail-tabs" role="tablist">
+      <button class="detail-tab ${activeTab==='about'?'active':''}" role="tab" aria-selected="${activeTab==='about'}" onclick="switchTab('about', this)">About</button>
+      <button class="detail-tab ${activeTab==='requirements'?'active':''}" role="tab" aria-selected="${activeTab==='requirements'}" onclick="switchTab('requirements', this)">Requirements</button>
+      <button class="detail-tab ${activeTab==='benefits'?'active':''}" role="tab" aria-selected="${activeTab==='benefits'}" onclick="switchTab('benefits', this)">Benefits</button>
+      <button class="detail-tab ${activeTab==='company'?'active':''}" role="tab" aria-selected="${activeTab==='company'}" onclick="switchTab('company', this)">Company</button>
+    </div>
+
+    <!-- Tab: About -->
+    <div class="tab-content ${activeTab==='about'?'active':''}" id="tab-about" role="tabpanel">
+      <div class="detail-section">
+        <h2 class="detail-section-title">About the Role</h2>
+        <p class="detail-paragraph">${job.about}</p>
+      </div>
+      <div class="detail-section">
+        <h2 class="detail-section-title">Responsibilities</h2>
+        <ul class="detail-list">
+          ${job.responsibilities.map(r => `
+            <li>
+              <span class="li-icon bullet"><i data-lucide="arrow-right" width="14" height="14"></i></span>
+              ${r}
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tab: Requirements -->
+    <div class="tab-content ${activeTab==='requirements'?'active':''}" id="tab-requirements" role="tabpanel">
+      <div class="detail-section">
+        <h2 class="detail-section-title">Requirements</h2>
+        <ul class="detail-list">
+          ${job.requirements.map(r => `
+            <li>
+              <span class="li-icon check"><i data-lucide="check-circle-2" width="15" height="15"></i></span>
+              ${r}
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tab: Benefits -->
+    <div class="tab-content ${activeTab==='benefits'?'active':''}" id="tab-benefits" role="tabpanel">
+      <div class="detail-section">
+        <h2 class="detail-section-title">Benefits & Perks</h2>
+        <div class="benefits-pills">
+          ${job.benefits.map(b => `
+            <span class="benefit-pill">
+              <i data-lucide="star" width="12" height="12" style="color:var(--warning)"></i>
+              ${b}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Company -->
+    <div class="tab-content ${activeTab==='company'?'active':''}" id="tab-company" role="tabpanel">
+      <div class="company-card">
+        <div class="company-card-header">
+          <div class="company-card-logo" style="background:${job.logoColor};" aria-hidden="true">${job.logoText}</div>
+          <div>
+            <div class="company-card-name">${job.company}</div>
+            <div class="company-card-meta">${job.companyMeta}</div>
+          </div>
+        </div>
+        <p class="company-card-desc">${job.companyDesc}</p>
+        <div class="company-ratings">
+          <div class="rating-box">
+            <div class="rating-num">${job.cultureRating}<span class="rating-max">/5</span></div>
+            <div class="rating-label">Culture Rating</div>
+          </div>
+          <div class="rating-box">
+            <div class="rating-num">${job.wlbRating}<span class="rating-max">/5</span></div>
+            <div class="rating-label">Work-Life Balance</div>
+          </div>
+          <div class="rating-box">
+            <div class="rating-num">${job.openRoles}</div>
+            <div class="rating-label">Open Roles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Similar Jobs (always visible) -->
+    <div class="similar-jobs">
+      <h2 class="detail-section-title" style="margin-bottom:12px;">Similar Jobs</h2>
+      ${SIMILAR_JOBS.map(sj => `
+        <div class="mini-job-card" onclick="showToast('Opening ${sj.title} at ${sj.company}...')" tabindex="0" role="button">
+          <div class="mini-logo" style="background:${sj.logoColor};" aria-hidden="true">${sj.logoText}</div>
+          <div class="mini-info">
+            <div class="mini-title">${sj.title}</div>
+            <div class="mini-company">${sj.company}</div>
+          </div>
+          <div class="mini-salary">${sj.salary}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════
+function switchTab(tab, btn) {
+  activeTab = tab;
+  // Update tab buttons
+  document.querySelectorAll('.detail-tab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  // Update tab panels
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const panel = document.getElementById('tab-' + tab);
+  if (panel) panel.classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+// FILTERS
+// ══════════════════════════════════════════════
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+function updateCounts() {
+  const checked = document.querySelectorAll('[data-filter]:checked').length;
+  const base = 12483;
+  const delta = checked * 800;
+  const newCount = Math.max(400, base - delta + Math.floor(Math.random() * 200));
+  const el = document.getElementById('results-count');
+  if (el) el.textContent = newCount.toLocaleString() + ' results';
+}
+
+function applyFilters() {
+  updateCounts();
+  showToast('Filters applied successfully');
+}
+
+function removeChip(btn, filter) {
+  btn.style.transform = 'scale(0.85)';
+  btn.style.opacity = '0';
+  setTimeout(() => btn.remove(), 200);
+  // Uncheck corresponding filter if it exists
+  const cb = document.querySelector(`[data-filter][value="${filter}"]`);
+  if (cb) { cb.checked = false; }
+  updateCounts();
+}
+
+function clearAllFilters() {
+  document.querySelectorAll('[data-filter]').forEach(cb => { cb.checked = false; });
+  document.querySelectorAll('.toggle-switch input').forEach(t => { t.checked = false; });
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.style.transform = 'scale(0)';
+    chip.style.opacity = '0';
+    setTimeout(() => chip.remove(), 200);
+  });
+  // Reset salary
+  document.getElementById('salary-min').value = 40;
+  document.getElementById('salary-max').value = 400;
+  updateSalarySlider();
+  updateCounts();
+  showToast('All filters cleared');
+}
+
+// ══════════════════════════════════════════════
+// SALARY SLIDER
+// ══════════════════════════════════════════════
+function updateSalarySlider() {
+  const minSlider = document.getElementById('salary-min');
+  const maxSlider = document.getElementById('salary-max');
+  const fill = document.getElementById('salary-fill');
+  const minLabel = document.getElementById('salary-min-label');
+  const maxLabel = document.getElementById('salary-max-label');
+
+  let minVal = parseInt(minSlider.value);
+  let maxVal = parseInt(maxSlider.value);
+
+  // Prevent crossing
+  if (minVal >= maxVal - 10) {
+    if (event && event.target === minSlider) {
+      minSlider.value = maxVal - 10;
+      minVal = maxVal - 10;
+    } else {
+      maxSlider.value = minVal + 10;
+      maxVal = minVal + 10;
+    }
+  }
+
+  const totalRange = 400 - 40;
+  const leftPct = ((minVal - 40) / totalRange) * 100;
+  const rightPct = ((maxVal - 40) / totalRange) * 100;
+
+  fill.style.left = leftPct + '%';
+  fill.style.width = (rightPct - leftPct) + '%';
+
+  minLabel.textContent = '$' + minVal + 'K';
+  maxLabel.textContent = maxVal >= 400 ? '$400K+' : '$' + maxVal + 'K';
+}
+
+// ══════════════════════════════════════════════
+// VIEW TOGGLE
+// ══════════════════════════════════════════════
+function initViewToggle() {
+  document.getElementById('list-view-btn').addEventListener('click', () => {
+    document.getElementById('list-view-btn').classList.add('active');
+    document.getElementById('grid-view-btn').classList.remove('active');
+    document.getElementById('list-view-btn').setAttribute('aria-pressed', 'true');
+    document.getElementById('grid-view-btn').setAttribute('aria-pressed', 'false');
+  });
+  document.getElementById('grid-view-btn').addEventListener('click', () => {
+    document.getElementById('grid-view-btn').classList.add('active');
+    document.getElementById('list-view-btn').classList.remove('active');
+    document.getElementById('grid-view-btn').setAttribute('aria-pressed', 'true');
+    document.getElementById('list-view-btn').setAttribute('aria-pressed', 'false');
+    showToast('Grid view coming soon!');
+  });
+}
+
+// ══════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════
+function openModal() {
+  document.getElementById('apply-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('apply-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function submitApplication(e) {
+  e.preventDefault();
+  closeModal();
+  setTimeout(() => showToast('🎉 Application submitted to Stripe!'), 300);
+}
+// Click outside to close
+document.getElementById('apply-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('apply-modal')) closeModal();
+});
+// Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let toastTimeout;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  const msgEl = document.getElementById('toast-msg');
+  msgEl.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ══════════════════════════════════════════════
+// SHARE
+// ══════════════════════════════════════════════
+function shareJob() {
+  if (navigator.share) {
+    navigator.share({ title: 'TalentArc Job', url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      showToast('Job link copied to clipboard!');
+    });
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+  document.getElementById('clear-filters-btn').addEventListener('click', clearAllFilters);
+  initViewToggle();
+  renderJobList();
+  renderJobDetail(JOBS[0]);
+  updateSalarySlider();
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>

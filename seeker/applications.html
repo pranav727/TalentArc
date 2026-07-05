@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Applications · TalentArc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ─────────────────────────────────────────
+       DESIGN TOKENS
+     ───────────────────────────────────────── */
+    :root {
+      --primary:        #6366F1;
+      --primary-light:  #818CF8;
+      --primary-dark:   #4F46E5;
+      --accent:         #06B6D4;
+      --success:        #10B981;
+      --warning:        #F59E0B;
+      --error:          #EF4444;
+      --purple:         #A855F7;
+
+      /* Radius */
+      --r-sm:  8px;
+      --r-md:  12px;
+      --r-lg:  16px;
+      --r-xl:  20px;
+      --r-pill:999px;
+
+      /* Transitions */
+      --t-fast: 0.15s ease;
+      --t-base: 0.25s ease;
+      --t-slow: 0.4s ease;
+
+      /* Sidebar */
+      --sidebar-w: 220px;
+    }
+
+    /* Dark theme */
+    [data-theme="dark"] {
+      --bg-base:    #0A0A0F;
+      --bg-1:       #0F0F17;
+      --bg-2:       #13131E;
+      --bg-3:       #1A1A28;
+      --bg-4:       #1E1E2E;
+      --bg-5:       #242438;
+      --bg-hover:   #252535;
+      --border:     rgba(255,255,255,0.06);
+      --border-2:   rgba(255,255,255,0.10);
+      --text-1:     #E2E8F0;
+      --text-2:     #94A3B8;
+      --text-3:     #64748B;
+      --shadow:     0 4px 24px rgba(0,0,0,0.5);
+      --shadow-sm:  0 2px 8px  rgba(0,0,0,0.3);
+      --glow:       0 0 20px rgba(99,102,241,0.15);
+    }
+
+    /* Light theme */
+    [data-theme="light"] {
+      --bg-base:    #F0F0F8;
+      --bg-1:       #FAFAFA;
+      --bg-2:       #FFFFFF;
+      --bg-3:       #F5F5FF;
+      --bg-4:       #EDEDFA;
+      --bg-5:       #E8E8F5;
+      --bg-hover:   #F0F0FF;
+      --border:     rgba(0,0,0,0.08);
+      --border-2:   rgba(0,0,0,0.12);
+      --text-1:     #0F172A;
+      --text-2:     #475569;
+      --text-3:     #94A3B8;
+      --shadow:     0 4px 24px rgba(0,0,0,0.08);
+      --shadow-sm:  0 2px 8px  rgba(0,0,0,0.05);
+      --glow:       0 0 20px rgba(99,102,241,0.08);
+    }
+
+    /* ─────────────────────────────────────────
+       RESET & BASE
+     ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+      transition: background var(--t-base), color var(--t-base);
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ─────────────────────────────────────────
+       LAYOUT SHELL
+     ───────────────────────────────────────── */
+    .app-shell { display: flex; min-height: 100vh; }
+
+    /* ─────────────────────────────────────────
+       SIDEBAR
+     ───────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0;
+      display: flex; flex-direction: column; background: var(--bg-2); border-right: 1px solid var(--border);
+      z-index: 100; transition: transform var(--t-base), background var(--t-base); overflow: hidden;
+    }
+    .sidebar::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(99,102,241,0.04) 0%, transparent 60%); pointer-events: none;
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px; padding: 22px 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), var(--purple));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.4); flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 15px; font-weight: 700; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--primary-light), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; scrollbar-width: none; }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r-sm);
+      color: var(--text-2); font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all var(--t-fast); position: relative; margin-bottom: 2px;
+      white-space: nowrap; overflow: hidden;
+    }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-1); }
+    .nav-item.active { background: rgba(99,102,241,0.15); color: var(--primary-light); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px;
+      background: linear-gradient(180deg, var(--primary), var(--purple)); border-radius: 0 3px 3px 0;
+    }
+    .nav-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+    .nav-label { flex: 1; }
+    .nav-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill); line-height: 1.4; }
+    .badge-number { background: var(--error); color: #fff; }
+    .badge-new { background: linear-gradient(135deg, var(--primary), var(--purple)); color: #fff; font-size: 9px; }
+
+    .sidebar-profile {
+      padding: 14px 14px 18px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background var(--t-fast);
+    }
+    .sidebar-profile:hover { background: var(--bg-hover); }
+    .profile-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0; border: 2px solid rgba(99,102,241,0.4);
+    }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-name { font-size: 12.5px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-role { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .settings-btn {
+      width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      color: var(--text-3); transition: all var(--t-fast); flex-shrink: 0;
+    }
+    .settings-btn:hover { background: var(--border-2); color: var(--text-1); }
+
+    /* ─────────────────────────────────────────
+       MAIN AREA
+     ───────────────────────────────────────── */
+    .main-area { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ─────────────────────────────────────────
+       TOP HEADER
+     ───────────────────────────────────────── */
+    .top-header {
+      position: sticky; top: 0; z-index: 90; background: rgba(10,10,15,0.75); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 28px;
+      height: 66px; display: flex; align-items: center; gap: 20px; transition: background var(--t-base);
+    }
+    [data-theme="light"] .top-header { background: rgba(250,250,250,0.85); }
+    .header-greeting { flex: 1; }
+    .header-greeting h1 { font-size: 16px; font-weight: 700; color: var(--text-1); letter-spacing: -0.2px; }
+    .header-greeting p { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center;
+      color: var(--text-2); background: var(--bg-3); border: 1px solid var(--border); cursor: pointer; transition: all var(--t-fast);
+      position: relative;
+    }
+    .icon-btn:hover { background: var(--bg-4); color: var(--text-1); border-color: var(--border-2); }
+    .notif-dot {
+      position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--error);
+      border-radius: 50%; border: 1.5px solid var(--bg-2);
+    }
+    .theme-toggle { width: 36px; height: 36px; }
+    .menu-toggle { display: none; }
+
+    /* ─────────────────────────────────────────
+       PAGE CONTENT
+     ───────────────────────────────────────── */
+    .page-content { padding: 24px 28px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ─────────────────────────────────────────
+       TABS / STATS
+     ───────────────────────────────────────── */
+    .tabs-container {
+      display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);
+      padding-bottom: 2px; flex-wrap: wrap; gap: 12px;
+    }
+    .tabs { display: flex; gap: 8px; }
+    .tab {
+      padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-2); border-radius: var(--r-sm);
+      transition: all var(--t-fast); cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .tab:hover { color: var(--text-1); background: var(--bg-hover); }
+    .tab.active { color: var(--primary-light); background: rgba(99,102,241,0.1); font-weight: 600; }
+    .tab-count { font-size: 10.5px; padding: 2px 6px; border-radius: var(--r-pill); background: var(--bg-3); color: var(--text-3); }
+    .tab.active .tab-count { background: var(--primary); color: #fff; }
+
+    .stats-summary { display: flex; gap: 24px; }
+    .stat-mini { display: flex; flex-direction: column; }
+    .stat-mini-val { font-size: 18px; font-weight: 700; color: var(--text-1); }
+    .stat-mini-lbl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ─────────────────────────────────────────
+       CONTENT GRID
+     ───────────────────────────────────────── */
+    .content-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+    .list-panel { display: flex; flex-direction: column; gap: 12px; }
+
+    /* Cards */
+    .app-card {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 18px;
+      cursor: pointer; transition: all var(--t-base); display: flex; flex-direction: column; gap: 12px;
+    }
+    .app-card:hover { border-color: var(--border-2); box-shadow: var(--shadow-sm); transform: translateY(-1.5px); }
+    .app-card.active { border-color: var(--primary); background: rgba(99,102,241,0.03); box-shadow: var(--glow); }
+
+    .app-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .comp-logo {
+      width: 40px; height: 40px; border-radius: var(--r-md); display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: #fff; flex-shrink: 0;
+    }
+    .app-meta { flex: 1; }
+    .app-title { font-size: 14px; font-weight: 600; color: var(--text-1); }
+    .app-comp { font-size: 12.5px; color: var(--text-2); margin-top: 1px; display: flex; align-items: center; gap: 4px; }
+    .status-badge {
+      font-size: 10.5px; font-weight: 600; padding: 3px 10px; border-radius: var(--r-pill); white-space: nowrap;
+    }
+    .badge-shortlisted { background: rgba(16,185,129,0.12); color: var(--success); }
+    .badge-interview   { background: rgba(99,102,241,0.12); color: var(--primary-light); }
+    .badge-applied     { background: rgba(100,116,139,0.12); color: var(--text-2); }
+    .badge-offered     { background: rgba(245,158,11,0.12); color: var(--warning); }
+    .badge-rejected    { background: rgba(239,68,68,0.12); color: var(--error); }
+
+    .app-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; font-size: 11.5px; color: var(--text-3); }
+    .app-date { display: flex; align-items: center; gap: 4px; }
+
+    /* Detail Panel */
+    .detail-panel {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 24px;
+      display: flex; flex-direction: column; gap: 24px; position: sticky; top: 86px;
+    }
+    .detail-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    .detail-comp-wrap { display: flex; align-items: center; gap: 14px; }
+    .detail-logo {
+      width: 52px; height: 52px; border-radius: var(--r-lg); display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 22px; color: #fff;
+    }
+    .detail-title { font-size: 18px; font-weight: 700; color: var(--text-1); letter-spacing: -0.3px; }
+    .detail-subtitle { font-size: 13.5px; color: var(--text-2); margin-top: 2px; }
+
+    .action-row { display: flex; gap: 10px; }
+    .btn {
+      padding: 10px 18px; border-radius: var(--r-pill); font-size: 13px; font-weight: 600; display: inline-flex;
+      align-items: center; gap: 6px; transition: all var(--t-fast);
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .btn-secondary { border: 1px solid var(--border); color: var(--text-2); }
+    .btn-secondary:hover { border-color: var(--border-2); color: var(--text-1); background: var(--bg-hover); }
+
+    /* Timeline */
+    .timeline-title { font-size: 14px; font-weight: 700; color: var(--text-1); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .timeline { display: flex; flex-direction: column; position: relative; padding-left: 24px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 2px; background: var(--border);
+    }
+
+    .timeline-item { position: relative; padding-bottom: 24px; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-dot {
+      position: absolute; left: -24px; top: 4px; width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid var(--border); background: var(--bg-2); display: flex; align-items: center; justify-content: center;
+      transition: all var(--t-base);
+    }
+    .timeline-item.completed .timeline-dot { border-color: var(--success); background: var(--success); }
+    .timeline-item.completed .timeline-dot::after {
+      content: '✓'; color: #fff; font-size: 9px; font-weight: 800;
+    }
+    .timeline-item.active .timeline-dot {
+      border-color: var(--primary); background: var(--primary);
+      box-shadow: 0 0 0 4px var(--glow);
+      animation: pulse-glow 2s infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+      50% { box-shadow: 0 0 0 6px rgba(99,102,241,0.3); }
+    }
+    .timeline-item.future .timeline-dot { border-color: var(--border-2); }
+
+    .timeline-content { display: flex; flex-direction: column; gap: 3px; }
+    .timeline-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .timeline-stage { font-size: 13.5px; font-weight: 600; color: var(--text-2); }
+    .timeline-item.active .timeline-stage { color: var(--primary-light); }
+    .timeline-item.completed .timeline-stage { color: var(--text-1); }
+    .timeline-date { font-size: 11.5px; color: var(--text-3); }
+    .timeline-desc { font-size: 12.5px; color: var(--text-3); line-height: 1.5; }
+    .timeline-item.active .timeline-desc { color: var(--text-2); }
+
+    /* Details Tab Section */
+    .detail-body { display: flex; flex-direction: column; gap: 16px; }
+    .detail-row { display: flex; border-bottom: 1px solid var(--border); padding-bottom: 12px; justify-content: space-between; }
+    .detail-row:last-child { border: none; }
+    .detail-lbl { font-size: 12.5px; color: var(--text-3); }
+    .detail-val { font-size: 13px; font-weight: 500; color: var(--text-1); }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .detail-panel { position: relative; top: 0; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; }
+      .menu-toggle { display: flex; }
+      .top-header { padding: 0 16px; }
+      .page-content { padding: 16px; }
+      .tabs-container { flex-direction: column; align-items: flex-start; }
+      .stats-summary { width: 100%; justify-content: space-between; margin-top: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-text">TalentArc</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Job Seeker Portal</div>
+      <a href="./dashboard.html" class="nav-item">
+        <i data-lucide="layout-dashboard" class="nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="./jobs.html" class="nav-item">
+        <i data-lucide="briefcase" class="nav-icon"></i>
+        <span class="nav-label">Find Jobs</span>
+      </a>
+      <a href="./applications.html" class="nav-item active">
+        <i data-lucide="file-check" class="nav-icon"></i>
+        <span class="nav-label">My Applications</span>
+        <span class="nav-badge badge-number" id="activeAppBadge">8</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="heart" class="nav-icon"></i>
+        <span class="nav-label">Saved Jobs</span>
+      </a>
+      <a href="./ai-tools.html" class="nav-item">
+        <i data-lucide="sparkles" class="nav-icon"></i>
+        <span class="nav-label">AI Tools</span>
+        <span class="nav-badge badge-new">NEW</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i data-lucide="trending-up" class="nav-icon"></i>
+        <span class="nav-label">Career Insights</span>
+      </a>
+      <a href="./messages.html" class="nav-item">
+        <i data-lucide="message-square" class="nav-icon"></i>
+        <span class="nav-label">Messages</span>
+        <span class="nav-badge badge-number">3</span>
+      </a>
+      <a href="./notifications.html" class="nav-item">
+        <i data-lucide="bell" class="nav-icon"></i>
+        <span class="nav-label">Notifications</span>
+        <span class="nav-badge badge-number">7</span>
+      </a>
+    </nav>
+    <div class="sidebar-profile">
+      <div class="profile-avatar">PS</div>
+      <div class="profile-info">
+        <div class="profile-name">Priya Sharma</div>
+        <div class="profile-role">Software Engineer</div>
+      </div>
+      <button class="settings-btn" aria-label="Settings">
+        <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+        <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+      </button>
+      <div class="header-greeting">
+        <h1>Track Your Applications</h1>
+        <p>Stay updated on the progress of your job search</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+          <i data-lucide="sun" id="themeIcon" style="width: 18px; height: 18px;"></i>
+        </button>
+        <a href="./notifications.html" class="icon-btn" aria-label="Notifications">
+          <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+          <span class="notif-dot"></span>
+        </a>
+        <div class="header-avatar">PS</div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="page-content">
+      <!-- TABS CONTAINER -->
+      <section class="tabs-container">
+        <div class="tabs">
+          <div class="tab active" onclick="filterApps('all')">All <span class="tab-count">24</span></div>
+          <div class="tab" onclick="filterApps('active')">Active <span class="tab-count">8</span></div>
+          <div class="tab" onclick="filterApps('shortlisted')">Shortlisted <span class="tab-count">3</span></div>
+          <div class="tab" onclick="filterApps('interview')">Interview <span class="tab-count">2</span></div>
+          <div class="tab" onclick="filterApps('offered')">Offered <span class="tab-count">1</span></div>
+          <div class="tab" onclick="filterApps('rejected')">Rejected <span class="tab-count">4</span></div>
+        </div>
+        <div class="stats-summary">
+          <div class="stat-mini">
+            <span class="stat-mini-val">24</span>
+            <span class="stat-mini-lbl">Submitted</span>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-mini-val">8</span>
+            <span class="stat-mini-lbl">Active</span>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-mini-val">3</span>
+            <span class="stat-mini-lbl">Shortlisted</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTENT GRID -->
+      <div class="content-grid">
+        <!-- LEFT: APP LIST -->
+        <section class="list-panel" id="appsList">
+          <!-- App 1: Stripe -->
+          <div class="app-card active" data-id="stripe" data-status="active" onclick="selectApp('stripe')">
+            <div class="app-header">
+              <div class="comp-logo" style="background: linear-gradient(135deg, #635BFF, #8B83FF);">S</div>
+              <div class="app-meta">
+                <h3 class="app-title">Senior Software Engineer</h3>
+                <div class="app-comp">Stripe <i data-lucide="shield-check" style="width: 12px; height: 12px; color: var(--success);"></i></div>
+              </div>
+              <span class="status-badge badge-shortlisted">Shortlisted</span>
+            </div>
+            <div class="app-footer">
+              <div class="app-date"><i data-lucide="calendar" style="width: 12px; height: 12px;"></i> Applied Jan 15, 2025</div>
+              <div>ATS Score: 78%</div>
+            </div>
+          </div>
+
+          <!-- App 2: Vercel -->
+          <div class="app-card" data-id="vercel" data-status="interview" onclick="selectApp('vercel')">
+            <div class="app-header">
+              <div class="comp-logo" style="background: #000; border: 1px solid var(--border-2);">V</div>
+              <div class="app-meta">
+                <h3 class="app-title">Staff Engineer</h3>
+                <div class="app-comp">Vercel</div>
+              </div>
+              <span class="status-badge badge-interview">Interview</span>
+            </div>
+            <div class="app-footer">
+              <div class="app-date"><i data-lucide="calendar" style="width: 12px; height: 12px;"></i> Applied Jan 12, 2025</div>
+              <div>ATS Score: 85%</div>
+            </div>
+          </div>
+
+          <!-- App 3: Linear -->
+          <div class="app-card" data-id="linear" data-status="active" onclick="selectApp('linear')">
+            <div class="app-header">
+              <div class="comp-logo" style="background: #5E6AD2;">L</div>
+              <div class="app-meta">
+                <h3 class="app-title">Principal Engineer</h3>
+                <div class="app-comp">Linear</div>
+              </div>
+              <span class="status-badge badge-applied">Applied</span>
+            </div>
+            <div class="app-footer">
+              <div class="app-date"><i data-lucide="calendar" style="width: 12px; height: 12px;"></i> Applied Jan 9, 2025</div>
+              <div>ATS Score: 81%</div>
+            </div>
+          </div>
+
+          <!-- App 4: Figma -->
+          <div class="app-card" data-id="figma" data-status="offered" onclick="selectApp('figma')">
+            <div class="app-header">
+              <div class="comp-logo" style="background: #F24E1E;">F</div>
+              <div class="app-meta">
+                <h3 class="app-title">Lead Product Designer</h3>
+                <div class="app-comp">Figma</div>
+              </div>
+              <span class="status-badge badge-offered">Offered</span>
+            </div>
+            <div class="app-footer">
+              <div class="app-date"><i data-lucide="calendar" style="width: 12px; height: 12px;"></i> Applied Jan 2, 2025</div>
+              <div>ATS Score: 92%</div>
+            </div>
+          </div>
+
+          <!-- App 5: Google -->
+          <div class="app-card" data-id="google" data-status="rejected" onclick="selectApp('google')">
+            <div class="app-header">
+              <div class="comp-logo" style="background: #4285F4;">G</div>
+              <div class="app-meta">
+                <h3 class="app-title">Frontend Tech Lead</h3>
+                <div class="app-comp">Google</div>
+              </div>
+              <span class="status-badge badge-rejected">Rejected</span>
+            </div>
+            <div class="app-footer">
+              <div class="app-date"><i data-lucide="calendar" style="width: 12px; height: 12px;"></i> Applied Dec 20, 2024</div>
+              <div>ATS Score: 74%</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT: DETAIL TIMELINE -->
+        <section class="detail-panel" id="detailPanel">
+          <div class="detail-header">
+            <div class="detail-comp-wrap">
+              <div class="detail-logo" id="detailLogo" style="background: linear-gradient(135deg, #635BFF, #8B83FF);">S</div>
+              <div>
+                <h2 class="detail-title" id="detailTitle">Senior Software Engineer</h2>
+                <div class="detail-subtitle" id="detailCompName">Stripe · San Francisco, CA (Hybrid)</div>
+              </div>
+            </div>
+            <div class="action-row">
+              <a href="./messages.html" class="btn btn-secondary" id="detailMsgBtn"><i data-lucide="message-square" style="width: 14px; height: 14px;"></i> Message Recruiter</a>
+              <a href="#" class="btn btn-primary" id="detailActionBtn">View Original Post</a>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="timeline-title"><i data-lucide="clock" style="width: 16px; height: 16px; color: var(--primary);"></i> Progress Timeline</h3>
+            <div class="timeline" id="detailTimeline">
+              <!-- Timeline Items will be inserted here dynamically -->
+            </div>
+          </div>
+
+          <div>
+            <h3 class="timeline-title"><i data-lucide="file-text" style="width: 16px; height: 16px; color: var(--primary);"></i> Submission Details</h3>
+            <div class="detail-body">
+              <div class="detail-row">
+                <span class="detail-lbl">Submitted Resume</span>
+                <span class="detail-val" id="detailResume">Priya_Resume_2025.pdf</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-lbl">Cover Letter</span>
+                <span class="detail-val" id="detailCL">Generated by AI</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-lbl">Expected Salary</span>
+                <span class="detail-val" id="detailSalary">$145,000 – $165,000</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-lbl">Referrals</span>
+                <span class="detail-val" id="detailReferrals">None</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────
+  // THEME MANAGEMENT
+  // ─────────────────────────────────────────
+  const themeToggleBtn = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  
+  function getTheme() {
+    return localStorage.getItem('tarc-seeker-theme') || 'dark';
+  }
+  
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      themeIcon.setAttribute('data-lucide', 'sun');
+    } else {
+      themeIcon.setAttribute('data-lucide', 'moon');
+    }
+    if (window.lucide) lucide.createIcons();
+    localStorage.setItem('tarc-seeker-theme', theme);
+  }
+  
+  themeToggleBtn.addEventListener('click', () => {
+    const nextTheme = getTheme() === 'dark' ? 'light' : 'dark';
+    applyTheme(nextTheme);
+  });
+  
+  applyTheme(getTheme());
+
+  // ─────────────────────────────────────────
+  // MOBILE NAVIGATION
+  // ─────────────────────────────────────────
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && e.target !== menuToggle && sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // ─────────────────────────────────────────
+  // APP DATA AND DETAIL BINDING
+  // ─────────────────────────────────────────
+  const appData = {
+    stripe: {
+      title: "Senior Software Engineer",
+      company: "Stripe",
+      logoBg: "linear-gradient(135deg, #635BFF, #8B83FF)",
+      logoLetter: "S",
+      location: "San Francisco, CA (Hybrid)",
+      resume: "Priya_Resume_2025.pdf",
+      coverLetter: "Generated by AI",
+      salary: "$145,000 – $165,000",
+      referrals: "None",
+      timeline: [
+        { stage: "Application Submitted", date: "Jan 15, 2025 · 10:23 AM", desc: "Your application was received by Stripe's recruiting team.", status: "completed" },
+        { stage: "Application Viewed", date: "Jan 17, 2025 · 2:15 PM", desc: "Alex Morrison from recruitment viewed your profile and resume.", status: "completed" },
+        { stage: "Under Review", date: "Jan 18, 2025 · 11:30 AM", desc: "The hiring manager is reviewing your application.", status: "completed" },
+        { stage: "Shortlisted", date: "Jan 20, 2025 · 4:10 PM", desc: "Congratulations! You have been shortlisted for the initial assessment.", status: "completed" },
+        { stage: "Assessment Scheduled", date: "Jan 22, 2025 · 10:00 AM", desc: "Technical take-home assessment has been assigned. Due by Jan 25.", status: "active" },
+        { stage: "Interview Scheduled", date: "Pending", desc: "Awaiting assessment completion to schedule 1-on-1 team interview.", status: "future" },
+        { stage: "Offer Extended", date: "Pending", desc: "Final hiring decision.", status: "future" }
+      ]
+    },
+    vercel: {
+      title: "Staff Engineer",
+      company: "Vercel",
+      logoBg: "#000",
+      logoLetter: "V",
+      location: "Remote (Global)",
+      resume: "Priya_Resume_Senior.pdf",
+      coverLetter: "Vercel_Cover_Letter.pdf",
+      salary: "$210,000 – $240,000",
+      referrals: "Sarah Chen (Staff Eng)",
+      timeline: [
+        { stage: "Application Submitted", date: "Jan 12, 2025 · 9:00 AM", desc: "Your application was received successfully.", status: "completed" },
+        { stage: "Application Viewed", date: "Jan 13, 2025 · 3:00 PM", desc: "Application viewed by recruitment coordinator.", status: "completed" },
+        { stage: "Technical Screening", date: "Jan 15, 2025 · 2:00 PM", desc: "Initial technical screen with Staff Developer.", status: "completed" },
+        { stage: "Onsite Interview Scheduled", date: "Jan 24, 2025 · 11:00 AM EST", desc: "Virtual onsite interview (3 rounds) scheduled with team.", status: "active" },
+        { stage: "Final Decision", date: "Pending", desc: "Decision will be communicated after onsite round.", status: "future" }
+      ]
+    },
+    linear: {
+      title: "Principal Engineer",
+      company: "Linear",
+      logoBg: "#5E6AD2",
+      logoLetter: "L",
+      location: "Remote (US/EU)",
+      resume: "Priya_Resume_2025.pdf",
+      coverLetter: "Linear_Intro.docx",
+      salary: "$195,000 – $220,000",
+      referrals: "None",
+      timeline: [
+        { stage: "Application Submitted", date: "Jan 9, 2025 · 5:30 PM", desc: "Your application has been received.", status: "completed" },
+        { stage: "Application Viewed", date: "Jan 14, 2025 · 10:15 AM", desc: "Linear hiring managers are currently reviewing your profile.", status: "active" },
+        { stage: "Next Steps", date: "Pending", desc: "A recruiter will reach out if your background matches their need.", status: "future" }
+      ]
+    },
+    figma: {
+      title: "Lead Product Designer",
+      company: "Figma",
+      logoBg: "#F24E1E",
+      logoLetter: "F",
+      location: "San Francisco, CA (Onsite)",
+      resume: "Priya_Portfolio_Resume.pdf",
+      coverLetter: "None",
+      salary: "$180,000 – $210,000",
+      referrals: "Eric Kim (Designer)",
+      timeline: [
+        { stage: "Application Submitted", date: "Jan 2, 2025 · 10:00 AM", desc: "Application submitted.", status: "completed" },
+        { stage: "Recruiter Screen", date: "Jan 5, 2025 · 1:00 PM", desc: "Introductory call completed.", status: "completed" },
+        { stage: "Portfolio Review", date: "Jan 10, 2025 · 3:00 PM", desc: "Portfolio presentation to design team completed.", status: "completed" },
+        { stage: "Onsite Panels", date: "Jan 15, 2025 · 9:30 AM", desc: "All panels completed.", status: "completed" },
+        { stage: "Offer Extended", date: "Jan 20, 2025 · 2:00 PM", desc: "Congratulations! An official offer has been extended.", status: "completed" },
+        { stage: "Offer Accepted", date: "Jan 22, 2025 · 9:00 AM", desc: "You have signed the offer! Welcome to Figma.", status: "active" }
+      ]
+    },
+    google: {
+      title: "Frontend Tech Lead",
+      company: "Google",
+      logoBg: "#4285F4",
+      logoLetter: "G",
+      location: "Mountain View, CA",
+      resume: "Priya_Resume_2025.pdf",
+      coverLetter: "Google_CoverLetter.pdf",
+      salary: "$230,000 – $280,000",
+      referrals: "Vikram Sen (Manager)",
+      timeline: [
+        { stage: "Application Submitted", date: "Dec 20, 2024", desc: "Application submitted online.", status: "completed" },
+        { stage: "Recruiter Screen", date: "Dec 28, 2024", desc: "Intro call with Google Recruiter.", status: "completed" },
+        { stage: "Technical Assessment", date: "Jan 8, 2025", desc: "Completed coding assessment.", status: "completed" },
+        { stage: "Application Rejected", date: "Jan 12, 2025", desc: "Thank you for your time. Google decided not to proceed at this time.", status: "rejected" }
+      ]
+    }
+  };
+
+  function selectApp(id) {
+    // UI selection state
+    document.querySelectorAll('.app-card').forEach(card => card.classList.remove('active'));
+    const selectedCard = document.querySelector(`.app-card[data-id="${id}"]`);
+    if (selectedCard) selectedCard.classList.add('active');
+
+    // Bind data
+    const data = appData[id];
+    if (!data) return;
+
+    document.getElementById('detailTitle').textContent = data.title;
+    document.getElementById('detailCompName').textContent = `${data.company} · ${data.location}`;
+    
+    const logoEl = document.getElementById('detailLogo');
+    logoEl.style.background = data.logoBg;
+    logoEl.textContent = data.logoLetter;
+
+    document.getElementById('detailResume').textContent = data.resume;
+    document.getElementById('detailCL').textContent = data.coverLetter;
+    document.getElementById('detailSalary').textContent = data.salary;
+    document.getElementById('detailReferrals').textContent = data.referrals;
+
+    // Timeline creation
+    const timelineEl = document.getElementById('detailTimeline');
+    timelineEl.innerHTML = '';
+
+    data.timeline.forEach((step, idx) => {
+      let statusClass = 'future';
+      if (step.status === 'completed') statusClass = 'completed';
+      else if (step.status === 'active') statusClass = 'active';
+      else if (step.status === 'rejected') statusClass = 'rejected';
+
+      const item = document.createElement('div');
+      item.className = `timeline-item ${statusClass}`;
+      item.innerHTML = `
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-meta">
+            <span class="timeline-stage">${step.stage}</span>
+            <span class="timeline-date">${step.date}</span>
+          </div>
+          <p class="timeline-desc">${step.desc}</p>
+        </div>
+      `;
+      timelineEl.appendChild(item);
+    });
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function filterApps(status) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    const cards = document.querySelectorAll('.app-card');
+    cards.forEach(card => {
+      const cardStatus = card.getAttribute('data-status');
+      if (status === 'all') {
+        card.style.display = 'flex';
+      } else if (status === 'active' && (cardStatus === 'active' || cardStatus === 'interview')) {
+        card.style.display = 'flex';
+      } else if (cardStatus === status) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  // Load first item
+  selectApp('stripe');
+</script>
+</body>
+</html>

@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — TalentArc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../assets/js/auth-store.js"></script>
+  <style>
+    /* ===================== DESIGN TOKENS ===================== */
+    :root {
+      --primary: #6366F1;
+      --primary-light: #818CF8;
+      --primary-glow: rgba(99,102,241,0.35);
+      --accent: #06B6D4;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+
+      --bg-0: #0A0A0F;
+      --bg-1: #0F0F17;
+      --bg-2: #13131E;
+      --bg-3: #1A1A28;
+      --bg-4: #1E1E2E;
+
+      --text-primary: #E2E8F0;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.14);
+      --border-focus: rgba(99,102,241,0.6);
+
+      --card-bg: rgba(255,255,255,0.04);
+      --card-hover: rgba(255,255,255,0.07);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+      --shadow-glow: 0 0 32px rgba(99,102,241,0.25);
+
+      --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+      --transition-bounce: 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-0);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===================== THEME TOGGLE ===================== */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--bg-3);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      backdrop-filter: blur(12px);
+    }
+    .theme-toggle:hover {
+      background: var(--bg-4);
+      color: var(--primary-light);
+      border-color: var(--border-hover);
+      transform: scale(1.08);
+    }
+
+    /* ===================== LAYOUT ===================== */
+    .auth-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===================== LEFT PANEL ===================== */
+    .left-panel {
+      flex: 1;
+      background: linear-gradient(135deg, #0A0A0F 0%, #0D0D1A 40%, #111128 70%, #0E0E1F 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 48px 56px;
+      min-height: 100vh;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -80px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: -60px;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(6,182,212,0.10) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .left-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      position: relative;
+      z-index: 1;
+      text-decoration: none;
+    }
+    .left-logo .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 16px rgba(99,102,241,0.4);
+    }
+
+    .left-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .left-headline {
+      font-size: clamp(28px, 3vw, 42px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -1.8px;
+      color: var(--text-primary);
+    }
+    .left-headline .gradient-text {
+      background: linear-gradient(135deg, #818CF8 0%, #06B6D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ===================== FEATURE LIST ===================== */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .feature-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .fi-purple { background: rgba(99,102,241,0.18); color: var(--primary-light); }
+    .fi-cyan   { background: rgba(6,182,212,0.15);  color: var(--accent); }
+    .fi-green  { background: rgba(16,185,129,0.15); color: var(--success); }
+    .fi-amber  { background: rgba(245,158,11,0.15); color: var(--warning); }
+
+    .feature-text {}
+    .feature-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .feature-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .feature-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-left: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ===================== TESTIMONIAL ===================== */
+    .left-testimonial {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .testimonial-quote {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .testimonial-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7C3AED, #06B6D4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .testimonial-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .testimonial-role {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ===================== RIGHT PANEL ===================== */
+    .right-panel {
+      width: 560px;
+      flex-shrink: 0;
+      background: var(--bg-1);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 48px 52px 60px;
+      overflow-y: auto;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 460px;
+    }
+
+    /* ===================== FORM HEADER ===================== */
+    .form-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .form-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.7px;
+      margin-bottom: 8px;
+    }
+    .form-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .form-subtitle a {
+      color: var(--primary-light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color var(--transition);
+    }
+    .form-subtitle a:hover { color: var(--accent); }
+
+    /* ===================== ROLE SELECTOR ===================== */
+    .role-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .role-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 12px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+    }
+    .role-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity var(--transition);
+      background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, transparent 100%);
+    }
+    .role-card:hover {
+      border-color: var(--border-hover);
+      background: var(--card-hover);
+      transform: translateY(-2px);
+    }
+    .role-card:hover::before { opacity: 1; }
+
+    .role-card.selected {
+      border-color: var(--primary);
+      background: rgba(99,102,241,0.08);
+      box-shadow: 0 0 0 1px rgba(99,102,241,0.3), 0 4px 20px rgba(99,102,241,0.2);
+    }
+    .role-card.selected::before { opacity: 1; }
+
+    .role-card.selected .role-emoji { filter: none; }
+    .role-card.selected .role-name { color: var(--primary-light); }
+
+    .role-check {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      opacity: 0;
+      transform: scale(0);
+      transition: all var(--transition-bounce);
+    }
+    .role-card.selected .role-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .role-emoji {
+      font-size: 24px;
+      line-height: 1;
+      filter: grayscale(0.3);
+      transition: filter var(--transition);
+    }
+    .role-card.selected .role-emoji { filter: none; }
+
+    .role-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      transition: color var(--transition);
+    }
+    .role-desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ===================== SOCIAL GRID ===================== */
+    .social-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .social-btn:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    .social-btn:active { transform: translateY(0); }
+    .btn-google:hover  { background: rgba(66,133,244,0.08); border-color: rgba(66,133,244,0.3); }
+    .btn-github:hover  { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
+    .btn-linkedin:hover{ background: rgba(0,119,181,0.1);  border-color: rgba(0,119,181,0.35); }
+    .btn-microsoft:hover{ background: rgba(0,120,212,0.08); border-color: rgba(0,120,212,0.3); }
+
+    /* ===================== DIVIDER ===================== */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    /* ===================== INPUTS ===================== */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .input-wrapper { position: relative; }
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      transition: color var(--transition);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .field-input {
+      width: 100%;
+      height: 46px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      padding: 0 14px;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .field-input.has-icon { padding-left: 44px; }
+    .field-input.has-right { padding-right: 44px; }
+    .field-input::placeholder { color: var(--text-muted); }
+    .field-input:focus {
+      border-color: var(--primary);
+      background: var(--bg-3);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    .field-input.input-valid { border-color: var(--success); box-shadow: 0 0 0 3px rgba(16,185,129,0.12); }
+    .field-input.input-error { border-color: var(--error);  box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+
+    .input-right-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: color var(--transition);
+    }
+    .input-right-icon.valid { color: var(--success); cursor: default; }
+    .input-right-icon.error { color: var(--error); cursor: default; }
+    .input-right-icon.clickable:hover { color: var(--text-secondary); }
+
+    .field-error {
+      font-size: 12px;
+      color: var(--error);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: height 0.2s ease, opacity 0.2s ease;
+    }
+    .field-error.visible { height: 18px; opacity: 1; }
+
+    /* ===================== PASSWORD STRENGTH ===================== */
+    .strength-container {
+      margin-top: 10px;
+    }
+    .strength-bars {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+    .strength-bar {
+      flex: 1;
+      height: 4px;
+      border-radius: var(--radius-pill);
+      background: var(--border);
+      transition: background 0.35s ease, transform 0.2s ease;
+    }
+    .strength-bar.active-1 { background: var(--error); }
+    .strength-bar.active-2 { background: #F97316; }
+    .strength-bar.active-3 { background: var(--warning); }
+    .strength-bar.active-4 { background: var(--success); }
+
+    .strength-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: color 0.35s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .strength-label .strength-tip {
+      font-weight: 400;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    /* ===================== TERMS CHECKBOX ===================== */
+    .terms-row {
+      margin-bottom: 20px;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      user-select: none;
+      line-height: 1.5;
+    }
+    .checkbox-label input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      border: 1.5px solid var(--border-hover);
+      border-radius: 4px;
+      background: var(--bg-2);
+      cursor: pointer;
+      position: relative;
+      transition: var(--transition);
+      margin-top: 2px;
+    }
+    .checkbox-label input[type="checkbox"]:checked {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .checkbox-label input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 4px;
+      width: 5px;
+      height: 8px;
+      border: 2px solid white;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+    .checkbox-label a {
+      color: var(--primary-light);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .checkbox-label a:hover { color: var(--accent); }
+
+    /* ===================== SUBMIT BUTTON ===================== */
+    .btn-submit {
+      width: 100%;
+      height: 50px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, #7C3AED 100%);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.2px;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+      margin-bottom: 14px;
+    }
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(99,102,241,0.55);
+    }
+    .btn-submit:hover::before { opacity: 1; }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit.loading { pointer-events: none; opacity: 0.75; }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .form-tagline {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .form-tagline i { color: var(--success); }
+
+    /* ===================== SUCCESS OVERLAY ===================== */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,15,0.97);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      gap: 16px;
+    }
+    .success-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(16,185,129,0.12);
+      border: 2px solid var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--success);
+      animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+    .success-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 1100px) {
+      .right-panel { width: 500px; padding: 40px 40px 60px; }
+    }
+
+    @media (max-width: 768px) {
+      .auth-wrapper { flex-direction: column; }
+      .left-panel {
+        min-height: auto;
+        padding: 32px 24px 40px;
+        flex: none;
+      }
+      .left-content { margin-top: 24px; }
+      .feature-list { display: none; }
+      .left-testimonial { display: none; }
+      .right-panel {
+        width: 100%;
+        padding: 40px 24px 60px;
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+      .role-selector { gap: 8px; }
+      .role-card { padding: 12px 8px; }
+      .role-emoji { font-size: 20px; }
+    }
+
+    @media (max-width: 480px) {
+      .field-row { grid-template-columns: 1fr; }
+      .social-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ===================== LIGHT THEME ===================== */
+    [data-theme="light"] {
+      --bg-0: #FAFAFA;
+      --bg-1: #F0F0F8;
+      --bg-2: #FFFFFF;
+      --bg-3: #F5F5FF;
+      --bg-4: #ECECFF;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --border: rgba(0,0,0,0.09);
+      --border-hover: rgba(0,0,0,0.16);
+      --card-bg: rgba(0,0,0,0.03);
+      --card-hover: rgba(0,0,0,0.05);
+    }
+    [data-theme="light"] .left-panel {
+      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+    }
+    [data-theme="light"] .right-panel { background: #fff; }
+    [data-theme="light"] .field-input { background: #F9F9FF; }
+    [data-theme="light"] .field-input:focus { background: #fff; }
+    [data-theme="light"] .social-btn { background: #fff; }
+    [data-theme="light"] .grid-bg { display: none; }
+
+    /* ===================== ENTRY ANIMATIONS ===================== */
+    @keyframes slide-in-right {
+      from { opacity: 0; transform: translateX(24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-container > * {
+      animation: slide-in-right 0.5s ease forwards;
+    }
+    .form-container > *:nth-child(1) { animation-delay: 0.05s; opacity: 0; }
+    .form-container > *:nth-child(2) { animation-delay: 0.1s; opacity: 0; }
+    .form-container > *:nth-child(3) { animation-delay: 0.15s; opacity: 0; }
+    .form-container > *:nth-child(4) { animation-delay: 0.2s; opacity: 0; }
+    .form-container > *:nth-child(5) { animation-delay: 0.25s; opacity: 0; }
+    .form-container > *:nth-child(6) { animation-delay: 0.3s; opacity: 0; }
+    .form-container > *:nth-child(7) { animation-delay: 0.35s; opacity: 0; }
+    .form-container > *:nth-child(8) { animation-delay: 0.38s; opacity: 0; }
+    .form-container > *:nth-child(9) { animation-delay: 0.42s; opacity: 0; }
+    .form-container > *:nth-child(10){ animation-delay: 0.45s; opacity: 0; }
+
+    .left-content > * {
+      animation: slide-up 0.6s ease forwards;
+    }
+    .left-content > *:nth-child(1) { animation-delay: 0.1s; opacity: 0; }
+    .left-content > *:nth-child(2) { animation-delay: 0.2s; opacity: 0; }
+    .left-content > *:nth-child(3) { animation-delay: 0.3s; opacity: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <i data-lucide="sun" width="16" height="16"></i>
+  </button>
+
+  <!-- Success Overlay -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-icon">
+      <i data-lucide="check" width="36" height="36"></i>
+    </div>
+    <div class="success-title">Account created! 🚀</div>
+    <div class="success-subtitle" id="successMsg">Redirecting to your dashboard...</div>
+  </div>
+
+  <div class="auth-wrapper">
+
+    <!-- ===== LEFT PANEL ===== -->
+    <div class="left-panel">
+      <div class="grid-bg"></div>
+
+      <a href="../index.html" class="left-logo">
+        <div class="logo-icon">✦</div>
+        TalentArc
+      </a>
+
+      <div class="left-content">
+        <h1 class="left-headline">
+          Your Career.<br />
+          <span class="gradient-text">Elevated</span><br />
+          by AI.
+        </h1>
+
+        <!-- Feature List -->
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-icon fi-purple">
+              <i data-lucide="sparkles" width="18" height="18"></i>
+            </div>
+            <div class="feature-text">
+              <div class="feature-title">
+                AI-powered job matching
+                <span class="feature-badge">95%+ relevance</span>
+              </div>
+              <div class="feature-desc">Our AI analyzes 300+ signals to surface roles perfectly aligned with your skills and goals.</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon fi-cyan">
+              <i data-lucide="file-text" width="18" height="18"></i>
+            </div>
+            <div class="feature-text">
+              <div class="feature-title">ATS-optimized resume builder</div>
+              <div class="feature-desc">Beat applicant tracking systems with AI-tailored resumes that get you past the screener.</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon fi-green">
+              <i data-lucide="trending-up" width="18" height="18"></i>
+            </div>
+            <div class="feature-text">
+              <div class="feature-title">Real-time salary insights</div>
+              <div class="feature-desc">Know your market value with live salary data from 50K+ verified offers.</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon fi-amber">
+              <i data-lucide="mic" width="18" height="18"></i>
+            </div>
+            <div class="feature-text">
+              <div class="feature-title">AI interview coach</div>
+              <div class="feature-desc">Practice with an AI that simulates real interviews and gives instant, actionable feedback.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonial -->
+      <div class="left-testimonial">
+        <div class="testimonial-quote">
+          "I went from 0 callbacks to 3 offers in 6 weeks. TalentArc's resume builder and interview 
+          coach were the only two things that changed — and that made all the difference."
+        </div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AJ</div>
+          <div>
+            <div class="testimonial-name">Alex Johnson</div>
+            <div class="testimonial-role">Product Manager at Notion · hired via TalentArc</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT PANEL ===== -->
+    <div class="right-panel">
+      <div class="form-container">
+
+        <!-- Header -->
+        <div class="form-header">
+          <div class="form-title">Create your account</div>
+          <div class="form-subtitle">
+            Already have an account? <a href="./login.html">Sign in</a>
+          </div>
+        </div>
+
+        <!-- Role Selector -->
+        <div class="role-selector" id="roleSelector" role="radiogroup" aria-label="Account type">
+          <div class="role-card selected" data-role="seeker" data-redirect="../seeker/dashboard.html" role="radio" aria-checked="true" tabindex="0">
+            <div class="role-check">
+              <i data-lucide="check" width="10" height="10"></i>
+            </div>
+            <div class="role-emoji">🔍</div>
+            <div class="role-name">Job Seeker</div>
+            <div class="role-desc">Find your dream job with AI-powered matching</div>
+          </div>
+          <div class="role-card" data-role="employer" data-redirect="../employer/dashboard.html" role="radio" aria-checked="false" tabindex="0">
+            <div class="role-check">
+              <i data-lucide="check" width="10" height="10"></i>
+            </div>
+            <div class="role-emoji">🏢</div>
+            <div class="role-name">Employer</div>
+            <div class="role-desc">Post jobs and find top talent fast</div>
+          </div>
+          <div class="role-card" data-role="recruiter" data-redirect="../recruiter/dashboard.html" role="radio" aria-checked="false" tabindex="0">
+            <div class="role-check">
+              <i data-lucide="check" width="10" height="10"></i>
+            </div>
+            <div class="role-emoji">👥</div>
+            <div class="role-name">Recruiter</div>
+            <div class="role-desc">Manage pipelines and source candidates</div>
+          </div>
+        </div>
+
+        <!-- Social Buttons -->
+        <div class="social-grid">
+          <button class="social-btn btn-google" onclick="socialAuth()">
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Google
+          </button>
+          <button class="social-btn btn-github" onclick="socialAuth()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
+          </button>
+          <button class="social-btn btn-linkedin" onclick="socialAuth()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#0A66C2">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            LinkedIn
+          </button>
+          <button class="social-btn btn-microsoft" onclick="socialAuth()">
+            <svg width="16" height="16" viewBox="0 0 23 23" fill="none">
+              <path fill="#f25022" d="M1 1h10v10H1z"/>
+              <path fill="#00a4ef" d="M12 1h10v10H12z"/>
+              <path fill="#7fba00" d="M1 12h10v10H1z"/>
+              <path fill="#ffb900" d="M12 12h10v10H12z"/>
+            </svg>
+            Microsoft
+          </button>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider">
+          <div class="divider-line"></div>
+          <div class="divider-text">— or register with email —</div>
+          <div class="divider-line"></div>
+        </div>
+
+        <!-- Registration Form -->
+        <form id="registerForm" novalidate>
+          <div class="field-group">
+
+            <!-- Name Row -->
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="firstName">First name</label>
+                <div class="input-wrapper">
+                  <input type="text" id="firstName" class="field-input" placeholder="Alex" autocomplete="given-name" aria-required="true" />
+                </div>
+                <div class="field-error" id="firstNameError" role="alert">
+                  <i data-lucide="alert-circle" width="12" height="12"></i>
+                  <span>Required</span>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field-label" for="lastName">Last name</label>
+                <div class="input-wrapper">
+                  <input type="text" id="lastName" class="field-input" placeholder="Johnson" autocomplete="family-name" aria-required="true" />
+                </div>
+                <div class="field-error" id="lastNameError" role="alert">
+                  <i data-lucide="alert-circle" width="12" height="12"></i>
+                  <span>Required</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="field">
+              <label class="field-label" for="email">Work email</label>
+              <div class="input-wrapper">
+                <span class="input-icon">
+                  <i data-lucide="mail" width="16" height="16"></i>
+                </span>
+                <input type="email" id="email" class="field-input has-icon has-right" placeholder="you@company.com" autocomplete="email" aria-required="true" />
+                <span class="input-right-icon" id="emailFeedback"></span>
+              </div>
+              <div class="field-error" id="emailError" role="alert">
+                <i data-lucide="alert-circle" width="12" height="12"></i>
+                <span>Please enter a valid email address</span>
+              </div>
+            </div>
+
+            <!-- Password + Strength -->
+            <div class="field">
+              <label class="field-label" for="password">Password</label>
+              <div class="input-wrapper">
+                <span class="input-icon">
+                  <i data-lucide="lock" width="16" height="16"></i>
+                </span>
+                <input type="password" id="password" class="field-input has-icon has-right" placeholder="Create a strong password" autocomplete="new-password" aria-required="true" />
+                <span class="input-right-icon clickable" id="passwordToggle" role="button" aria-label="Toggle password" tabindex="0">
+                  <i data-lucide="eye" width="16" height="16"></i>
+                </span>
+              </div>
+              <div class="field-error" id="passwordError" role="alert">
+                <i data-lucide="alert-circle" width="12" height="12"></i>
+                <span>Password must be at least 8 characters</span>
+              </div>
+
+              <!-- Strength Indicator -->
+              <div class="strength-container" id="strengthContainer" style="display:none;">
+                <div class="strength-bars">
+                  <div class="strength-bar" id="bar1"></div>
+                  <div class="strength-bar" id="bar2"></div>
+                  <div class="strength-bar" id="bar3"></div>
+                  <div class="strength-bar" id="bar4"></div>
+                </div>
+                <div class="strength-label">
+                  <span id="strengthLabel">Too weak</span>
+                  <span class="strength-tip" id="strengthTip">Add uppercase, numbers & symbols</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Terms -->
+          <div class="terms-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="termsCheck" aria-required="true" />
+              I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand TalentArc may send me relevant career updates.
+            </label>
+          </div>
+          <div class="field-error" id="termsError" style="margin-bottom:14px;" role="alert">
+            <i data-lucide="alert-circle" width="12" height="12"></i>
+            <span>Please accept the terms to continue</span>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <div class="spinner"></div>
+            <span class="btn-text">Create Free Account</span>
+            <i data-lucide="arrow-right" width="16" height="16" class="btn-text"></i>
+          </button>
+        </form>
+
+        <!-- Tagline -->
+        <div class="form-tagline">
+          <i data-lucide="shield-check" width="14" height="14"></i>
+          Free forever for job seekers · No credit card required
+        </div>
+
+      </div><!-- /form-container -->
+    </div><!-- /right-panel -->
+  </div><!-- /auth-wrapper -->
+
+  <script>
+    // ===================== THEME =====================
+    const root = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('ta-theme') || 'dark';
+    root.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('ta-theme', next);
+      updateThemeIcon(next);
+    });
+
+    function updateThemeIcon(theme) {
+      themeToggle.innerHTML = theme === 'dark'
+        ? '<i data-lucide="sun" width="16" height="16"></i>'
+        : '<i data-lucide="moon" width="16" height="16"></i>';
+      lucide.createIcons();
+    }
+
+    // ===================== LUCIDE INIT =====================
+    lucide.createIcons();
+
+    // ===================== ROLE SELECTOR =====================
+    let selectedRole = 'seeker';
+    let selectedRedirect = '../seeker/dashboard.html';
+
+    const roleCards = document.querySelectorAll('.role-card');
+    roleCards.forEach(card => {
+      card.addEventListener('click', () => selectRole(card));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectRole(card);
+        }
+      });
+    });
+
+    function selectRole(card) {
+      roleCards.forEach(c => {
+        c.classList.remove('selected');
+        c.setAttribute('aria-checked', 'false');
+      });
+      card.classList.add('selected');
+      card.setAttribute('aria-checked', 'true');
+      selectedRole = card.getAttribute('data-role');
+      selectedRedirect = card.getAttribute('data-redirect');
+    }
+
+    // ===================== EMAIL VALIDATION =====================
+    const emailInput = document.getElementById('email');
+    const emailFeedback = document.getElementById('emailFeedback');
+    const emailError = document.getElementById('emailError');
+
+    function validateEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+    }
+
+    emailInput.addEventListener('input', () => {
+      const val = emailInput.value.trim();
+      if (!val) {
+        emailInput.classList.remove('input-valid', 'input-error');
+        emailFeedback.className = 'input-right-icon';
+        emailFeedback.innerHTML = '';
+        emailError.classList.remove('visible');
+        return;
+      }
+      if (validateEmail(val)) {
+        emailInput.classList.add('input-valid');
+        emailInput.classList.remove('input-error');
+        emailFeedback.className = 'input-right-icon valid';
+        emailFeedback.innerHTML = '<i data-lucide="check-circle" width="16" height="16"></i>';
+        emailError.classList.remove('visible');
+      } else {
+        emailInput.classList.add('input-error');
+        emailInput.classList.remove('input-valid');
+        emailFeedback.className = 'input-right-icon error';
+        emailFeedback.innerHTML = '<i data-lucide="x-circle" width="16" height="16"></i>';
+        emailError.classList.add('visible');
+      }
+      lucide.createIcons();
+    });
+
+    // ===================== PASSWORD STRENGTH =====================
+    const passwordInput = document.getElementById('password');
+    const passwordToggle = document.getElementById('passwordToggle');
+    const strengthContainer = document.getElementById('strengthContainer');
+    const strengthLabel = document.getElementById('strengthLabel');
+    const strengthTip = document.getElementById('strengthTip');
+    const bars = [
+      document.getElementById('bar1'),
+      document.getElementById('bar2'),
+      document.getElementById('bar3'),
+      document.getElementById('bar4'),
+    ];
+    let passwordVisible = false;
+
+    const strengthLevels = [
+      { label: 'Too weak',    tip: 'Add uppercase, numbers & symbols',   color: 'active-1' },
+      { label: 'Weak',        tip: 'Try adding numbers or symbols',       color: 'active-2' },
+      { label: 'Good',        tip: 'Add a symbol to make it stronger',    color: 'active-3' },
+      { label: 'Strong 🎉',   tip: 'Great password!',                     color: 'active-4' },
+    ];
+
+    const strengthColors = {
+      'active-1': '#EF4444',
+      'active-2': '#F97316',
+      'active-3': '#F59E0B',
+      'active-4': '#10B981',
+    };
+
+    function calcStrength(pw) {
+      let score = 0;
+      if (pw.length >= 8)  score++;
+      if (pw.length >= 12) score++;
+      if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+      if (/\d/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      return Math.min(4, Math.max(1, Math.floor(score * 0.8)));
+    }
+
+    passwordInput.addEventListener('input', () => {
+      const pw = passwordInput.value;
+
+      if (!pw) {
+        strengthContainer.style.display = 'none';
+        bars.forEach(b => { b.className = 'strength-bar'; });
+        return;
+      }
+
+      strengthContainer.style.display = 'block';
+      const score = calcStrength(pw);
+      const level = strengthLevels[score - 1];
+
+      bars.forEach((b, i) => {
+        b.className = 'strength-bar';
+        if (i < score) {
+          b.classList.add(level.color);
+        }
+      });
+
+      strengthLabel.textContent = level.label;
+      strengthLabel.style.color = strengthColors[level.color];
+      strengthTip.textContent = level.tip;
+    });
+
+    // Password toggle
+    passwordToggle.addEventListener('click', () => {
+      passwordVisible = !passwordVisible;
+      passwordInput.type = passwordVisible ? 'text' : 'password';
+      passwordToggle.innerHTML = passwordVisible
+        ? '<i data-lucide="eye-off" width="16" height="16"></i>'
+        : '<i data-lucide="eye" width="16" height="16"></i>';
+      lucide.createIcons();
+    });
+    passwordToggle.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') passwordToggle.click();
+    });
+
+    // ===================== FORM SUBMIT =====================
+    const registerForm = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const firstNameError = document.getElementById('firstNameError');
+    const lastNameError = document.getElementById('lastNameError');
+    const passwordError = document.getElementById('passwordError');
+    const termsCheck = document.getElementById('termsCheck');
+    const termsError = document.getElementById('termsError');
+
+    registerForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  let valid = true;
+
+  // First name
+  if (!firstNameInput.value.trim()) {
+    firstNameInput.classList.add('input-error');
+    firstNameError.classList.add('visible');
+    valid = false;
+  } else {
+    firstNameInput.classList.remove('input-error');
+    firstNameError.classList.remove('visible');
+  }
+
+  // Last name
+  if (!lastNameInput.value.trim()) {
+    lastNameInput.classList.add('input-error');
+    lastNameError.classList.add('visible');
+    valid = false;
+  } else {
+    lastNameInput.classList.remove('input-error');
+    lastNameError.classList.remove('visible');
+  }
+
+  // Email
+  if (!validateEmail(emailInput.value.trim())) {
+    emailInput.classList.add('input-error');
+    emailInput.classList.remove('input-valid');
+    emailError.classList.add('visible');
+    valid = false;
+  }
+
+  // Password
+  if (passwordInput.value.length < 8) {
+    passwordInput.classList.add('input-error');
+    passwordError.classList.add('visible');
+    valid = false;
+  } else {
+    passwordInput.classList.remove('input-error');
+    passwordError.classList.remove('visible');
+  }
+
+  // Terms
+  if (!termsCheck.checked) {
+    termsError.classList.add('visible');
+    valid = false;
+  } else {
+    termsError.classList.remove('visible');
+  }
+
+  if (!valid) return;
+
+  // ---- REAL ACCOUNT CREATION ----
+  const result = taRegisterUser({
+    firstName: firstNameInput.value.trim(),
+    lastName: lastNameInput.value.trim(),
+    email: emailInput.value.trim(),
+    password: passwordInput.value,
+    role: selectedRole
+  });
+
+  if (!result.ok) {
+    emailInput.classList.add('input-error');
+    emailInput.classList.remove('input-valid');
+    emailError.querySelector('span').textContent = result.error;
+    emailError.classList.add('visible');
+    return;
+  }
+
+  submitBtn.classList.add('loading');
+  setTimeout(() => {
+    submitBtn.classList.remove('loading');
+    showSuccess();
+  }, 1200);
+});
+
+    // Inline clear
+    firstNameInput.addEventListener('input', () => {
+      if (firstNameInput.value.trim()) {
+        firstNameInput.classList.remove('input-error');
+        firstNameError.classList.remove('visible');
+      }
+    });
+    lastNameInput.addEventListener('input', () => {
+      if (lastNameInput.value.trim()) {
+        lastNameInput.classList.remove('input-error');
+        lastNameError.classList.remove('visible');
+      }
+    });
+    passwordInput.addEventListener('input', () => {
+      if (passwordInput.value.length >= 8) {
+        passwordInput.classList.remove('input-error');
+        passwordError.classList.remove('visible');
+      }
+    });
+    termsCheck.addEventListener('change', () => {
+      if (termsCheck.checked) termsError.classList.remove('visible');
+    });
+
+    function showSuccess() {
+      const overlay = document.getElementById('successOverlay');
+      const msg = document.getElementById('successMsg');
+      const roleNames = { seeker: 'job seeker', employer: 'employer', recruiter: 'recruiter' };
+      msg.textContent = `Setting up your ${roleNames[selectedRole]} dashboard...`;
+      overlay.classList.add('show');
+      lucide.createIcons();
+      setTimeout(() => {
+        window.location.href = selectedRedirect;
+      }, 2200);
+    }
+
+    function socialAuth() {
+      submitBtn.classList.add('loading');
+      setTimeout(() => {
+        submitBtn.classList.remove('loading');
+        showSuccess();
+      }, 1600);
+    }
+  </script>
+</body>
+</html>
